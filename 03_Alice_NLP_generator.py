@@ -5,7 +5,7 @@ Created on Fri Jul 21 19:07:10 2017
 @author: Rahul
 """
 
-'''Example script to generate text from Nietzsche's writings.
+'''Example script to generate text from Lewis Carroll's Alice in Wonderland.
 At least 20 epochs are required before the generated text
 starts sounding coherent.
 It is recommended to run this script on GPU, as recurrent
@@ -24,7 +24,7 @@ import numpy as np
 import random
 import sys
 
-path = get_file('alice30.txt', origin='http://www.umich.edu/~umfandsf/other/ebooks/alice30.txt')
+path = get_file('Alice.txt', origin='https://github.com/rahulremanan/python_tutorial/blob/master/Alice.txt')
 text = open(path).read().lower()
 print('corpus length:', len(text))
 
