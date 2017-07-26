@@ -15,7 +15,6 @@ print(data)
 alphabet = 'abcdefghijklmnopqrstuvwxyz '
 # define a mapping of chars to integers
 char_to_int = dict((c, i) for i, c in enumerate(alphabet))
-print (char_to_int)
 int_to_char = dict((i, c) for i, c in enumerate(alphabet))
 # integer encode input data
 integer_encoded = [char_to_int[char] for char in data]
