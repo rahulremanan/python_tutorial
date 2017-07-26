@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 """
 Created on Wed Jul 26 14:54:52 2017
 
@@ -16,13 +17,11 @@ References:
 Reaches 98.6% accuracy on task 'single_supporting_fact_10k' after 120 epochs.
 Time per epoch: 3s on CPU (core i7).
 '''
-from __future__ import print_function
-
 import keras
 from keras.models import Sequential, Model
 from keras.layers.embeddings import Embedding
-from keras.layers import Input, Activation, Dense, Permute, Dropout, merge
-from keras.layers import Merge
+from keras.layers import Input, Activation, Dense, Permute, Dropout, add, concatenate, dot
+# from keras.layers import Merge
 from keras.layers import LSTM, GRU
 from keras.utils.data_utils import get_file
 from keras.preprocessing.sequence import pad_sequences
@@ -111,13 +110,13 @@ def vectorize_stories(data, word_idx, story_maxlen, query_maxlen):
             pad_sequences(Xq, maxlen=query_maxlen), np.array(Y))
 
 try:
-    path = get_file('babi-tasks-v1-2.tar.gz', origin='https://github.com/rahulremanan/python_tutorial/babi_tasks_1-20_v1-2.tar.gz')
+    path = get_file('babi-tasks-v1-2.tar.gz', origin='https://github.com/rahulremanan/python_tutorial/blob/master/babi_tasks_1-20_v1-2.tar.gz')
 except:
     print('Error downloading dataset, please download it manually:\n'
-          '$ wget https://github.com/rahulremanan/python_tutorial/babi/tasks_1-20_v1-2.tar.gz\n'
-          '$ mv tasks_1-20_v1-2.tar.gz ~/.keras/datasets/babi-tasks-v1-2.tar.gz')
+          '$ wget https://github.com/rahulremanan/python_tutorial/blob/master/babi_tasks_1-20_v1-2.tar.gz'
+          '$ mv tasks_1-20_v1-2.tar.gz ~/.keras/datasets/babi_tasks_v1-2.tar.gz')
     raise
-tar = tarfile.open(path)
+tar = tarfile.open('D:/Github/rahulremanan/python_tutorial/babi_tasks_1-20_v1-2.tar.gz')
 
 challenges = {
     # QA1 with 10,000 samples
@@ -223,17 +222,17 @@ print('Question encoded', question_encoded)
 # compute a 'match' between the first input vector sequence
 # and the question vector sequence
 # shape: `(samples, story_maxlen, query_maxlen)
-match = merge([input_encoded_m, question_encoded], mode='dot', dot_axes=(2, 2))
+match = dot([input_encoded_m, question_encoded], (2, 2), normalize=False)
 match = Activation('softmax')(match)
 print('Match shape', match)
 
 # add the match matrix with the second input vector sequence
-response = merge([match, input_encoded_c], mode='sum')  # (samples, story_maxlen, query_maxlen)
+response = add([match, input_encoded_c])  # (samples, story_maxlen, query_maxlen)
 response = Permute((2, 1))(response)  # (samples, query_maxlen, story_maxlen)
 print('Response shape', response)
 
 # concatenate the response vector with the question vector sequence
-answer = merge([response, question_encoded], mode='concat')
+answer = concatenate([response, question_encoded])
 print('Answer shape', answer)
 
 # the original paper uses a matrix multiplication for this reduction step.
