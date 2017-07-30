@@ -21,10 +21,10 @@ import twitter # pip install python-twitter
 # Fetching tweets
 
 def get_tweets():
-    api = twitter.Api(consumer_key='insert consumer key',
-                      consumer_secret='insert consumer secret',
-                      access_token_key='insert access token key',
-                      access_token_secret='insert access token secret')
+    api = twitter.api(consumer_key='d3t5F3wXmgiyUkbKNJzQo8CmT',
+                      consumer_secret='Rklcd7zkTbmOw7X9DS9U5DPwZWjE74HbZhfVsovIblNYgLqgDj',
+                      access_token_key='2sVJtXU60KhcEFuE3eXznF8Rn',
+                      access_token_secret='l0ZmId6T4PHqK6VolwVQvVt7Io9F424AAF5puduXLKMvs7IG7q')
     tweets = []
     max_id = None
     for _ in range(100):
@@ -36,7 +36,8 @@ def get_tweets():
         max_id = tweets[-1].id
     return [tweet.text for tweet in tweets]
 
-np.save(file='./doctorsroom_tweets.npy', arr=get_tweets())
+#np.save(file='./doctorsroom_tweets.npy', arr=get_tweets())
+get_tweets=np.load(file='./doctorsroom_tweets.npy')
 
 # Creating the corpus
 
