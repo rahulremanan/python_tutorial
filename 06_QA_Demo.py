@@ -16,6 +16,7 @@ References:
   http://arxiv.org/abs/1503.08895
 Reaches 98.6% accuracy on task 'single_supporting_fact_10k' after 120 epochs.
 Time per epoch: 3s on CPU (core i7).
+Original code: https://github.com/fchollet/keras/blob/master/examples/babi_memnn.py
 '''
 import keras
 from keras.models import Sequential, Model
@@ -222,7 +223,7 @@ print('Question encoded', question_encoded)
 # compute a 'match' between the first input vector sequence
 # and the question vector sequence
 # shape: `(samples, story_maxlen, query_maxlen)
-match = dot([input_encoded_m, question_encoded], (2, 2), normalize=False)
+match = dot([input_encoded_m, question_encoded], axes=(2, 2), normalize=False)
 match = Activation('softmax')(match)
 print('Match shape', match)
 
