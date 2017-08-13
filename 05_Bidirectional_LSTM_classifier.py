@@ -17,7 +17,7 @@ from keras.models import Sequential, model_from_json
 from keras.layers import LSTM, Dense, Embedding, Dropout, Bidirectional
 from keras.layers import TimeDistributed
 from keras.optimizers import Adam
-import cPickle as pickle
+import pickle
 import spacy
 
 
