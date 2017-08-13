@@ -6,3 +6,6 @@
 
 05 install:
 python -m spacy download en*
+
+05 cmd:
+python 05_Bidirectional_LSTM_classifier.py 05_model_dir 05_train_dir 05_dev_dir
