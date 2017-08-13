@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jul  3 00:15:19 2017
-
-@author: rahul
-"""
+#"""
+#Created on Mon Jul  3 00:15:19 2017
+#
+#@author: rahul
+#"""
 
 from __future__ import print_function
 from keras.models import Model

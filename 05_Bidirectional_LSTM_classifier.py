@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Jul 21 23:41:03 2017
-
-@author: Rahul
-"""
+#"""
+#Created on Fri Jul 21 23:41:03 2017
+#
+#@author: Rahul
+#"""
 # Example code from Spacy: https://github.com/explosion/spaCy/blob/master/examples/deep_learning_keras.py
 # Detailed documentation: https://explosion.ai/blog/spacy-deep-learning-keras
 
@@ -17,7 +17,10 @@ from keras.models import Sequential, model_from_json
 from keras.layers import LSTM, Dense, Embedding, Dropout, Bidirectional
 from keras.layers import TimeDistributed
 from keras.optimizers import Adam
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 import spacy
 
 

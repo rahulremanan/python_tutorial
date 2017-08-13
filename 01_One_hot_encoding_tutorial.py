@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 13 15:26:57 2017
-
-@author: Rahul
-"""
+#"""
+#Created on Thu Jul 13 15:26:57 2017
+#
+#@author: Rahul
+#"""
 # One Hot Encoding Tutorial
 # Forked from: http://machinelearningmastery.com/how-to-one-hot-encode-sequence-data-in-python/
 
