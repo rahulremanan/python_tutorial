@@ -8,6 +8,9 @@ Instructions for running 05_Bidirectional_LSTM_classifier.py:
 
 	install spacy english language model:
 	sudo python -m spacy download en
+	
+	create a folder to save the trained model:
+	mkdir model
 
 	cmd:
 	python 05_Bidirectional_LSTM_classifier.py model train test
