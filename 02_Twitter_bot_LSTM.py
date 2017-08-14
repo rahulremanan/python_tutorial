@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 18 20:19:28 2017
-
-@author: Rahul
-"""
-verbose=1
+#"""
+#Created on Tue Jul 18 20:19:28 2017
+#
+#@author: Rahul
+#"""
 from __future__ import print_function
+verbose=1
 import keras
 from keras.callbacks import ModelCheckpoint
 from keras.models import Sequential
@@ -21,10 +21,10 @@ import twitter # pip install python-twitter
 # Fetching tweets
 
 def get_tweets():
-    api = twitter.api(consumer_key='d3t5F3wXmgiyUkbKNJzQo8CmT',
-                      consumer_secret='Rklcd7zkTbmOw7X9DS9U5DPwZWjE74HbZhfVsovIblNYgLqgDj',
-                      access_token_key='2sVJtXU60KhcEFuE3eXznF8Rn',
-                      access_token_secret='l0ZmId6T4PHqK6VolwVQvVt7Io9F424AAF5puduXLKMvs7IG7q')
+    api = twitter.api(consumer_key='enter consumer key',
+                      consumer_secret='enter consumer secret',
+                      access_token_key='enter access token key',
+                      access_token_secret='enter access token secret')
     tweets = []
     max_id = None
     for _ in range(100):
