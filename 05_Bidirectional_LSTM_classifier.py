@@ -21,7 +21,7 @@ try:
     import cPickle as pickle
 except:
     import pickle
-import spacy
+import spacy # pip install -U spacy, python -m spacy download en (or) cd en_core python setup.py install
 
 
 class SentimentAnalyser(object):
@@ -188,7 +188,7 @@ def main(model_dir, train_dir, dev_dir,
          is_runtime=False,
          nr_hidden=64, max_length=100, # Shape
          dropout=0.5, learn_rate=0.001, # General NN config
-         nb_epoch=5, batch_size=100, nr_examples=-1):  # Training params
+         nb_epoch=5, batch_size=250, nr_examples=-1):  # Training params
     model_dir = pathlib.Path(model_dir)
     train_dir = pathlib.Path(train_dir)
     dev_dir = pathlib.Path(dev_dir)
