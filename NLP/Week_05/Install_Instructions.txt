@@ -1,0 +1,10 @@
+Instructions for running 05_Bidirectional_LSTM_classifier.py:
+
+	Install spacy english language model:
+	$sudo python -m spacy download en
+	
+	Create a folder to save the trained model:
+	$mkdir model
+
+	Train the sentiment analysis model:
+	$python 05_Bidirectional_LSTM_classifier.py model train test
