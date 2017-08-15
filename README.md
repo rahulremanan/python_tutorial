@@ -2,7 +2,7 @@
 
 **A repository of codes and tutorials for running natural language processing (NLP) using deep learning methods with Keras and Tensorflow.**
 
-**For the "Hello World! Python Workshops @ Think Coffee", intermediate complexity lessons organized by the AI @ Columbia University Medical Center NYC MeetUp in collaboration with Moad Computer - manufacturer of open-source dev-ops server for deep learning (https://www.moad.computer) with co-host Rahul Remanan.**
+**For the "Hello World! Python Workshops @ Think Coffee", intermediate complexity lessons organized by the AI @ Columbia University Medical Center NYC MeetUp (https://www.meetup.com/AI-at-CUMC/) in collaboration with Moad Computer - manufacturer of open-source dev-ops server for deep learning (https://www.moad.computer) with co-host Rahul Remanan.**
 
 Instructions for running 05_Bidirectional_LSTM_classifier.py:
 
