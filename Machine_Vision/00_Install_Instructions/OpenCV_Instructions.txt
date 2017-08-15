@@ -25,7 +25,7 @@ $ sudo apt-get install python3-pip
 $ sudo pip3 install virtualenv virtualenvwrapper
 # Update ~/.bashrc file
 # virtualenv and virtualenvwrapper
-$ sudo ~/.bashrc
+$ sudo nano ~/.bashrc
 # Paste the following
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
