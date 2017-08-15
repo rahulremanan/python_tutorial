@@ -1,10 +1,17 @@
 # Update any available packages
-sudo apt-get update
+$ sudo apt-get update
 $ sudo apt-get upgrade
 # Install developer tools for compiling OpenCV 3.0
 $ sudo apt-get install build-essential cmake git pkg-config
 # Install libraries and packages for handling image formats
-$ sudo apt-get install libjpeg8-dev libtiff4-dev libjasper-dev libpng12-dev
+$ sudo apt-get install libjpeg8-dev libtiff5-dev
+# Installer from earlier release
+$ echo "deb http://us.archive.ubuntu.com/ubuntu/ yakkety universe" | sudo tee -a /etc/apt/sources.list
+$ sudo apt-get update
+$ sudo apt-get install libjasper-dev
+$ echo "deb http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/ xenial main" | sudo tee -a /etc/apt/sources.list
+$ sudo apt-get update
+$ sudo apt-get install libpng-dev
 # Install libararies and packages for handling video formats
 $ sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
 # Install GTK for GUI features of OpenCV
@@ -14,10 +21,12 @@ $ sudo apt-get install libatlas-base-dev gfortran
 # Install pip, the package manager for python
 $ sudo apt-get install python3-pip
 # Install dependencies for setting up a virtual environment
-Install OpenCV 3.0 and Python 3.4+ on UbuntuShell
+# Install OpenCV 3.0 and Python 3.4+ on UbuntuShell
 $ sudo pip3 install virtualenv virtualenvwrapper
 # Update ~/.bashrc file
 # virtualenv and virtualenvwrapper
+$ sudo ~/.bashrc
+# Paste the following
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
@@ -26,36 +35,49 @@ $ source ~/.bashrc
 # Create a virtual environment called OpenCV
 $ mkvirtualenv OpenCV
 # Install python 3 development files
-$ sudo apt-get install python3.4-dev
+$ sudo apt-get install python3.5-dev
 # Install numpy for math calculations
 $ sudo rm -rf ~/.cache/pip/
 $ pip install numpy
+---OR---
+$ sudo pip3 install -U numpy 
 # Clone the github OpenCV repository
 $ cd ~
 $ git clone https://github.com/opencv/opencv.git
 $ cd opencv
 $ git checkout 3.1.0
+---OR---
+# For the latest version from GitHub
+$ git checkout 
 # Clone the github OpenCV contribute repository for access to standard keypoint detectors and local invariant descriptors (such as SIFT, SURF, etc.) and newer OpenCV 3.0 features like text detection
 $ cd ~
 $ git clone https://github.com/opencv/opencv_contrib.git
 $ cd opencv_contrib
 $ git checkout 3.1.0
+---OR---
+# For the latest version from GitHub
+$ git checkout
+# Build the OpenCV installer using CMake
 $ cd ~/opencv
 $ mkdir build
 $ cd build
-$ cmake -D CMAKE_BUILD_TYPE=RELEASE \
+$ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D CMAKE_INSTALL_PREFIX=/usr/local \
 	-D INSTALL_C_EXAMPLES=ON \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
 	-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
 	-D BUILD_EXAMPLES=ON ..
-# Install OpenCV in /usr/local/lib/python3.4/site-packages/ folder
-$sudo make -j $(nproc --all)
-$sudo make install
+# Install OpenCV in /usr/local/lib/python3.5/dist-packages/ folder
+$ sudo make -j $(nproc --all)
+$ sudo make install
 $ sudo ldconfig
 # Rename the site package to cv2 for import into python as cv2
-$ cd ~/.virtualenvs/OpenCV/lib/python3.4/site-packages/
-$ ln -s /usr/local/lib/python3.4/site-packages/cv2.cpython-34m.so cv2.so
+cd /usr/local/lib/python3.5/dist-packages
+ls
+# Get the file name for python binding file. It looks something like: cv2.cpython-35m-x86_64-linux-gnu.so 
+$ cd ~/.virtualenvs/OpenCV/lib/python3.5/site-packages/
+$ ln -s /usr/local/lib/python3.5/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so cv2.so
+$ deactivate
 $ workon OpenCV
 $ python
 >>> import cv2
