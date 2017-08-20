@@ -27,7 +27,6 @@ from keras.layers import LSTM, GRU
 from keras.utils.data_utils import get_file
 from keras.preprocessing.sequence import pad_sequences
 from keras import backend as K
-
 from functools import reduce
 import tarfile
 import numpy as np
@@ -111,7 +110,7 @@ def vectorize_stories(data, word_idx, story_maxlen, query_maxlen):
             pad_sequences(Xq, maxlen=query_maxlen), np.array(Y))
 
 try:
-    path = get_file('babi-tasks-v1-2.tar.gz', origin='https://github.com/rahulremanan/python_tutorial/blob/master/babi_tasks_1-20_v1-2.tar.gz')
+    path = get_file('babi-tasks-v1-2.tar.gz', origin='https://github.com/rahulremanan/python_tutorial/blob/master/NLP/data/babi_tasks_1-20_v1-2.tar.gz')
 except:
     print('Error downloading dataset, please download it manually:\n'
           '$ wget https://github.com/rahulremanan/python_tutorial/blob/master/babi_tasks_1-20_v1-2.tar.gz'
