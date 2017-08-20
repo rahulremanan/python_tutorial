@@ -294,13 +294,13 @@ model.compile(optimizer='rmsprop', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 if load_model == 1:
-    model = keras.models.load_model('model.h5')
+    model = keras.models.load_model('model_qa_demo.h5')
 
 if train_model == 1:
     # train, batch_size = 32 and epochs = 120
     model.fit([inputs_train, queries_train], answers_train, batch_size, train_epochs,
           validation_data=([inputs_test, queries_test], answers_test))
-    model.save('model.h5')
+    model.save('model_qa_demo.h5')
 
 if test_qualitative == 1:
     print('-------------------------------------------------------------------------------------------')
@@ -318,9 +318,9 @@ if user_questions == 1:
     while 1:
         print('-------------------------------------------------------------------------------------------')
         print('Please input a story')
-        user_story_inp = raw_input().split(' ')
+        user_story_inp = input().split(' ')
         print('Please input a query')
-        user_query_inp = raw_input().split(' ')
+        user_query_inp = input().split(' ')
         user_story, user_query, user_ans = vectorize_stories([[user_story_inp, user_query_inp, '.']], word_idx, story_maxlen, query_maxlen)
         user_prediction = model.predict([user_story, user_query])
         user_prediction = idx_word[np.argmax(user_prediction)]
