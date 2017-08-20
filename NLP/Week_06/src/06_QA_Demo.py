@@ -40,6 +40,48 @@ lstm_size = 64
 test_qualitative = 0
 user_questions = 0
 
+class housekeeping:
+    def is_valid_file(parser, arg):
+        arg = arg.replace("'",'' )
+        arg = arg.replace('"', '')
+        if not os.path.isfile(arg):
+            parser.error("the file %s does not exist..." % arg)
+        else:
+            return arg
+    def is_valid_dir(parser, arg):
+        arg = arg.replace("'",'' )
+        arg = arg.replace('"', '')
+        if not os.path.isdir(arg):
+            parser.error("the folder %s does not exist..." % arg)
+        else:
+            return arg
+    def mkdate(datestr):
+        datestr = datestr.replace("'","")
+        datestr = datestr.replace('"','')
+        try:
+            datestr = dt.datetime.strptime(datestr, '%Y,%m,%d')
+        except:
+            datestr = dt.datetime.strptime(datestr, '%Y-%m-%d')
+        return datestr
+    def to_integer(dt_time):
+        return dt_time.year, dt_time.month, dt_time.day
+    def generate_timestamp():
+        timestamp=0
+        try:
+            if timestamp <1:
+                timestamp +=1
+                timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
+                print ("time stamp generated: "+timestring)
+                return timestring
+            else:
+                timestamp+=1
+                print ("time stamp already generated: "+timestring)
+        except:
+            print ("error generating time stamp...")    
+    def create_data_dir(directory):
+         if not os.path.exists(directory):
+            os.makedirs(directory)
+
 def tokenize(sent):
     '''Return the tokens of a sentence including punctuation.
     >>> tokenize('Bob dropped the apple. Where is the apple?')
