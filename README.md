@@ -21,7 +21,7 @@
 
 ## One hot Encoding <a name="Week1"></a>
 
-##Twitter Bot <a name="Week2"></a>
+## Twitter Bot <a name="Week2"></a>
 
 ## Alice <a name="Week3"></a>
 
