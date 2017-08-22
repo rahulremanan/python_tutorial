@@ -7,9 +7,9 @@
 **Below, we are detailing the scripts in this repo.**
 
 **Table of Contents**
-1. [Day 1](#Day 1)
+1. [Day 1](#Day1)
 
 
 
-##### Day 1 <a name="Day 1"></a>
+##### Day 1 <a name="Day1"></a>
 
