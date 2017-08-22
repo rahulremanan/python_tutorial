@@ -6,10 +6,27 @@
 
 **Below, we are detailing the scripts in this repo.**
 
-**Table of Contents**
-1. [Day 1](#Day1)
+<!--https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/ Keep this handy-->
+
+**NLP Table of Contents**
+1. [Week 1: One hot encoding](#Week1)
+2. [Week 2: Twitter Bot using a LSTM model](#Week2)
+3. [Week 3: Alice NLP Generator](#Week3)
+4. [Week 4: Character embedding](#Week4)
+5. [Week 5: Bidirectional LSTM classifier](#Week5)
+6. [Week 6: QA Demo](#Week6)
 
 
 
-##### Day 1 <a name="Day1"></a>
+##### One hot Encoding <a name="Week1"></a>
+
+##### Twitter Bot <a name="Week2"></a>
+
+##### Alice <a name="Week3"></a>
+
+##### Character embedding <a name="Week4"></a>
+
+##### Bidirectional LSTM Classifier <a name="Week5"></a>
+
+##### QA Demo <a name="Week6"></a>
 
