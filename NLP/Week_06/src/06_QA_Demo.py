@@ -1,87 +1,22 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-"""
-Created on Wed Jul 26 14:54:52 2017
-
-@author: Rahul
-"""
-
-'''Trains a memory network on the bAbI dataset.
-References:
-- Jason Weston, Antoine Bordes, Sumit Chopra, Tomas Mikolov, Alexander M. Rush,
-  "Towards AI-Complete Question Answering: A Set of Prerequisite Toy Tasks",
-  http://arxiv.org/abs/1502.05698
-- Sainbayar Sukhbaatar, Arthur Szlam, Jason Weston, Rob Fergus,
-  "End-To-End Memory Networks",
-  http://arxiv.org/abs/1503.08895
-Reaches 98.6% accuracy on task 'single_supporting_fact_10k' after 120 epochs.
-Time per epoch: 3s on CPU (core i7).
-Original code: https://github.com/fchollet/keras/blob/master/examples/babi_memnn.py
-'''
 import keras
 from keras.models import Sequential, Model
 from keras.layers.embeddings import Embedding
 from keras.layers import Input, Activation, Dense, Permute, Dropout, add, concatenate, dot
-# from keras.layers import Merge
-from keras.layers import LSTM, GRU
-from keras.utils.data_utils import get_file
+from keras.layers import LSTM
 from keras.preprocessing.sequence import pad_sequences
-from keras import backend as K
 from functools import reduce
 import tarfile
 import numpy as np
 import re
-import argparse
 
 train_model = 1
-train_epochs = 100
+train_epochs = 5000
 load_model = 0
-batch_size = 32
-lstm_size = 64
-test_qualitative = 0
+batch_size = 500
+lstm_size = 1024
+est_qualitative = 0
 user_questions = 0
-
-class housekeeping:
-    def is_valid_file(parser, arg):
-        arg = arg.replace("'",'' )
-        arg = arg.replace('"', '')
-        if not os.path.isfile(arg):
-            parser.error("the file %s does not exist..." % arg)
-        else:
-            return arg
-    def is_valid_dir(parser, arg):
-        arg = arg.replace("'",'' )
-        arg = arg.replace('"', '')
-        if not os.path.isdir(arg):
-            parser.error("the folder %s does not exist..." % arg)
-        else:
-            return arg
-    def mkdate(datestr):
-        datestr = datestr.replace("'","")
-        datestr = datestr.replace('"','')
-        try:
-            datestr = dt.datetime.strptime(datestr, '%Y,%m,%d')
-        except:
-            datestr = dt.datetime.strptime(datestr, '%Y-%m-%d')
-        return datestr
-    def to_integer(dt_time):
-        return dt_time.year, dt_time.month, dt_time.day
-    def generate_timestamp():
-        timestamp=0
-        try:
-            if timestamp <1:
-                timestamp +=1
-                timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
-                print ("time stamp generated: "+timestring)
-                return timestring
-            else:
-                timestamp+=1
-                print ("time stamp already generated: "+timestring)
-        except:
-            print ("error generating time stamp...")    
-    def create_data_dir(directory):
-         if not os.path.exists(directory):
-            os.makedirs(directory)
+num_recurrent_units = 10
 
 def tokenize(sent):
     '''Return the tokens of a sentence including punctuation.
@@ -152,14 +87,7 @@ def vectorize_stories(data, word_idx, story_maxlen, query_maxlen):
     return (pad_sequences(X, maxlen=story_maxlen),
             pad_sequences(Xq, maxlen=query_maxlen), np.array(Y))
 
-try:
-    path = get_file('babi-tasks-v1-2.tar.gz', origin='https://github.com/rahulremanan/python_tutorial/blob/master/NLP/data/babi_tasks_1-20_v1-2.tar.gz')
-except:
-    print('Error downloading dataset, please download it manually:\n'
-          '$ wget https://github.com/rahulremanan/python_tutorial/blob/master/babi_tasks_1-20_v1-2.tar.gz'
-          '$ mv tasks_1-20_v1-2.tar.gz ~/.keras/datasets/babi_tasks_v1-2.tar.gz')
-    raise
-tar = tarfile.open('D:/Github/rahulremanan/python_tutorial/babi_tasks_1-20_v1-2.tar.gz')
+tar = tarfile.open('/home/info/babi_tasks_1-20_v1-2.tar.gz')
 
 challenges = {
     # QA1 with 10,000 samples
@@ -278,29 +206,33 @@ print('Response shape', response)
 answer = concatenate([response, question_encoded])
 print('Answer shape', answer)
 
-# the original paper uses a matrix multiplication for this reduction step.
-# we choose to use a RNN instead.
-#answer = LSTM(lstm_size, return_sequences=True)(answer)  # Generate tensors of shape 32
-#answer = Dropout(0.3)(answer)
-answer = LSTM(lstm_size)(answer)  # Generate tensors of shape 32
-answer = Dropout(0.3)(answer)
-answer = Dense(vocab_size)(answer)  # (samples, vocab_size)
-# we output a probability distribution over the vocabulary
-answer = Activation('softmax')(answer)
-
-# build the final model
-model = Model([input_sequence, question], answer)
-model.compile(optimizer='rmsprop', loss='categorical_crossentropy',
+class RNN:
+    def LSTM_layer(answer, lstm_size, dropout, vocab_size):
+        answer = LSTM(lstm_size, return_sequences=True)(answer)
+        answer = Dropout(dropout)(answer)
+        for cur_unit in range(num_recurrent_units):
+            answer = LSTM(lstm_size, return_sequences=True)(answer)
+        answer = LSTM(lstm_size)(answer)
+        answer = Dropout(dropout)(answer)
+        answer = Dense(vocab_size)(answer)
+        answer = Activation('softmax')(answer)
+        model = Model([input_sequence, question], answer)
+        model.compile(optimizer='rmsprop', loss='categorical_crossentropy',
               metrics=['accuracy'])
+        return model
+
+dropout = 0.3
+model = RNN.LSTM_layer(answer, lstm_size, dropout, vocab_size)
+model.summary()
 
 if load_model == 1:
-    model = keras.models.load_model('model_qa_demo.h5')
+    model = keras.models.load_model('/home/info/model_qa_demo.h5')
 
 if train_model == 1:
     # train, batch_size = 32 and epochs = 120
     model.fit([inputs_train, queries_train], answers_train, batch_size, train_epochs,
           validation_data=([inputs_test, queries_test], answers_test))
-    model.save('model_qa_demo.h5')
+    model.save('/home/info/model_qa_demo.h5')
 
 if test_qualitative == 1:
     print('-------------------------------------------------------------------------------------------')
