@@ -9,6 +9,7 @@
 <!--https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/ Keep this handy-->
 
 **NLP Table of Contents**
+
 1. [Week 1: One hot encoding](#Week1)
 2. [Week 2: Twitter Bot using a LSTM model](#Week2)
 3. [Week 3: Alice NLP Generator](#Week3)
@@ -18,15 +19,15 @@
 
 
 
-##### One hot Encoding <a name="Week1"></a>
+## One hot Encoding <a name="Week1"></a>
 
-##### Twitter Bot <a name="Week2"></a>
+##Twitter Bot <a name="Week2"></a>
 
-##### Alice <a name="Week3"></a>
+## Alice <a name="Week3"></a>
 
-##### Character embedding <a name="Week4"></a>
+## Character embedding <a name="Week4"></a>
 
-##### Bidirectional LSTM Classifier <a name="Week5"></a>
+## Bidirectional LSTM Classifier <a name="Week5"></a>
 
-##### QA Demo <a name="Week6"></a>
+## QA Demo <a name="Week6"></a>
 
