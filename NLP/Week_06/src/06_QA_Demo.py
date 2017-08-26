@@ -69,9 +69,7 @@ dropout = 0.3
 timestr = housekeeping.generate_timestamp()
 dataset_loc = ('/home/info/babi_tasks_1-20_v1-2.tar.gz')
 weights_loc = ('/home/info/qa_demo_weights*.[Hh]5')
-stateful_weights_loc = '/home/info/qa_demo_weights_stateful*.[Hh]5'
 weights_save_loc = ('/home/info/qa_demo_weights_'+timestr+'.h5')
-stateful_weights_save_loc = ('/home/info/qa_demo_weights_stateful_'+timestr+'.h5')
 
 def tokenize(sent):
     '''Return the tokens of a sentence including punctuation.
@@ -253,9 +251,7 @@ if load_model ==1:
     try:
         newest_weights = max(glob.iglob(weights_loc), 
                          key=os.path.getctime)
-        newest_weights_stateful = max(glob.iglob(stateful_weights_loc), 
-                                  key=os.path.getctime)
-        print (newest_weights, newest_weights_stateful)
+        print (newest_weights)
     except:
         print ('Error loading saved weights...')
 
@@ -312,4 +308,4 @@ if user_questions == 1:
             print('Result')
             print(' '.join(user_story_inp), ' '.join(user_query_inp), '| Prediction:', user_prediction)
         except:
-            print ('Question cannot be understood. Please ensure spaces between each words...')
+            print ('Question cannot be understood. Please ensure spaces between each words and vocabulary limited to the bAbI dataset...')
