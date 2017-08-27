@@ -251,7 +251,7 @@ if load_model ==1:
     try:
         newest_weights = max(glob.iglob(weights_loc), 
                          key=os.path.getctime)
-        print (newest_weights)
+        print ('Successfully loaded model weights from: '+newest_weights)
     except:
         print ('Error loading saved weights...')
 
