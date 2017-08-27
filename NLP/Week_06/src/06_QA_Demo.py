@@ -275,12 +275,17 @@ try:
     model.summary()
     if load_model == 1:
         model = keras.models.load_model(newest_weights)
+        print ("Loaded saved model weights...")
+    else:
+        print ("Tabula rasa....")
     if train_model == 1:
         model.fit([inputs_train, queries_train], answers_train, batch_size, train_epochs,
           validation_data=([inputs_test, queries_test], answers_test))
         model.save(weights_save_loc)
+    else:
+        print ("Using pre-trained model for prediction...")
 except:
-    print ("Can't train the model...")
+    print ("No pre-trained model or model weights loaded...")
 
 if test_qualitative == 1:
     print('-------------------------------------------------------------------------------------------')
