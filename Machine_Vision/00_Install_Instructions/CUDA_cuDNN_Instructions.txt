@@ -1,0 +1,24 @@
+# Setting up
+sudo apt install linux-headers-$(uname -r)
+
+
+# Download CUDA
+wget --"<pointer>" -c
+
+# Install CUDA 8.0
+# Change into the folder with the files you downloaded
+sudo dpkg -i cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64.deb # install the downloaded package
+sudo apt update # update your package list
+sudo apt upgrade
+sudo apt install cuda # install cuda
+
+# Download cuDNN
+wget --"<pointer>" -c
+
+# Install cuDNN
+# Change into the folder with the files you downloaded
+tar -xvzf cudnn-8.0-linux-x64-v7.tgz # extract the downloaded file
+sudo mv cuda /usr/local/ # move the file into the correct folder
+gedit ~/.bashrc
+# paste this at the end of the file: export LD_LIBRARY_PATH=/usr/local/cuda/lib64/
+sudo apt install libcupti-dev
