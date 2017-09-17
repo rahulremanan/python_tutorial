@@ -1,6 +1,7 @@
 # Setting up
 sudo apt install linux-headers-$(uname -r)
-
+sudo apt-get update
+sudo apt-get upgrade
 
 # Download CUDA
 wget --"<pointer>" -c
@@ -12,13 +13,30 @@ sudo apt update # update your package list
 sudo apt upgrade
 sudo apt install cuda # install cuda
 
+--OR--
+
+sudo apt-get install cuda
+
+# Install CUDA dev-tools
+sudo apt-get install nvidia-cuda-dev nvidia-cuda-toolkit nvidia-nsight
+nvcc --version
+
 # Download cuDNN
 wget --"<pointer>" -c
 
 # Install cuDNN
 # Change into the folder with the files you downloaded
-tar -xvzf cudnn-8.0-linux-x64-v7.tgz # extract the downloaded file
-sudo mv cuda /usr/local/ # move the file into the correct folder
-gedit ~/.bashrc
+tar -xvzf cudnn-8.0-linux-x64-v5.1.tgz # extract the downloaded file
+sudo mv cuda /usr/local/cuda/ # move the file into the correct folder
+sudo cp -P ~/cuda/include/cudnn.h /usr/local/cuda/include/
+sudo cp -P ~/cuda/lib64/libcudnn* /usr/local/cuda/lib64/
+sudo chmod a+r /usr/local/cuda/lib64/
+
+# Update LD library path:
+sudo nano ~/.bashrc
 # paste this at the end of the file: export LD_LIBRARY_PATH=/usr/local/cuda/lib64/
-sudo apt install libcupti-dev
+env | grep '^LD_LIBRARY_PATH'
+
+--OR--
+
+sudo dpkg -i libcudnn6_6.0.21-1+cuda8.0_amd64.deb
