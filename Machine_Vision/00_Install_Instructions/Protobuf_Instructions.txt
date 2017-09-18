@@ -1,0 +1,20 @@
+# Install protobuf from source 
+$ sudo apt-get install autoconf automake libtool curl make g++ unzip
+$ git clone https://github.com/google/protobuf.git
+$ cd protobuf
+$ ./autogen.sh
+$ sudo ./configure --prefix=/usr
+$ sudo make 
+$ sudo make check
+$ sudo make install
+$ sudo ldconfig
+
+# Remove protobuf
+$ sudo apt-get remove --purge libprotobuf-dev
+$ sudo pip3 uninstall protobuf
+$ sudo apt-get autoremove
+# Remove/backup all existing copies of protobuf
+$ cd /usr/lib/x86_64-linux-gnu
+$ sudo mkdir BACKUP
+$ sudo mv libmirprotobuf.so* ./BACKUP/
+$ sudo mv ./BACKUP/lib* ./
