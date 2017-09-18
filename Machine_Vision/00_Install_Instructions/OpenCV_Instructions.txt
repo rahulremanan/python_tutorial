@@ -1,33 +1,18 @@
 # Update any available packages
 $ sudo apt-get update
 $ sudo apt-get upgrade
-# Install developer tools for compiling OpenCV 3.0
-$ sudo apt-get install build-essential cmake git pkg-config
-# Install libraries and packages for handling image formats
-$ sudo apt-get install libjpeg8-dev libtiff5-dev
 # Installer from earlier release
 $ echo "deb http://us.archive.ubuntu.com/ubuntu/ yakkety universe" | sudo tee -a /etc/apt/sources.list
-$ sudo apt-get update
-$ sudo apt-get install libjasper-dev
 $ echo "deb http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/ xenial main" | sudo tee -a /etc/apt/sources.list
 $ sudo apt-get update
-$ sudo apt-get install libpng-dev
-# Install libararies and packages for handling video formats
-$ sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+# Install developer tools for compiling OpenCV 3.0
+$ sudo apt-get install -y build-essential cmake git python3.5-dev libatlas-base-dev gfortran python3-pip libgtk2.0-dev pkg-config libjpeg8-dev libtiff5-dev libjasper-dev libpng-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libgphoto2-dev gstreamer1.0-dev libdc1394-22 ffmpeg libavresample-dev
 # To fix videodev.h missing error
 # Generate a symbolic link
 $ sudo ln -s /usr/include/libv4l1-videodev.h   /usr/include/linux/videodev.h 
-# Install gstreamer libdc1394 libv4l video handling files
-$ sudo apt-get install -y libgphoto2-dev gstreamer1.0-dev libdc1394-22 ffmpeg libavresample-dev
 # Fix python.h missing error
 # Copy headers from python3.5m to include folder
 $ sudo cp /usr/include/python3.5m/* /usr/include/
-# Install GTK for GUI features of OpenCV
-$ sudo apt-get install libgtk2.0-dev
-# Install package dependencies for OpenCV
-$ sudo apt-get install libatlas-base-dev gfortran
-# Install pip, the package manager for python
-$ sudo apt-get install python3-pip
 # Install dependencies for setting up a virtual environment
 # Install OpenCV 3.0 and Python 3.4+ on UbuntuShell
 $ sudo pip3 install virtualenv virtualenvwrapper
@@ -42,8 +27,6 @@ source /usr/local/bin/virtualenvwrapper.sh
 $ source ~/.bashrc
 # Create a virtual environment called OpenCV
 $ mkvirtualenv OpenCV
-# Install python 3 development files
-$ sudo apt-get install python3.5-dev
 # Install numpy for math calculations
 $ sudo rm -rf ~/.cache/pip/
 $ pip install numpy
