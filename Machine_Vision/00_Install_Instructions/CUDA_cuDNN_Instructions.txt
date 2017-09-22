@@ -26,7 +26,7 @@ wget --"<pointer>" -c
 
 # Install cuDNN
 # Change into the folder with the files you downloaded
-tar -xvzf cudnn-8.0-linux-x64-v5.1.tgz # extract the downloaded file
+tar -xvzf cudnn-8.0-linux-x64-v7.tgz # extract the downloaded file
 sudo mv cuda /usr/local/cuda/ # move the file into the correct folder
 sudo cp -P ~/cuda/include/cudnn.h /usr/local/cuda/include/
 sudo cp -P ~/cuda/lib64/libcudnn* /usr/local/cuda/lib64/
@@ -40,3 +40,4 @@ env | grep '^LD_LIBRARY_PATH'
 --OR--
 
 sudo dpkg -i libcudnn6_6.0.21-1+cuda8.0_amd64.deb
+sudo dpkg -i libcudnn6-dev_6.0.21-1+cuda8.0_amd64.deb

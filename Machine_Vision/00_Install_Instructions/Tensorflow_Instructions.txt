@@ -22,13 +22,55 @@ which gcc
 gcc --version
 g++ --version
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 10
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 10
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 16
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 16
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 11
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 11
+
+cxx_builtin_include_directory: "/usr/local/cuda/targets/x86_64-linux/include"
+
+to file tensorflow/third_party/gpus/crosstool/CROSSTOOL
+
+Eg:
+toolchain {
+  abi_version: "local"
+  abi_libc_version: "local"
+  builtin_sysroot: ""
+  compiler: "compiler"
+  host_system_name: "local"
+  needsPic: true
+  target_libc: "macosx"
+  target_cpu: "darwin"
+  target_system_name: "local"
+  toolchain_identifier: "local_darwin"
+  tool_path { name: "ar" path: "/usr/bin/libtool" }
+  tool_path { name: "compat-ld" path: "/usr/bin/ld" }
+  tool_path { name: "cpp" path: "/usr/bin/cpp" }
+  tool_path { name: "dwp" path: "/usr/bin/dwp" }
+  tool_path { name: "gcc" path: "clang/bin/crosstool_wrapper_driver_is_not_gcc$
+  cxx_flag: "-std=c++11"
+  cxx_builtin_include_directory: "/usr/local/cuda-8.0/include"...
+
+
+seem to be a workaround.
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 15
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++ 12
 
 After compiling TensorFlow you can use previous version of gcc calling above command with proper path to /usr/bin/gcc-6 -priority
 
 ./configure
 sudo bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
+
+--OR--
+
+sudo bazel build -c opt --config=cuda --copt=-msse4.1 --copt=-msse4.2 --copt=-mavx --copt=-mavx2 --copt=-mfma //tensorflow/tools/pip_package:build_pip_package
+
+--OR--
+
+sudo bazel build -c opt --copt=-march="haswell" --config=cuda //tensorflow/tools/pip_package:build_pip_package
+
 sudo bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 cd /tmp/tensorflow_pkg
 ls
