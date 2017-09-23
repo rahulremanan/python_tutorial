@@ -1,7 +1,8 @@
 # Transfer learning using Keras and Tensorflow.
-# Written by Rahul Remanan and MOAD (https://www.moad.computer) Machine Vision team.
+# Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
-# License: MIT Open source license (https://github.com/rahulremanan/python_tutorial/blob/master/LICENSE).
+# License: MIT open source license (https://github.com/rahulremanan/python_tutorial/blob/master/LICENSE).
+# Example usage: python3 transfer_learning.py --training_directory '/home/info/train' --validation_directory '/home/info/val' --batches 20 --epochs 10 --model_file '/home/info/transfer_learn_epoch100.model' --output_directory '/home/info/model' --train_model True --load_model True --fine_tune True --test_augmentation False --plot True  
 import time
 import os
 import sys
@@ -53,7 +54,7 @@ def get_bool_fn(bool_fn):       #Boolean filter
         return load_value
     except:
         print ("Please check if: --train_model, --load_model, --fine_tune, --test_aug, --plot arguments are True or False statements...")
-        print ("Example --train_model True")
+        print ("Example usage: --train_model True ")
 
 def get_nb_files(directory):
   if not os.path.exists(directory):
@@ -90,13 +91,13 @@ def setup_to_finetune(model, optimizer):
 
 def train(args):
   """Use transfer learning and fine-tuning to train a network on a new dataset"""
-  nb_train_samples = get_nb_files(args.train_dir)
+  nb_train_samples = get_nb_files(args.train_dir[0])
   print (nb_train_samples)
-  nb_classes = len(glob.glob(args.train_dir + "/*"))
+  nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
   print (nb_classes)
-  nb_val_samples = get_nb_files(args.val_dir)
-  nb_epoch = int(args.epoch)
-  batch_size = int(args.batch)
+  nb_val_samples = get_nb_files(args.val_dir[0])
+  nb_epoch = int(args.epoch[0])
+  batch_size = int(args.batch[0])
 
   train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
       rotation_range=30,
@@ -106,7 +107,7 @@ def train(args):
       zoom_range=0.2,
       horizontal_flip=True)
   
-  test_aug = get_bool_fn(args.test_aug)  
+  test_aug = get_bool_fn(args.test_aug[0])  
   
   if test_aug==True:
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
@@ -119,13 +120,13 @@ def train(args):
   else:
       test_datagen = ImageDataGenerator(rescale=1. / 255)
 
-  train_generator = train_datagen.flow_from_directory(args.train_dir,
+  train_generator = train_datagen.flow_from_directory(args.train_dir[0],
     target_size=(IM_WIDTH, IM_HEIGHT),
     batch_size=batch_size,
     class_mode='categorical')
 
   validation_generator = test_datagen.flow_from_directory(
-    args.val_dir,
+    args.val_dir[0],
     target_size=(IM_WIDTH, IM_HEIGHT),
     batch_size=batch_size,
     class_mode='categorical')
@@ -136,11 +137,11 @@ def train(args):
   print (model.summary)
   
   try:
-      load_model = get_bool_fn(args.load_model)
-      train_model = get_bool_fn(args.train_model)
-      fine_tune_model = get_bool_fn(args.fine_tune)
+      load_model = get_bool_fn(args.load_model[0])
+      train_model = get_bool_fn(args.train_model[0])
+      fine_tune_model = get_bool_fn(args.fine_tune[0])
       if load_model == True:
-            model = keras.models.load_model(args.model_file)
+            model = keras.models.load_model(args.model_file[0])
             print ("Loaded saved model weights...")
       else:
                 print ("Tabula rasa....")
@@ -174,7 +175,7 @@ def train(args):
             else:
                 model_train = model_tl
                 
-            output_loc = args.output_dir
+            output_loc = args.output_dir[0]
             output_file = (output_loc+"//"+"trained_"+timestr+"bone_age.model")
             model.save(output_file)
       else:
@@ -182,14 +183,14 @@ def train(args):
   except:
         print ("No pre-trained model or model weights loaded...")
   
-  gen_plot = get_bool_fn(args.plot)
+  gen_plot = get_bool_fn(args.plot[0])
   if gen_plot==True:
       plot_training(model_train)
   else:
       model_train
 
 def plot_training(history):
-  output_loc = args.output_dir
+  output_loc = args.output_dir[0]
   output_file_acc = os.path.join(output_loc+"//training_plot_acc_"+timestr+".png")
   output_file_loss = os.path.join(output_loc+"//training_plot_loss_"+timestr+".png")
   
@@ -217,11 +218,13 @@ def get_user_options():
     a.add_argument("--training_directory", 
                  help = "Specify folder contraining the files for training...", 
                  dest = "train_dir", 
-                 required = True, type=lambda x: is_valid_dir(a, x), 
+                 required = True, 
+                 type=lambda x: is_valid_dir(a, x), 
                  nargs=1)
     a.add_argument("--validation_directory", 
                    help = "Specify folder containing the files for validation...", 
-                   dest = "val_dir", retured = True, 
+                   dest = "val_dir", 
+                   required = True, 
                    type=lambda x: is_valid_dir(a, x), 
                    nargs=1)
     a.add_argument("--epochs", 
@@ -247,8 +250,7 @@ def get_user_options():
                    help = "Specify output folder...", 
                    dest = "output_dir", 
                    required = True, 
-                   nargs=1, 
-                   type=lambda x: is_valid_dir(a, x), 
+                   type=lambda x: is_valid_dir(a, x),
                    nargs=1)
     a.add_argument("--train_model", 
                    help = "Specify if the model should be trained...", 
@@ -289,15 +291,10 @@ def get_user_options():
     return args
 
 if __name__=="__main__":
-    args = cmd_args.get_user_options()
+    args = get_user_options()
 
-    if args.train_dir is None or args.val_dir is None:
-      a.print_help()
-      sys.exit(1)
-
-    if (not os.path.exists(args.train_dir)) or (not os.path.exists(args.val_dir)) or (not os.path.exists(args.model_file)) or (not os.path.exists(args.output_dir)):
+    if (not os.path.exists(args.train_dir[0])) or (not os.path.exists(args.val_dir[0])) or (not os.path.exists(args.model_file[0])) or (not os.path.exists(args.output_dir[0])):
       print("directories do not exist")
       sys.exit(1)
 
     train(args)
-# Example usage: python3 transfer_learning.py --train_dir /home/info/train --val_dir /home/info/val --batch 20 --epoch 10 --model_file /home/info/transfer_learn_epoch100.model --output_dir /home/info/model --train_model True --load_model True --fine_tune True --test_aug False --plot True
