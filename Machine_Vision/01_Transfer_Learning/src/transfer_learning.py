@@ -29,6 +29,10 @@ def get_train_model(bool_fn):
     train_model = bool(bool_fn)
     return train_model
 
+def get_fine_tune(bool_fn):
+    tune_model = bool(bool_fn)
+    return tune_model
+
 def get_nb_files(directory):
   if not os.path.exists(directory):
     return 0
@@ -80,6 +84,7 @@ def train(args):
       shear_range=0.2,
       zoom_range=0.2,
       horizontal_flip=True)
+  
   test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
       rotation_range=30,
       width_shift_range=0.2,
@@ -105,6 +110,7 @@ def train(args):
   try:
       load_model = get_load_model(args.load_model)
       train_model = get_train_model(args.train_model)
+      fine_tune_model = get_fine_tune(args.fine_tune)
       if load_model == True:
             model = keras.models.load_model(args.model_file)
             print ("Loaded saved model weights...")
@@ -115,8 +121,8 @@ def train(args):
             setup_to_transfer_learn(model, base_model, optimizer)
             print (model.summary)
             print (nb_train_samples)
-
-            history_tl = model.fit_generator(
+            
+            model_tl = model.fit_generator(
                   train_generator,
                   epochs=nb_epoch,
                   steps_per_epoch=nb_train_samples // batch_size,
@@ -127,13 +133,18 @@ def train(args):
           # fine-tuning
             setup_to_finetune(model, optimizer)
 
-            history_ft = model.fit_generator(
+            model_ft = model.fit_generator(
                   train_generator,
                   steps_per_epoch=nb_train_samples // batch_size,
                   epochs=nb_epoch,
                   validation_data=validation_generator,
                   validation_steps=nb_val_samples // batch_size,
                   class_weight='auto')
+            
+            if fine_tune_model == True:
+                model_train = model_ft
+            else:
+                model_train = model_tl
 
             model.save(args.model_file)
       else:
@@ -143,7 +154,7 @@ def train(args):
 
 
   if args.plot:
-    plot_training(history_ft)
+    plot_training(model_train)
 
 def plot_training(history):
   output_loc = args.output_dir
@@ -175,6 +186,7 @@ if __name__=="__main__":
   a.add_argument("--output_dir")
   a.add_argument("--train_model", default=True)
   a.add_argument("--load_model", default=False)
+  a.add_argument("--fine_tune", default=True)
 
   args = a.parse_args()
   if args.train_dir is None or args.val_dir is None:
@@ -186,4 +198,4 @@ if __name__=="__main__":
     sys.exit(1)
 
   train(args)
-# Example usage: python3 transfer_learning.py --train /home/info/train --val_dir /home/info/val --batch 20 --epoch 10 --model_file /home/info/transfer_learn_epoch100.model --output_dir /home/info/model --train True --load True
+# Example usage: python3 transfer_learning.py --train_dir /home/info/train --val_dir /home/info/val --batch 20 --epoch 10 --model_file /home/info/transfer_learn_epoch100.model --output_dir /home/info/model --train_model True --load_model True --fine_tune True
