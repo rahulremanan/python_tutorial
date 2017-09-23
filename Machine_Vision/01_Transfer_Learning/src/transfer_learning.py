@@ -1,3 +1,7 @@
+# Transfer learning using Keras and Tensorflow.
+# Written by Rahul Remanan and MOAD (https://www.moad.computer) Machine Vision team.
+# For more information contact: info@moad.computer
+# License: MIT Open source license (https://github.com/rahulremanan/python_tutorial/blob/master/LICENSE).
 import time
 import os
 import sys
@@ -13,7 +17,7 @@ from keras.layers import Dense, GlobalAveragePooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, RMSprop, Adagrad
 
-IM_WIDTH, IM_HEIGHT = 299, 299 #fixed size for InceptionV3
+IM_WIDTH, IM_HEIGHT = 299, 299 #Fixed size for InceptionV3
 NB_EPOCHS = 100
 BAT_SIZE = 10
 FC_SIZE = 1024
@@ -26,14 +30,30 @@ optimizer = sgd
 
 def generate_timestamp():
     timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
-    print ("time stamp generated: "+timestring)
+    print ("Time stamp generated: "+timestring)
     return timestring
 
 timestr = generate_timestamp()
+
+def is_valid_file(parser, arg):
+    if not os.path.isfile(arg):
+        parser.error("The file %s does not exist..." % arg)
+    else:
+        return arg
+    
+def is_valid_dir(parser, arg):
+    if not os.path.isdir(arg):
+        parser.error("The folder %s does not exist..." % arg)
+    else:
+        return arg
  
-def get_bool_fn(bool_fn):       # Boolean filter
-    load_value = bool(bool_fn)
-    return load_value
+def get_bool_fn(bool_fn):       #Boolean filter
+    try:
+        load_value = bool(bool_fn)
+        return load_value
+    except:
+        print ("Please check if: --train_model, --load_model, --fine_tune, --test_aug, --plot arguments are True or False statements...")
+        print ("Example --train_model True")
 
 def get_nb_files(directory):
   if not os.path.exists(directory):
@@ -181,6 +201,7 @@ def plot_training(history):
   plt.xlabel('epoch')
   plt.legend(['train', 'test'], loc='upper left')
   fig.savefig(output_file_acc, dpi=fig.dpi)
+  print ("Successfully created model training accuracy plot...")
 
   plt.plot(history.history['loss'])
   plt.plot(history.history['val_loss'])
@@ -189,29 +210,94 @@ def plot_training(history):
   plt.xlabel('epoch')
   plt.legend(['train', 'test'], loc='upper left')
   fig.savefig(output_file_loss, dpi=fig.dpi)
+  print ("Successfully created model training loss function plot...")
+
+def get_user_options():
+    a = argparse.ArgumentParser()
+    a.add_argument("--training_directory", 
+                 help = "Specify folder contraining the files for training...", 
+                 dest = "train_dir", 
+                 required = True, type=lambda x: is_valid_dir(a, x), 
+                 nargs=1)
+    a.add_argument("--validation_directory", 
+                   help = "Specify folder containing the files for validation...", 
+                   dest = "val_dir", retured = True, 
+                   type=lambda x: is_valid_dir(a, x), 
+                   nargs=1)
+    a.add_argument("--epochs", 
+                   help = "Specify epochs for training...", 
+                   dest = "epoch", 
+                   default=NB_EPOCHS, 
+                   required=False, 
+                   type = int, 
+                   nargs=1)
+    a.add_argument("--batches", help = "Specify batches for training...", 
+                   dest = "batch", 
+                   default=BAT_SIZE, 
+                   required=False, 
+                   type = int, 
+                   nargs=1)
+    a.add_argument("--model_file", 
+                   help = "Specify pre-trained model file for training...", 
+                   dest = "model_file", 
+                   default="/home/info/model/inceptionv3-ft.model", 
+                   required=False, 
+                   nargs=1)
+    a.add_argument("--output_directory", 
+                   help = "Specify output folder...", 
+                   dest = "output_dir", 
+                   required = True, 
+                   nargs=1, 
+                   type=lambda x: is_valid_dir(a, x), 
+                   nargs=1)
+    a.add_argument("--train_model", 
+                   help = "Specify if the model should be trained...", 
+                   dest = "train_model", 
+                   required=False, 
+                   default=True, 
+                   nargs=1, 
+                   type = bool)
+    a.add_argument("--load_model", 
+                   help = "Specify if a pre-trained model should be loaded...", 
+                   dest = "load_model", 
+                   required=False, 
+                   default=False, 
+                   nargs=1, 
+                   type = bool)
+    a.add_argument("--fine_tune", 
+                   help = "Specify model should be fine tuned...", 
+                   dest = "fine_tune", 
+                   required=False, 
+                   default=True, 
+                   nargs=1, 
+                   type = bool)
+    a.add_argument("--test_augmentation", 
+                   help = "Specify if image augmentation should be done on test dataset...", 
+                   dest = "test_aug", 
+                   required=False, 
+                   default=False, 
+                   nargs=1, 
+                   type = bool)
+    a.add_argument("--plot", 
+                   help = "Specify if a plot should be generated...", 
+                   dest = "plot", 
+                   required=False, 
+                   default=True, 
+                   nargs=1, 
+                   type = bool)
+    args = a.parse_args()
+    return args
 
 if __name__=="__main__":
-  a = argparse.ArgumentParser()
-  a.add_argument("--train_dir")
-  a.add_argument("--val_dir")
-  a.add_argument("--epoch", default=NB_EPOCHS)
-  a.add_argument("--batch", default=BAT_SIZE)
-  a.add_argument("--model_file", default="/home/info/model/inceptionv3-ft.model")
-  a.add_argument("--output_dir")
-  a.add_argument("--train_model", default=True)
-  a.add_argument("--load_model", default=False)
-  a.add_argument("--fine_tune", default=True)
-  a.add_argument("--test_aug", default=False)
-  a.add_argument("--plot", default=True)
+    args = cmd_args.get_user_options()
 
-  args = a.parse_args()
-  if args.train_dir is None or args.val_dir is None:
-    a.print_help()
-    sys.exit(1)
+    if args.train_dir is None or args.val_dir is None:
+      a.print_help()
+      sys.exit(1)
 
-  if (not os.path.exists(args.train_dir)) or (not os.path.exists(args.val_dir)):
-    print("directories do not exist")
-    sys.exit(1)
+    if (not os.path.exists(args.train_dir)) or (not os.path.exists(args.val_dir)) or (not os.path.exists(args.model_file)) or (not os.path.exists(args.output_dir)):
+      print("directories do not exist")
+      sys.exit(1)
 
-  train(args)
+    train(args)
 # Example usage: python3 transfer_learning.py --train_dir /home/info/train --val_dir /home/info/val --batch 20 --epoch 10 --model_file /home/info/transfer_learn_epoch100.model --output_dir /home/info/model --train_model True --load_model True --fine_tune True --test_aug False --plot True
