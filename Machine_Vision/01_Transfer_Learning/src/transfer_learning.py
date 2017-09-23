@@ -18,10 +18,10 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, RMSprop, Adagrad
 
 IM_WIDTH, IM_HEIGHT = 299, 299 #Fixed size for InceptionV3
-NB_EPOCHS = 100
-BAT_SIZE = 10
+DEFAULT_EPOCHS = 100
+DEFAULT_BATCHES = 10
 FC_SIZE = 1024
-NB_IV3_LAYERS_TO_FREEZE = 172
+NB_LAYERS_TO_FREEZE = 169
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
@@ -81,9 +81,9 @@ def add_new_last_layer(base_model, nb_classes):
 
 def setup_to_finetune(model, optimizer):
   """Freeze the bottom NB_IV3_LAYERS and retrain the remaining top layers"""
-  for layer in model.layers[:NB_IV3_LAYERS_TO_FREEZE]:
+  for layer in model.layers[:NB_LAYERS_TO_FREEZE]:
      layer.trainable = False
-  for layer in model.layers[NB_IV3_LAYERS_TO_FREEZE:]:
+  for layer in model.layers[NB_LAYERS_TO_FREEZE:]:
      layer.trainable = True
   model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
   return model
@@ -227,13 +227,13 @@ def get_user_options():
     a.add_argument("--epochs", 
                    help = "Specify epochs for training...", 
                    dest = "epoch", 
-                   default=NB_EPOCHS, 
+                   default=DEFAULT_EPOCHS, 
                    required=False, 
                    type = int, 
                    nargs=1)
     a.add_argument("--batches", help = "Specify batches for training...", 
                    dest = "batch", 
-                   default=BAT_SIZE, 
+                   default=DEFAULT_BATCHES, 
                    required=False, 
                    type = int, 
                    nargs=1)
