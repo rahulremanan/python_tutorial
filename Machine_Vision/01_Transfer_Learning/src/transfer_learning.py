@@ -294,7 +294,7 @@ if __name__=="__main__":
     args = get_user_options()
 
     if (not os.path.exists(args.train_dir[0])) or (not os.path.exists(args.val_dir[0])) or (not os.path.exists(args.model_file[0])) or (not os.path.exists(args.output_dir[0])):
-      print("directories do not exist")
+      print("Specified directories do not exist...")
       sys.exit(1)
 
     train(args)
