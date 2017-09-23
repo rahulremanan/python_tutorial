@@ -1,14 +1,17 @@
+import time
 import os
 import sys
 import glob
 import argparse
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import keras
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
 from keras.models import Model
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, RMSprop, Adagrad
-import keras 
 
 IM_WIDTH, IM_HEIGHT = 299, 299 #fixed size for InceptionV3
 NB_EPOCHS = 100
@@ -21,17 +24,16 @@ rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
 ada = Adagrad(lr=1e-7, epsilon=1e-08, decay=0.0)
 optimizer = sgd
 
-def get_load_model(bool_fn):
-    load_model = bool(bool_fn)
-    return load_model
+def generate_timestamp():
+    timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
+    print ("time stamp generated: "+timestring)
+    return timestring
 
-def get_train_model(bool_fn):
-    train_model = bool(bool_fn)
-    return train_model
-
-def get_fine_tune(bool_fn):
-    tune_model = bool(bool_fn)
-    return tune_model
+timestr = generate_timestamp()
+ 
+def get_bool_fn(bool_fn):       # Boolean filter
+    load_value = bool(bool_fn)
+    return load_value
 
 def get_nb_files(directory):
   if not os.path.exists(directory):
@@ -76,7 +78,6 @@ def train(args):
   nb_epoch = int(args.epoch)
   batch_size = int(args.batch)
 
-  # data prep
   train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
       rotation_range=30,
       width_shift_range=0.2,
@@ -85,22 +86,29 @@ def train(args):
       zoom_range=0.2,
       horizontal_flip=True)
   
-  test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
-      rotation_range=30,
-      width_shift_range=0.2,
-      height_shift_range=0.2,
-      shear_range=0.2,
-      zoom_range=0.2,
-      horizontal_flip=True)
+  test_aug = get_bool_fn(args.test_aug)  
+  
+  if test_aug==True:
+      test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
+          rotation_range=30,
+          width_shift_range=0.2,
+          height_shift_range=0.2,
+          shear_range=0.2,
+          zoom_range=0.2,
+          horizontal_flip=True)
+  else:
+      test_datagen = ImageDataGenerator(rescale=1. / 255)
 
   train_generator = train_datagen.flow_from_directory(args.train_dir,
     target_size=(IM_WIDTH, IM_HEIGHT),
-    batch_size=batch_size)
+    batch_size=batch_size,
+    class_mode='categorical')
 
   validation_generator = test_datagen.flow_from_directory(
     args.val_dir,
     target_size=(IM_WIDTH, IM_HEIGHT),
-    batch_size=batch_size)
+    batch_size=batch_size,
+    class_mode='categorical')
   
   base_model = InceptionV3(weights='imagenet', include_top=False) #include_top=False excludes final FC layer
   model = add_new_last_layer(base_model, nb_classes)
@@ -108,9 +116,9 @@ def train(args):
   print (model.summary)
   
   try:
-      load_model = get_load_model(args.load_model)
-      train_model = get_train_model(args.train_model)
-      fine_tune_model = get_fine_tune(args.fine_tune)
+      load_model = get_bool_fn(args.load_model)
+      train_model = get_bool_fn(args.train_model)
+      fine_tune_model = get_bool_fn(args.fine_tune)
       if load_model == True:
             model = keras.models.load_model(args.model_file)
             print ("Loaded saved model weights...")
@@ -145,35 +153,42 @@ def train(args):
                 model_train = model_ft
             else:
                 model_train = model_tl
-
-            model.save(args.model_file)
+                
+            output_loc = args.output_dir
+            output_file = (output_loc+"//"+"trained_"+timestr+"bone_age.model")
+            model.save(output_file)
       else:
           print ("Using pre-trained model for prediction...")
   except:
         print ("No pre-trained model or model weights loaded...")
-
-
-  if args.plot:
-    plot_training(model_train)
+  
+  gen_plot = get_bool_fn(args.plot)
+  if gen_plot==True:
+      plot_training(model_train)
+  else:
+      model_train
 
 def plot_training(history):
   output_loc = args.output_dir
-  acc = history.history['acc']
-  val_acc = history.history['val_acc']
-  loss = history.history['loss']
-  val_loss = history.history['val_loss']
-  epochs = range(len(acc))
-
-  plt.plot(epochs, acc, 'r.')
-  plt.plot(epochs, val_acc, 'r')
-  plt.title('Training and validation accuracy')
-
-  plt.figure()
-  plt.plot(epochs, loss, 'r.')
-  plt.plot(epochs, val_loss, 'r-')
-  plt.title('Training and validation loss')
+  output_file_acc = os.path.join(output_loc+"//training_plot_acc_"+timestr+".png")
+  output_file_loss = os.path.join(output_loc+"//training_plot_loss_"+timestr+".png")
+  
   fig = plt.figure()
-  fig.savefig(output_loc)
+  plt.plot(history.history['acc'])
+  plt.plot(history.history['val_acc'])
+  plt.title('model accuracy')
+  plt.ylabel('accuracy')
+  plt.xlabel('epoch')
+  plt.legend(['train', 'test'], loc='upper left')
+  fig.savefig(output_file_acc, dpi=fig.dpi)
+
+  plt.plot(history.history['loss'])
+  plt.plot(history.history['val_loss'])
+  plt.title('model loss')
+  plt.ylabel('loss')
+  plt.xlabel('epoch')
+  plt.legend(['train', 'test'], loc='upper left')
+  fig.savefig(output_file_loss, dpi=fig.dpi)
 
 if __name__=="__main__":
   a = argparse.ArgumentParser()
@@ -182,11 +197,12 @@ if __name__=="__main__":
   a.add_argument("--epoch", default=NB_EPOCHS)
   a.add_argument("--batch", default=BAT_SIZE)
   a.add_argument("--model_file", default="/home/info/model/inceptionv3-ft.model")
-  a.add_argument("--plot", action="store_true")
   a.add_argument("--output_dir")
   a.add_argument("--train_model", default=True)
   a.add_argument("--load_model", default=False)
   a.add_argument("--fine_tune", default=True)
+  a.add_argument("--test_aug", default=False)
+  a.add_argument("--plot", default=True)
 
   args = a.parse_args()
   if args.train_dir is None or args.val_dir is None:
@@ -198,4 +214,4 @@ if __name__=="__main__":
     sys.exit(1)
 
   train(args)
-# Example usage: python3 transfer_learning.py --train_dir /home/info/train --val_dir /home/info/val --batch 20 --epoch 10 --model_file /home/info/transfer_learn_epoch100.model --output_dir /home/info/model --train_model True --load_model True --fine_tune True
+# Example usage: python3 transfer_learning.py --train_dir /home/info/train --val_dir /home/info/val --batch 20 --epoch 10 --model_file /home/info/transfer_learn_epoch100.model --output_dir /home/info/model --train_model True --load_model True --fine_tune True --test_aug False --plot True
