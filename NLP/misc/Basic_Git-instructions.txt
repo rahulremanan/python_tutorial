@@ -2,3 +2,18 @@ git add .
 git commit -a
 git pull -r
 git push origin master
+# Apply stash
+git stash pop
+# Clear stash
+git stash clear
+# Clear a large file
+git add --all
+git commit -a
+git push origin master # Let the push fail
+git filter-branch --force --index-filter "git rm --cached --ignore-un
+match  path/to/file" --prune-empty --tag-name-filter cat --
+--all
+# Create a branch in your machine and switch to it
+git checkout -b [name_of_your_new_branch]
+# Sync with master brach
+git checkout master

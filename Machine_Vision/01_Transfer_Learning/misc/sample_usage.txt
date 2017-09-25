@@ -1,1 +1,1 @@
-python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/val --batches 20 --epochs 2 --output_directory /home/info --train_model True --fine_tune True --test_augmentation False --plot True --summary True
+python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/val --batches 20 --epochs 200 --output_directory /home/info --train_model True --fine_tune True --test_augmentation False --plot True --summary True
