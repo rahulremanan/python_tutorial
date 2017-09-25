@@ -2,7 +2,7 @@
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
 # License: MIT open source license (https://github.com/rahulremanan/python_tutorial/blob/master/LICENSE).
-# Example usage: python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/train --batches 20 --epochs 2 --output_directory /home/info --train_model True --fine_tune True --test_augmentation False --plot True
+# Example usage: python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/val --batches 20 --epochs 2 --output_directory /home/info --train_model True --fine_tune True --test_augmentation False --plot True --summary True
 import time
 import os
 import sys
@@ -134,7 +134,13 @@ def train(args):
   base_model = InceptionV3(weights='imagenet', include_top=False) #include_top=False excludes final FC layer
   model = add_new_last_layer(base_model, nb_classes)
   print ("Inception model loaded...")
-  print (model.summary)
+  
+  model_summary = get_bool_fn(args.model_summary[0])
+  
+  if model_summary == True:
+      print (model.summary())
+  else:
+      print ("Loading Inception version 3 ...")
     
   load_model = get_bool_fn(args.load_model[0])
   
@@ -278,6 +284,13 @@ def get_user_options():
                    dest = "plot", 
                    required=False, 
                    default=[True], 
+                   nargs=1, 
+                   type = bool)
+    a.add_argument("--summary", 
+                   help = "Specify if a summary should be generated...", 
+                   dest = "model_summary", 
+                   required=False, 
+                   default=[False], 
                    nargs=1, 
                    type = bool)
     args = a.parse_args()
