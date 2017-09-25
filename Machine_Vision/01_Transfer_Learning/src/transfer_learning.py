@@ -254,7 +254,7 @@ def get_user_options():
     a.add_argument("--train_model", 
                    help = "Specify if the model should be trained...", 
                    dest = "train_model", 
-                   required=False, 
+                   required=True, 
                    default=[True], 
                    nargs=1, 
                    type = bool)
