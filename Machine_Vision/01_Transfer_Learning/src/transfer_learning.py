@@ -2,7 +2,7 @@
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
 # License: MIT open source license (https://github.com/rahulremanan/python_tutorial/blob/master/LICENSE).
-# Example usage: python3 transfer_learning.py --training_directory '/home/info/train' --validation_directory '/home/info/val' --batches 20 --epochs 10 --model_file '/home/info/transfer_learn_epoch100.model' --output_directory '/home/info/model' --train_model True --load_model True --fine_tune True --test_augmentation False --plot True  
+# Example usage: python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/train --batches 20 --epochs 2 --output_directory /home/info --train_model True --fine_tune True --test_augmentation False --plot True
 import time
 import os
 import sys
@@ -21,7 +21,7 @@ from keras.optimizers import SGD, RMSprop, Adagrad
 IM_WIDTH, IM_HEIGHT = 299, 299 #Fixed size for InceptionV3
 DEFAULT_EPOCHS = 100
 DEFAULT_BATCHES = 10
-FC_SIZE = 1024
+FC_SIZE = 128
 NB_LAYERS_TO_FREEZE = 169
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
@@ -92,9 +92,9 @@ def setup_to_finetune(model, optimizer):
 def train(args):
   """Use transfer learning and fine-tuning to train a network on a new dataset"""
   nb_train_samples = get_nb_files(args.train_dir[0])
-  print (nb_train_samples)
+  print ("Total number of training samples = " + str(nb_train_samples))
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
-  print (nb_classes)
+  print ("Number of training categories = " + str(nb_classes))
   nb_val_samples = get_nb_files(args.val_dir[0])
   nb_epoch = int(args.epoch[0])
   batch_size = int(args.batch[0])
@@ -135,84 +135,77 @@ def train(args):
   model = add_new_last_layer(base_model, nb_classes)
   print ("Inception model loaded...")
   print (model.summary)
+    
+  load_model = get_bool_fn(args.load_model[0])
   
-  try:
-      load_model = get_bool_fn(args.load_model[0])
-      train_model = get_bool_fn(args.train_model[0])
-      fine_tune_model = get_bool_fn(args.fine_tune[0])
-      if load_model == True:
-            model = keras.models.load_model(args.model_file[0])
-            print ("Loaded saved model weights...")
-      else:
-                print ("Tabula rasa....")
-      if train_model == True:
-            # transfer learning
-            setup_to_transfer_learn(model, base_model, optimizer)
-            print (model.summary)
-            print (nb_train_samples)
-            
-            model_tl = model.fit_generator(
-                  train_generator,
-                  epochs=nb_epoch,
-                  steps_per_epoch=nb_train_samples // batch_size,
-                  validation_data=validation_generator,
-                  validation_steps=nb_val_samples // batch_size,
-                  class_weight='auto')
-
-          # fine-tuning
-            setup_to_finetune(model, optimizer)
-
-            model_ft = model.fit_generator(
-                  train_generator,
-                  steps_per_epoch=nb_train_samples // batch_size,
-                  epochs=nb_epoch,
-                  validation_data=validation_generator,
-                  validation_steps=nb_val_samples // batch_size,
-                  class_weight='auto')
-            
-            if fine_tune_model == True:
-                model_train = model_ft
-            else:
-                model_train = model_tl
-                
-            output_loc = args.output_dir[0]
-            output_file = (output_loc+"//"+"trained_"+timestr+"bone_age.model")
-            model.save(output_file)
-      else:
-          print ("Using pre-trained model for prediction...")
-  except:
-        print ("No pre-trained model or model weights loaded...")
+  fine_tune_model = get_bool_fn(args.fine_tune[0])
   
-  gen_plot = get_bool_fn(args.plot[0])
-  if gen_plot==True:
-      plot_training(model_train)
+  if load_model == True:
+      print (args.model_file[0])
+      model = keras.models.load_model(args.model_file[0])
+      print ("Loaded saved model weights...")
   else:
-      model_train
+      model = model
+      print ("Tabula rasa....")
+      
+  setup_to_transfer_learn(model, base_model, optimizer)
+            
+  model_tl = model.fit_generator(train_generator,
+                  epochs=nb_epoch,
+                  steps_per_epoch=nb_train_samples // batch_size,
+                  validation_data=validation_generator,
+                  validation_steps=nb_val_samples // batch_size,
+                  class_weight='auto')
+  setup_to_finetune(model, optimizer)
+
+  model_ft = model.fit_generator(train_generator,
+                  steps_per_epoch=nb_train_samples // batch_size,
+                  epochs=nb_epoch,
+                  validation_data=validation_generator,
+                  validation_steps=nb_val_samples // batch_size,
+                  class_weight='auto')
+  
+  if fine_tune_model == True:
+      model_train = model_ft
+  else:
+      model_train = model_tl
+      
+  return model_train
+  
+def generate_plot(args, model_train):
+    gen_plot = get_bool_fn(args.plot[0])
+    if gen_plot==True:
+        plot_training(model_train)
+    else:
+        model_train
 
 def plot_training(history):
   output_loc = args.output_dir[0]
   output_file_acc = os.path.join(output_loc+"//training_plot_acc_"+timestr+".png")
   output_file_loss = os.path.join(output_loc+"//training_plot_loss_"+timestr+".png")
   
-  fig = plt.figure()
+  fig_acc = plt.figure()
   plt.plot(history.history['acc'])
   plt.plot(history.history['val_acc'])
   plt.title('model accuracy')
   plt.ylabel('accuracy')
   plt.xlabel('epoch')
   plt.legend(['train', 'test'], loc='upper left')
-  fig.savefig(output_file_acc, dpi=fig.dpi)
+  fig_acc.savefig(output_file_acc, dpi=fig_acc.dpi)
   print ("Successfully created model training accuracy plot...")
+  plt.close()
 
+  fig_loss = plt.figure()
   plt.plot(history.history['loss'])
   plt.plot(history.history['val_loss'])
   plt.title('model loss')
   plt.ylabel('loss')
   plt.xlabel('epoch')
   plt.legend(['train', 'test'], loc='upper left')
-  fig.savefig(output_file_loss, dpi=fig.dpi)
+  fig_loss.savefig(output_file_loss, dpi=fig_loss.dpi)
   print ("Successfully created model training loss function plot...")
-
+  plt.close()
+  
 def get_user_options():
     a = argparse.ArgumentParser()
     a.add_argument("--training_directory", 
@@ -230,20 +223,20 @@ def get_user_options():
     a.add_argument("--epochs", 
                    help = "Specify epochs for training...", 
                    dest = "epoch", 
-                   default=DEFAULT_EPOCHS, 
+                   default=[DEFAULT_EPOCHS], 
                    required=False, 
                    type = int, 
                    nargs=1)
     a.add_argument("--batches", help = "Specify batches for training...", 
                    dest = "batch", 
-                   default=DEFAULT_BATCHES, 
+                   default=[DEFAULT_BATCHES], 
                    required=False, 
                    type = int, 
                    nargs=1)
     a.add_argument("--model_file", 
                    help = "Specify pre-trained model file for training...", 
                    dest = "model_file", 
-                   default="/home/info/model/inceptionv3-ft.model", 
+                   default=["/home/info/model/inceptionv3-ft.model"], 
                    required=False, 
                    nargs=1)
     a.add_argument("--output_directory", 
@@ -256,35 +249,35 @@ def get_user_options():
                    help = "Specify if the model should be trained...", 
                    dest = "train_model", 
                    required=False, 
-                   default=True, 
+                   default=[True], 
                    nargs=1, 
                    type = bool)
     a.add_argument("--load_model", 
                    help = "Specify if a pre-trained model should be loaded...", 
                    dest = "load_model", 
                    required=False, 
-                   default=False, 
+                   default=[False], 
                    nargs=1, 
                    type = bool)
     a.add_argument("--fine_tune", 
                    help = "Specify model should be fine tuned...", 
                    dest = "fine_tune", 
                    required=False, 
-                   default=True, 
+                   default=[True], 
                    nargs=1, 
                    type = bool)
     a.add_argument("--test_augmentation", 
                    help = "Specify if image augmentation should be done on test dataset...", 
                    dest = "test_aug", 
                    required=False, 
-                   default=False, 
+                   default=[False], 
                    nargs=1, 
                    type = bool)
     a.add_argument("--plot", 
                    help = "Specify if a plot should be generated...", 
                    dest = "plot", 
                    required=False, 
-                   default=True, 
+                   default=[True], 
                    nargs=1, 
                    type = bool)
     args = a.parse_args()
@@ -293,8 +286,17 @@ def get_user_options():
 if __name__=="__main__":
     args = get_user_options()
 
-    if (not os.path.exists(args.train_dir[0])) or (not os.path.exists(args.val_dir[0])) or (not os.path.exists(args.model_file[0])) or (not os.path.exists(args.output_dir[0])):
+    if (not os.path.exists(args.train_dir[0])) or (not os.path.exists(args.val_dir[0])) or (not os.path.exists(args.output_dir[0])):
       print("Specified directories do not exist...")
       sys.exit(1)
-
-    train(args)
+    train_model = get_bool_fn(args.train_model[0])  
+    
+    if train_model ==True:
+        print ("Training sesssion initiated...")
+        train(args)
+        generate_plot(args, train(args))
+    else:
+        print ("Nothing to do here...")
+        print ("Try setting the --train_model flag to True...")
+        print ("For more help, run with -h ...")
+        sys.exit(1)

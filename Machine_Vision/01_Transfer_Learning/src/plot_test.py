@@ -36,26 +36,31 @@ def generate_timestamp():
 timestr = generate_timestamp()
 
 def plot_training(history):
-  output_loc = '/home/info'
+  output_loc = '/home/info/'
   output_file_acc = os.path.join(output_loc+"//training_plot_acc_"+timestr+".png")
   output_file_loss = os.path.join(output_loc+"//training_plot_loss_"+timestr+".png")
   
-  fig = plt.figure()
+  fig_acc = plt.figure()
   plt.plot(history.history['acc'])
   plt.plot(history.history['val_acc'])
   plt.title('model accuracy')
   plt.ylabel('accuracy')
   plt.xlabel('epoch')
   plt.legend(['train', 'test'], loc='upper left')
-  fig.savefig(output_file_acc, dpi=fig.dpi)
+  fig_acc.savefig(output_file_acc, dpi=fig_acc.dpi)
+  print ("Successfully created model training accuracy plot...")
+  plt.close()
 
+  fig_loss = plt.figure()
   plt.plot(history.history['loss'])
   plt.plot(history.history['val_loss'])
   plt.title('model loss')
   plt.ylabel('loss')
   plt.xlabel('epoch')
   plt.legend(['train', 'test'], loc='upper left')
-  fig.savefig(output_file_loss, dpi=fig.dpi)
+  fig_loss.savefig(output_file_loss, dpi=fig_loss.dpi)
+  print ("Successfully created model training loss function plot...")
+  plt.close()
   
 plot_training(history)
   
