@@ -2,7 +2,7 @@
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
 # License: MIT open source license (https://github.com/rahulremanan/python_tutorial/blob/master/LICENSE).
-# Example usage: python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/val --batches 20 --epochs 2 --output_directory /home/info --train_model True --fine_tune True --test_augmentation False --plot True --summary True
+# Example usage: python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/val --batches 20 --epochs 200 --output_directory /home/info --train_model True --fine_tune True --test_augmentation False --plot True --summary True
 import time
 import os
 import sys
