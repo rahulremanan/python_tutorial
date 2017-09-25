@@ -1,12 +1,2 @@
 # Example usage: 
- python3 transfer_learning.py \
---training_directory /home/info/train \ 
---validation_directory /home/info/val \
---batches 20 \
---epochs 200 \
---output_directory /home/info \
---train_model True \
---fine_tune True \
---test_augmentation False \
---plot True \
---summary True
+python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/val --model_file /home/info/model/trained_2017_09_25-16_02_50.model --load_model True --batches 20 --epochs 2 --output_directory /home/info/model --train_model True --fine_tune True --test_augmentation False --plot True --summary False

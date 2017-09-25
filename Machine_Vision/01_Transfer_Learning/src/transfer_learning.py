@@ -1,23 +1,26 @@
 # Transfer learning using Keras and Tensorflow.
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
-# License: MIT open source license (https://github.com/rahulremanan/python_tutorial/blob/master/LICENSE).
-import time
+# License: MIT open source license (
+# Repository: https://github.com/rahulremanan/python_tutorial/import time
 import os
+import time
 import sys
 import glob
+import h5py
+import json
 import argparse
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import tensorflow
 import keras
+import PIL
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
 from keras.models import Model
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, RMSprop, Adagrad
-import h5py
-import json
 
 IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Fixed input image size for Inception version 3
 DEFAULT_EPOCHS = 100
@@ -102,14 +105,53 @@ def save_model(model, file_loc):
     model.save_weights(os.path.join(file_pointer + ".model"))
     # serialize model to JSON
     model_json = model.to_json()
-    with open(os.path.join(file_pointer+"_model.json", "w")) as json_file:
+    with open(os.path.join(file_pointer+"_model.json"), "w") as json_file:
         json_file.write(model_json)
     print ("Saved the trained model weights to: " + 
            str(os.path.join(file_pointer + ".model")))
     print ("Saved the trained model weights as a json file to: " + 
            str(os.path.join(file_pointer+"_model.json")))    
 
-def train(args):                                                                # Transfer learning and fine-tuning to train
+def generate_plot(args, model_train):
+    gen_plot = get_bool_fn(args.plot[0])
+    if gen_plot==True:
+        plot_training(model_train)
+    else:
+        print ("No training summary plots generated ...")
+        print ("Set: --plot True for creating training summary plots")
+
+def plot_training(history):
+  output_loc = args.output_dir[0]
+  
+  output_file_acc = os.path.join(output_loc+
+                                 "//training_plot_acc_"+timestr+".png")
+  output_file_loss = os.path.join(output_loc+
+                                  "//training_plot_loss_"+timestr+".png")
+  fig_acc = plt.figure()
+  plt.plot(history.history['acc'])
+  plt.plot(history.history['val_acc'])
+  plt.title('model accuracy')
+  plt.ylabel('accuracy')
+  plt.xlabel('epoch')
+  plt.legend(['train', 'test'], loc='upper left')
+  fig_acc.savefig(output_file_acc, dpi=fig_acc.dpi)
+  print ("Successfully created the training accuracy plot: " 
+         + str(output_file_acc))
+  plt.close()
+
+  fig_loss = plt.figure()
+  plt.plot(history.history['loss'])
+  plt.plot(history.history['val_loss'])
+  plt.title('model loss')
+  plt.ylabel('loss')
+  plt.xlabel('epoch')
+  plt.legend(['train', 'test'], loc='upper left')
+  fig_loss.savefig(output_file_loss, dpi=fig_loss.dpi)
+  print ("Successfully created the loss function plot: " 
+         + str(output_file_loss))
+  plt.close()
+        
+def train(args):                                                                # Transfer learning and fine-tuning for training
   nb_train_samples = get_nb_files(args.train_dir[0])
   print ("Total number of training samples = " + str(nb_train_samples))
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
@@ -166,8 +208,9 @@ def train(args):                                                                
   fine_tune_model = get_bool_fn(args.fine_tune[0])
   
   if load_model == True:
+      model = model
       print ("Loading model weights from: " + str(args.model_file[0]))
-      model = keras.models.load_model(args.model_file[0])
+      model.load_weights(args.model_file[0])
       print ("Successfully loaded saved model weights ...")
   else:
       model = model
@@ -194,51 +237,14 @@ def train(args):                                                                
   if fine_tune_model == True:
       model_train = model_ft
       save_model(model,  args.output_dir[0])
+      generate_plot(args, model_train)
   else:
       model_train = model_tl
       save_model(model,  args.output_dir[0])
+      generate_plot(args, model_train)
             
   return model_train
 
-def generate_plot(args, model_train):
-    gen_plot = get_bool_fn(args.plot[0])
-    if gen_plot==True:
-        plot_training(model_train)
-    else:
-        model_train
-
-def plot_training(history):
-  output_loc = args.output_dir[0]
-  
-  output_file_acc = os.path.join(output_loc+
-                                 "//training_plot_acc_"+timestr+".png")
-  output_file_loss = os.path.join(output_loc+
-                                  "//training_plot_loss_"+timestr+".png")
-  
-  fig_acc = plt.figure()
-  plt.plot(history.history['acc'])
-  plt.plot(history.history['val_acc'])
-  plt.title('model accuracy')
-  plt.ylabel('accuracy')
-  plt.xlabel('epoch')
-  plt.legend(['train', 'test'], loc='upper left')
-  fig_acc.savefig(output_file_acc, dpi=fig_acc.dpi)
-  print ("Successfully created the training accuracy plot: " 
-         + str(output_file_acc))
-  plt.close()
-
-  fig_loss = plt.figure()
-  plt.plot(history.history['loss'])
-  plt.plot(history.history['val_loss'])
-  plt.title('model loss')
-  plt.ylabel('loss')
-  plt.xlabel('epoch')
-  plt.legend(['train', 'test'], loc='upper left')
-  fig_loss.savefig(output_file_loss, dpi=fig_loss.dpi)
-  print ("Successfully created the loss function plot: " 
-         + str(output_file_loss))
-  plt.close()
-  
 def get_user_options():
     a = argparse.ArgumentParser()
     
@@ -352,7 +358,6 @@ if __name__=="__main__":
     if train_model ==True:
         print ("Training sesssion initiated ...")
         train(args)
-        generate_plot(args, train(args))
     else:
         print ("Nothing to do here ...")
         print ("Try setting the --train_model flag to True ...")
