@@ -94,18 +94,18 @@ def setup_to_finetune(model, optimizer):                                        
                 metrics=['accuracy'])
   return model
 
-def save_model(args, model):
+def save_model(args, name, model):
     file_loc = args.output_dir[0]
     file_pointer = os.path.join(file_loc+"//trained_"+ timestr)
-    model.save_weights(os.path.join(file_pointer + "_weights.model"))
+    model.save_weights(os.path.join(file_pointer + "_weights"+str(name)+".model"))
     # serialize model to JSON
     model_json = model.to_json()
-    with open(os.path.join(file_pointer+"_config.json"), "w") as json_file:
+    with open(os.path.join(file_pointer+"_config"+str(name)+".json"), "w") as json_file:
         json_file.write(model_json)
     print ("Saved the trained model weights to: " + 
-           str(os.path.join(file_pointer + "_weights.model")))
+           str(os.path.join(file_pointer + "_weights_"+str(name)+".model")))
     print ("Saved the trained model configuration as a json file to: " + 
-           str(os.path.join(file_pointer+"_config.json")))
+           str(os.path.join(file_pointer+"_config"+str(name)+".json")))
 
 def generate_labels(args):
     file_loc = args.output_dir[0]
@@ -148,21 +148,21 @@ def generate_labels(args):
 
     return labels
 
-def generate_plot(args, model_train):
+def generate_plot(args, name, model_train):
     gen_plot = args.plot[0]
     if gen_plot==True:
-        plot_training(model_train)
+        plot_training(args, name, model_train)
     else:
         print ("No training summary plots generated ...")
         print ("Set: --plot True for creating training summary plots")
 
-def plot_training(history):
+def plot_training(args, name, history):
   output_loc = args.output_dir[0]
   
   output_file_acc = os.path.join(output_loc+
-                                 "//training_plot_acc_"+timestr+".png")
+                                 "//training_plot_acc_"+timestr+str(name)+".png")
   output_file_loss = os.path.join(output_loc+
-                                  "//training_plot_loss_"+timestr+".png")
+                                  "//training_plot_loss_"+timestr+str(name)+".png")
   fig_acc = plt.figure()
   plt.plot(history.history['acc'])
   plt.plot(history.history['val_acc'])
@@ -283,8 +283,10 @@ def train(args):                                                                
       print ("Tabula rasa ...")
       
   if fine_tune_model == True:
+      print ("Fine tuning Inception v3 ...")
       setup_to_finetune(model, optimizer)
   else:
+      print ("Transfer learning using Inception v3 ...")
       setup_to_transfer_learn(model, base_model, optimizer)
             
   print ("Initializing training with  class labels: " + 
@@ -297,9 +299,14 @@ def train(args):                                                                
                   validation_steps=nb_val_samples // batch_size,
                   class_weight='auto')
   
-  save_model(args, model)
-  generate_plot(args, model_train)           
-
+  if fine_tune_model == True:
+      save_model(args, "_ft_", model)
+      generate_plot(args, "_ft_", model_train)
+  else:
+      save_model(args, "_tl_", model)
+      generate_plot(args, "_tl_", model_train)
+      
+  
 def get_user_options():
     a = argparse.ArgumentParser()
     

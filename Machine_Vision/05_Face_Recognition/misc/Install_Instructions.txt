@@ -1,0 +1,3 @@
+sudo apt-get install libboost-all-dev
+sudo pip3 install dlib
+sudo pip3 install face_recognition
