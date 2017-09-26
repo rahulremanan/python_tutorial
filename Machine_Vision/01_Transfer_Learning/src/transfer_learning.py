@@ -2,7 +2,7 @@
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
 # License: MIT open source license (
-# Repository: https://github.com/rahulremanan/python_tutorial/import time
+# Repository: https://github.com/rahulremanan/python_tutorial
 import argparse
 import os
 import time
@@ -100,12 +100,12 @@ def save_model(args, model):
     model.save_weights(os.path.join(file_pointer + "_weights.model"))
     # serialize model to JSON
     model_json = model.to_json()
-    with open(os.path.join(file_pointer+"_model.json"), "w") as json_file:
+    with open(os.path.join(file_pointer+"_config.json"), "w") as json_file:
         json_file.write(model_json)
     print ("Saved the trained model weights to: " + 
-           str(os.path.join(file_pointer + ".model")))
+           str(os.path.join(file_pointer + "_weights.model")))
     print ("Saved the trained model configuration as a json file to: " + 
-           str(os.path.join(file_pointer+"_model.json")))
+           str(os.path.join(file_pointer+"_config.json")))
 
 def generate_labels(args):
     file_loc = args.output_dir[0]
@@ -143,6 +143,7 @@ def generate_labels(args):
             json.dump(labels, json_file)
     else:
       print ("Mismatched training and validation data labels ...")
+      print ("Sub-folder names do not match between training and validation directories ...")
       sys.exit(1)
 
     return labels
@@ -191,18 +192,22 @@ def train(args):                                                                
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
   
   print ("Total number of training samples = " + str(nb_train_samples))
-  print ("Number of training categories = " + str(nb_classes))
+  print ("Number of training classes = " + str(nb_classes))
   
   nb_val_samples = get_nb_files(args.val_dir[0])
   nb_val_classes = len(glob.glob(args.val_dir[0] + "/*"))
   
-  print ("Total number of training samples = " + str(nb_val_samples))
-  print ("Number of training categories = " + str(nb_val_classes))
+  print ("Total number of validation samples = " + str(nb_val_samples))
+  print ("Number of validation classes = " + str(nb_val_classes))
   
   if nb_val_classes == nb_classes:
       print ("Initiating training session ...")
   else:
-      print ("Mismatched training and validation data classes ...")
+      print ("Mismatched number of training and validation data classes ...")
+      print ("Unequal number of sub-folders found between train and validation directories ...")
+      print ("Each sub-folder in train and validation directroies are treated as a separate class ...")
+      print ("Correct this mismatch and re-run ...")
+      print ("Now exiting ...")
       sys.exit(1)
       
   nb_epoch = int(args.epoch[0])
@@ -282,7 +287,7 @@ def train(args):                                                                
   else:
       setup_to_transfer_learn(model, base_model, optimizer)
             
-  print ("Initializing training with  category labels: " + 
+  print ("Initializing training with  class labels: " + 
          str(labels))
   
   model_train = model.fit_generator(train_generator,
@@ -410,6 +415,7 @@ if __name__=="__main__":
     (not os.path.exists(args.output_dir[0]))):
       print("Specified directories do not exist ...")
       sys.exit(1)
+    
     train_model = args.train_model[0]  
     
     if train_model ==True:
