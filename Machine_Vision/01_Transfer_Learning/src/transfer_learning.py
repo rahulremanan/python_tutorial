@@ -3,13 +3,13 @@
 # For more information contact: info@moad.computer
 # License: MIT open source license (
 # Repository: https://github.com/rahulremanan/python_tutorial/import time
+import argparse
 import os
 import time
 import sys
 import glob
 import h5py
 import json
-import argparse
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -52,21 +52,14 @@ def is_valid_dir(parser, arg):
         parser.error("The folder %s does not exist ..." % arg)
     else:
         return arg
- 
-def get_bool_fn(bool_fn):                                                       # Boolean filter
-    try:
-        load_value = bool(bool_fn)
-        return load_value
-    except:
-        print (("Please check if: \
-            --train_model \
-            --load_model \
-            --fine_tune \
-            --test_aug \
-            --plot \
-            --summary \
-            arguments are True or False statements..."))
-        print ("Example usage: --train_model True ")
+    
+def string_to_bool(val):
+    if val.lower() in ('yes', 'true', 't', 'y', '1', 'yeah'):
+        return True
+    elif val.lower() in ('no', 'false', 'f', 'n', '0', 'none'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected ...')
 
 def get_nb_files(directory):
   if not os.path.exists(directory):
@@ -102,7 +95,7 @@ def setup_to_finetune(model, optimizer):                                        
   return model
 
 def save_model(args, model):
-    file_loc = args.output_di[0]
+    file_loc = args.output_dir[0]
     file_pointer = os.path.join(file_loc+"//trained_"+ timestr)
     model.save_weights(os.path.join(file_pointer + "_weights.model"))
     # serialize model to JSON
@@ -117,7 +110,7 @@ def save_model(args, model):
 def generate_labels(args):
     file_loc = args.output_dir[0]
     data_dir = args.train_dir[0]
-    file_pointer = os.path.join(file_loc+"//trained_"+ timestr)
+    file_pointer = os.path.join(file_loc+"//trained_labels")
     dt = defaultdict(list)
     for root, subdirs, files in os.walk(data_dir):
         for filename in files:
@@ -130,13 +123,13 @@ def generate_labels(args):
 
     labels = sorted(dt.keys())
 
-    with open(os.path.join(file_pointer+"_labels.json"), "w") as json_file:
+    with open(os.path.join(file_pointer+".json"), "w") as json_file:
         json.dump(labels, json_file)
 
     return labels
 
 def generate_plot(args, model_train):
-    gen_plot = get_bool_fn(args.plot[0])
+    gen_plot = args.plot[0]
     if gen_plot==True:
         plot_training(model_train)
     else:
@@ -191,7 +184,7 @@ def train(args):                                                                
       zoom_range=0.2,
       horizontal_flip=True)
   
-  test_aug = get_bool_fn(args.test_aug[0])  
+  test_aug = args.test_aug[0]  
   
   if test_aug==True:
       test_datagen = ImageDataGenerator(
@@ -221,29 +214,29 @@ def train(args):                                                                
   
   labels = generate_labels(args)
   
-  print ((args.model_summary[0]))
-  
-  model_summary_ = get_bool_fn(args.model_summary[0])
+  model_summary_ = args.model_summary[0]
   
   if model_summary_ == True:
       print (model.summary())
   else:
       print ("Successfully loaded Inception version 3 for training ...")
     
-  load_model = get_bool_fn(args.load_model[0])
+  load_model_ = args.load_model[0]
+  fine_tune_model = args.fine_tune[0]
   
-  fine_tune_model = get_bool_fn(args.fine_tune[0])
-  
-  if load_model == True:
+  if load_model_ == True:      
       try:
           with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
           model = model_from_json(model_json)
       except:
           model = model
-      print ("Loading model weights from: " + str(args.weights_file[0]))
-      model.load_weights(args.weights_file[0])
-      print ("Successfully loaded saved model weights ...")
+      try:
+          model.load_weights(args.weights_file[0])
+          print ("Loaded model weights from: " + str(args.weights_file[0]))
+      except:
+          print ("Error loading model weights ...")
+          print ("Loaded default model weights ...")
   else:
       model = model
       print ("Tabula rasa ...")
@@ -301,15 +294,13 @@ def get_user_options():
     a.add_argument("--weights_file", 
                    help = "Specify pre-trained model weights file for training ...", 
                    dest = "weights_file", 
-                   default=["./model/trained_weights.model"], 
                    required=False,
                    type=lambda x: is_valid_file(a, x),
                    nargs=1)
     
     a.add_argument("--config_file", 
                    help = "Specify pre-trained model configuration file ...", 
-                   dest = "config_file", 
-                   default=["./model/model.json"], 
+                   dest = "config_file",  
                    required=False,
                    type=lambda x: is_valid_file(a, x),
                    nargs=1)
@@ -327,7 +318,7 @@ def get_user_options():
                    required=True, 
                    default=[True], 
                    nargs=1, 
-                   type = bool)
+                   type = string_to_bool)
     
     a.add_argument("--load_model", 
                    help = "Specify if pre-trained model should be loaded ...", 
@@ -335,7 +326,7 @@ def get_user_options():
                    required=False, 
                    default=[False], 
                    nargs=1, 
-                   type = bool)
+                   type = string_to_bool)
     
     a.add_argument("--fine_tune", 
                    help = "Specify model should be fine tuned ...", 
@@ -343,7 +334,7 @@ def get_user_options():
                    required=False, 
                    default=[True], 
                    nargs=1, 
-                   type = bool)
+                   type = string_to_bool)
     
     a.add_argument("--test_augmentation", 
                    help = "Specify image augmentation for test dataset ...", 
@@ -351,7 +342,7 @@ def get_user_options():
                    required=False, 
                    default=[False], 
                    nargs=1, 
-                   type = bool)
+                   type = string_to_bool)
     
     a.add_argument("--plot", 
                    help = "Specify if a plot should be generated ...", 
@@ -359,14 +350,14 @@ def get_user_options():
                    required=False, 
                    default=[True], 
                    nargs=1, 
-                   type = bool)
+                   type = string_to_bool)
     
     a.add_argument("--summary", 
                    help = "Specify if a summary should be generated ...", 
                    dest = "model_summary", 
                    required=False, 
                    default=[False], 
-                   type = bool,
+                   type = string_to_bool,
                    nargs=1)
     
     args = a.parse_args()
@@ -383,7 +374,7 @@ if __name__=="__main__":
     (not os.path.exists(args.output_dir[0]))):
       print("Specified directories do not exist ...")
       sys.exit(1)
-    train_model = get_bool_fn(args.train_model[0])  
+    train_model = args.train_model[0]  
     
     if train_model ==True:
         print ("Training sesssion initiated ...")
@@ -391,5 +382,5 @@ if __name__=="__main__":
     else:
         print ("Nothing to do here ...")
         print ("Try setting the --train_model flag to True ...")
-        print ("For more help, run with -h ...")
+        print ("For more help, run with -h flag ...")
         sys.exit(1)
