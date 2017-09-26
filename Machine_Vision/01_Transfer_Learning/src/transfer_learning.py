@@ -16,8 +16,9 @@ import matplotlib.pyplot as plt
 import tensorflow
 import keras
 import PIL
+from collections import defaultdict
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
-from keras.models import Model
+from keras.models import Model, model_from_json
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, RMSprop, Adagrad
@@ -100,17 +101,39 @@ def setup_to_finetune(model, optimizer):                                        
                 metrics=['accuracy'])
   return model
 
-def save_model(model, file_loc):
+def save_model(args, model):
+    file_loc = args.output_di[0]
     file_pointer = os.path.join(file_loc+"//trained_"+ timestr)
-    model.save_weights(os.path.join(file_pointer + ".model"))
+    model.save_weights(os.path.join(file_pointer + "_weights.model"))
     # serialize model to JSON
     model_json = model.to_json()
     with open(os.path.join(file_pointer+"_model.json"), "w") as json_file:
         json_file.write(model_json)
     print ("Saved the trained model weights to: " + 
            str(os.path.join(file_pointer + ".model")))
-    print ("Saved the trained model weights as a json file to: " + 
-           str(os.path.join(file_pointer+"_model.json")))    
+    print ("Saved the trained model configuration as a json file to: " + 
+           str(os.path.join(file_pointer+"_model.json")))
+
+def generate_labels(args):
+    file_loc = args.output_dir[0]
+    data_dir = args.train_dir[0]
+    file_pointer = os.path.join(file_loc+"//trained_"+ timestr)
+    dt = defaultdict(list)
+    for root, subdirs, files in os.walk(data_dir):
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            assert file_path.startswith(data_dir)
+            suffix = file_path[len(data_dir):]
+            suffix = suffix.lstrip("/")
+            label = suffix.split("/")[0]
+            dt[label].append(file_path)
+
+    labels = sorted(dt.keys())
+
+    with open(os.path.join(file_pointer+"_labels.json"), "w") as json_file:
+        json.dump(labels, json_file)
+
+    return labels
 
 def generate_plot(args, model_train):
     gen_plot = get_bool_fn(args.plot[0])
@@ -196,54 +219,52 @@ def train(args):                                                                
   model = add_new_last_layer(base_model, nb_classes)
   print ("Base model for transfer learning: Inception version 3 ...")
   
-  model_summary = get_bool_fn(args.model_summary[0])
+  labels = generate_labels(args)
   
-  if model_summary == True:
+  print ((args.model_summary[0]))
+  
+  model_summary_ = get_bool_fn(args.model_summary[0])
+  
+  if model_summary_ == True:
       print (model.summary())
   else:
-      print ("Successfully loaded the model for training ...")
+      print ("Successfully loaded Inception version 3 for training ...")
     
   load_model = get_bool_fn(args.load_model[0])
   
   fine_tune_model = get_bool_fn(args.fine_tune[0])
   
   if load_model == True:
-      model = model
-      print ("Loading model weights from: " + str(args.model_file[0]))
-      model.load_weights(args.model_file[0])
+      try:
+          with open(args.config_file[0]) as json_file:
+              model_json = json_file.read()
+          model = model_from_json(model_json)
+      except:
+          model = model
+      print ("Loading model weights from: " + str(args.weights_file[0]))
+      model.load_weights(args.weights_file[0])
       print ("Successfully loaded saved model weights ...")
   else:
       model = model
       print ("Tabula rasa ...")
       
-  setup_to_transfer_learn(model, base_model, optimizer)
-            
-  model_tl = model.fit_generator(train_generator,
-                  epochs=nb_epoch,
-                  steps_per_epoch=nb_train_samples // batch_size,
-                  validation_data=validation_generator,
-                  validation_steps=nb_val_samples // batch_size,
-                  class_weight='auto')
-  
-  setup_to_finetune(model, optimizer)
-
-  model_ft = model.fit_generator(train_generator,
-                  steps_per_epoch=nb_train_samples // batch_size,
-                  epochs=nb_epoch,
-                  validation_data=validation_generator,
-                  validation_steps=nb_val_samples // batch_size,
-                  class_weight='auto')
-  
   if fine_tune_model == True:
-      model_train = model_ft
-      save_model(model,  args.output_dir[0])
-      generate_plot(args, model_train)
+      setup_to_finetune(model, optimizer)
   else:
-      model_train = model_tl
-      save_model(model,  args.output_dir[0])
-      generate_plot(args, model_train)
+      setup_to_transfer_learn(model, base_model, optimizer)
             
-  return model_train
+  print ("Initializing training with  category labels: " + 
+         str(labels))
+  
+  model_train = model.fit_generator(train_generator,
+                  epochs=nb_epoch,
+                  steps_per_epoch=nb_train_samples // batch_size,
+                  validation_data=validation_generator,
+                  validation_steps=nb_val_samples // batch_size,
+                  class_weight='auto')
+  
+  save_model(args, model)
+  generate_plot(args, model_train)           
 
 def get_user_options():
     a = argparse.ArgumentParser()
@@ -277,11 +298,20 @@ def get_user_options():
                    type = int, 
                    nargs=1)
     
-    a.add_argument("--model_file", 
-                   help = "Specify pre-trained model file for training ...", 
-                   dest = "model_file", 
-                   default=["/home/info/model/inceptionv3-ft.model"], 
-                   required=False, 
+    a.add_argument("--weights_file", 
+                   help = "Specify pre-trained model weights file for training ...", 
+                   dest = "weights_file", 
+                   default=["./model/trained_weights.model"], 
+                   required=False,
+                   type=lambda x: is_valid_file(a, x),
+                   nargs=1)
+    
+    a.add_argument("--config_file", 
+                   help = "Specify pre-trained model configuration file ...", 
+                   dest = "config_file", 
+                   default=["./model/model.json"], 
+                   required=False,
+                   type=lambda x: is_valid_file(a, x),
                    nargs=1)
     
     a.add_argument("--output_directory", 
@@ -336,8 +366,8 @@ def get_user_options():
                    dest = "model_summary", 
                    required=False, 
                    default=[False], 
-                   nargs=1, 
-                   type = bool)
+                   type = bool,
+                   nargs=1)
     
     args = a.parse_args()
     
