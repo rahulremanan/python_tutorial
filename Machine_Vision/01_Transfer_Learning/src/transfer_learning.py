@@ -109,9 +109,14 @@ def save_model(args, model):
 
 def generate_labels(args):
     file_loc = args.output_dir[0]
-    data_dir = args.train_dir[0]
     file_pointer = os.path.join(file_loc+"//trained_labels")
+    
+    data_dir = args.train_dir[0]
+    val_dir_ = args.val_dir[0]
+    
     dt = defaultdict(list)
+    dv = defaultdict(list)
+    
     for root, subdirs, files in os.walk(data_dir):
         for filename in files:
             file_path = os.path.join(root, filename)
@@ -120,11 +125,25 @@ def generate_labels(args):
             suffix = suffix.lstrip("/")
             label = suffix.split("/")[0]
             dt[label].append(file_path)
+            
+    for root, subdirs, files in os.walk(val_dir_):
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            assert file_path.startswith(val_dir_)
+            suffix = file_path[len(val_dir_):]
+            suffix = suffix.lstrip("/")
+            label = suffix.split("/")[0]
+            dv[label].append(file_path)
 
     labels = sorted(dt.keys())
-
-    with open(os.path.join(file_pointer+".json"), "w") as json_file:
-        json.dump(labels, json_file)
+    val_labels = sorted(dv.keys())
+    
+    if set(labels) == set (val_labels):
+        with open(os.path.join(file_pointer+".json"), "w") as json_file:
+            json.dump(labels, json_file)
+    else:
+      print ("Mismatched training and validation data labels ...")
+      sys.exit(1)
 
     return labels
 
@@ -169,13 +188,26 @@ def plot_training(history):
         
 def train(args):                                                                # Transfer learning and fine-tuning for training
   nb_train_samples = get_nb_files(args.train_dir[0])
-  print ("Total number of training samples = " + str(nb_train_samples))
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
+  
+  print ("Total number of training samples = " + str(nb_train_samples))
   print ("Number of training categories = " + str(nb_classes))
+  
   nb_val_samples = get_nb_files(args.val_dir[0])
+  nb_val_classes = len(glob.glob(args.val_dir[0] + "/*"))
+  
+  print ("Total number of training samples = " + str(nb_val_samples))
+  print ("Number of training categories = " + str(nb_val_classes))
+  
+  if nb_val_classes == nb_classes:
+      print ("Initiating training session ...")
+  else:
+      print ("Mismatched training and validation data classes ...")
+      sys.exit(1)
+      
   nb_epoch = int(args.epoch[0])
   batch_size = int(args.batch[0])
-
+  
   train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
       rotation_range=30,
       width_shift_range=0.2,
@@ -197,11 +229,15 @@ def train(args):                                                                
           horizontal_flip=True)
   else:
       test_datagen = ImageDataGenerator(rescale=1. / 255)
+      
+  print ("Generating training data: ... ")
 
   train_generator = train_datagen.flow_from_directory(args.train_dir[0],
     target_size=(IM_WIDTH, IM_HEIGHT),
     batch_size=batch_size,
     class_mode='categorical')
+  
+  print ("Generating validation data: ... ")
 
   validation_generator = test_datagen.flow_from_directory(args.val_dir[0],
     target_size=(IM_WIDTH, IM_HEIGHT),
