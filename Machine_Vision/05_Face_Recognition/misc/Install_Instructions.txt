@@ -4,7 +4,7 @@ sudo apt-get install python-sphinx
 whereis boost
 mkdir temporarydir
 cd temporarydir
-sudo apt-get install -y build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev
+sudo apt-get install -y build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev
 download boost tar file
 unpack
 cd boost_1_65_1
