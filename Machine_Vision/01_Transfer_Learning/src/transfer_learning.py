@@ -262,10 +262,10 @@ def train(args):                                                                
   else:
       print ("Successfully loaded Inception version 3 for training ...")
     
-  load_model_ = args.load_model[0]
+  load_weights_ = args.load_weights[0]
   fine_tune_model = args.fine_tune[0]
   
-  if load_model_ == True:      
+  if load_weights_ == True:      
       try:
           with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
@@ -368,9 +368,9 @@ def get_user_options():
                    nargs=1, 
                    type = string_to_bool)
     
-    a.add_argument("--load_model", 
+    a.add_argument("--load_weights", 
                    help = "Specify if pre-trained model should be loaded ...", 
-                   dest = "load_model", 
+                   dest = "load_weights", 
                    required=False, 
                    default=[False], 
                    nargs=1, 
