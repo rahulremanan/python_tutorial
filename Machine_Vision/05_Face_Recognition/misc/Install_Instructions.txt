@@ -1,3 +1,62 @@
+sudo apt-get install scons
 sudo apt-get install libboost-all-dev
-sudo pip3 install dlib
+sudo apt-get install python-sphinx
+whereis boost
+mkdir temporarydir
+cd temporarydir
+sudo apt-get install -y build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev
+download boost tar file
+unpack
+cd boost_1_65_1
+./bootstrap.sh --prefix=/usr/ --with-python=/usr/bin/python3
+./b2 --with-python --buildid=3
+n=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $NF}'`
+sudo ./b2 --with=all -j $n install
+
+-- Not tested --
+ln -s /usr/boost_build/bin/b2 /usr/bin/b2 && \
+ln -s /usr/boost_build/bin/bjam /usr/bin/bjam && \
+cd /usr/boost_1_64_0 && \
+echo "using python : 3.5 ;" >> /home/info/site-config.jam && \
+sudo sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/local.conf'
+sudo ./b2 --with=all -j $n install
+b2 --with-python toolset=gcc stage
+
+-- Not tested --
+git clone https://github.com/boostorg/python
+cd python
+scons config --boost-include= /usr/include/boost --python=/usr/bin/python3
+scons test
+scons
+scons --python=/usr/bin/python3
+ldconfig -p | grep libboost_python
+
+# Install dlib
+git clone https://github.com/davisking/dlib.git
+cd dlib
+mkdir build 
+cd build;
+cmake .. -DDLIB_USE_CUDA=1 -DUSE_AVX_INSTRUCTIONS=1
+cmake --build . --config Release
+sudo make install
+sudo ldconfig
+cd ..
+pkg-config --libs --cflags dlib-1
+# In dlib root directory
+sudo python3 setup.py install
+sudo python3 setup.py install --yes USE_AVX_INSTRUCTIONS --yes DLIB_USE_CUDA
+
+# Install scipy
+sudo pip3 install scipy
+
+# Install face_recognition
 sudo pip3 install face_recognition
+
+python3
+import face_recognition
+
+from dlib import shape_predictor
+pip install git+https://github.com/ageitgey/face_recognition
+
+ldconfig -p | grep libpython2.7.dylib
+python -c "import dlib as d; print(d.PREFIX)"
