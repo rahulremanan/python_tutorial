@@ -58,5 +58,4 @@ import face_recognition
 from dlib import shape_predictor
 pip install git+https://github.com/ageitgey/face_recognition
 
-ldconfig -p | grep libpython2.7.dylib
-python -c "import dlib as d; print(d.PREFIX)"
+python3 -c "import face_recognition"
