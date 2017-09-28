@@ -103,7 +103,7 @@ def save_model(args, name, model):
     with open(os.path.join(file_pointer+"_config"+str(name)+".json"), "w") as json_file:
         json_file.write(model_json)
     print ("Saved the trained model weights to: " + 
-           str(os.path.join(file_pointer + "_weights_"+str(name)+".model")))
+           str(os.path.join(file_pointer + "_weights"+str(name)+".model")))
     print ("Saved the trained model configuration as a json file to: " + 
            str(os.path.join(file_pointer+"_config"+str(name)+".json")))
 
@@ -340,7 +340,7 @@ def get_user_options():
                    nargs=1)
     
     a.add_argument("--weights_file", 
-                   help = "Specify pre-trained model weights file for training ...", 
+                   help = "Specify pre-trained model weights for training ...", 
                    dest = "weights_file", 
                    required=False,
                    type=lambda x: is_valid_file(a, x),

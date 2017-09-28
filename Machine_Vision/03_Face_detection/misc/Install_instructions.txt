@@ -1,0 +1,2 @@
+sudo apt-get install -y ffmpeg libav-tools
+sudo pip3 install sk-video

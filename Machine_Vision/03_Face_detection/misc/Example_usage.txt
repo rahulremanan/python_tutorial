@@ -1,0 +1,1 @@
+python3 cam_module.py --weight_file /home/info/model/trained_2017_09_26-07_11_30_weights.model --config_file /home/info/model/trained_2017_09_26-07_11_30_model.json --labels_file /home/info/model/trained_labels.json --cascade_file /home/info/haarcascade_frontalcatface.xml --video /home/info/Drag_Me_Down.mp4 --webcam False --output_dir /home/info/
