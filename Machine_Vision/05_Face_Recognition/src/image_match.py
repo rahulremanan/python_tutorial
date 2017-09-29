@@ -11,20 +11,23 @@ import numpy as np
 source = '/home/info/Drag_Me_Down_LowRes.mp4'
 try:
     video_capture = cv2.VideoCapture(source)
+    print ("Imported video using Open-CV ...")
 except:
     video_capture =  skvideo.io.vread(source)
+    print ("Imported video using sci-kit video ...")
+    
+length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-reference_image_path = "/home/info/ref_img/"
-file_list = glob.glob(reference_image_path + '/*.jpg')
 save_path = "/home/info/proc_vid.avi"
 # Initialize some variables
 face_locations = []
 face_encodings = []
 face_names = []
+frame_number = 0
 process_this_frame = True
 mf = 0.5
 
-fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
 video_writer = cv2.VideoWriter(save_path, fourcc, 30.0, (853,480), True)
 
 (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
@@ -35,14 +38,21 @@ if int(major_ver)  < 3 :
 else :
     fps = video_capture.get(cv2.CAP_PROP_FPS)
     print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
-     
+reference_image_path = "/home/info/ref_img/"
+file_list = glob.glob(reference_image_path + '/*.jpg')
+    
 while True:
     # Grab a single frame of video
-    ret, frame = video_capture.read()    
+    ret, frame = video_capture.read()
+    frame_number += 1
     # Resize frame of video to 1/4 size for faster face recognition processing
     #small_frame = cv2.resize(frame, (0, 0), fx=mf, fy=mf)
     small_frame = frame
     # Only process every other frame of video to save time
+    
+    if not ret:
+        break
+    
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
         face_locations = face_recognition.face_locations(small_frame)
@@ -90,23 +100,11 @@ while True:
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (p1  - 94, bottom + 23 ), font, 0.75, (255, 255, 255), 1)
         
-        if video_writer is None:
-            (height, width)= frame.shape[:2]
-            zeros = np.zeros((height, width), dtype="uint8")
-            (B, G, R) = cv2.split(frame)
-            R = cv2.merge([zeros, zeros, R])
-            G = cv2.merge([zeros, G, zeros])
-            B = cv2.merge([B, zeros, zeros])
-            video_output = np.zeros((height * 2, width * 2, 3), dtype="uint8")
-            video_output[0:height, 0:width] = frame
-            video_output[0:height, width:width * 2] = R
-            video_output[height:height * 2, width:width * 2] = G
-            video_output[height:height * 2, 0:width] = B
- 
-            # write the output frame to file
-            video_writer.write(video_output)
+    # write the output frame to file
+    print("Writing frame {} / {}".format(frame_number, length))
+    video_writer.write(frame)
 
 # Release handle to read the video file or webcam
-#subprocess.call(["ffmpeg", "-y", "-i", "a.wav",  "-r", "30", "-i", "v.h264",  "-filter:a", "aresample=async=1", "-c:a", "flac", "-c:v", "copy", "av.mkv"])
+# subprocess.call(["ffmpeg", "-y", "-i", "a.wav",  "-r", "30", "-i", "v.h264",  "-filter:a", "aresample=async=1", "-c:a", "flac", "-c:v", "copy", "av.mkv"])
 video_capture.release()
 video_writer.release()

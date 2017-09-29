@@ -146,7 +146,9 @@ def gen_predict(model):
 def face_detect(model, labels, args):
     save_path = os.path.join(args.output_dir[0]+"//"+timestr+".avi")
     
-    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    frame_number = 0
+    
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
     video_writer = cv2.VideoWriter(save_path, fourcc, 30.0, (853,480), True)
 
     (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
@@ -174,20 +176,26 @@ def face_detect(model, labels, args):
             fps = video_capture.get(cv2.cv.CV_CAP_PROP_FPS)
             print ("Frames per second using video.get(cv2.cv.CV_CAP_PROP_FPS): {0}".format(fps))
         except:
-            fps = video_capture.get(cv2.CAP_PROP_FPS)
-            print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+            print ("Frames per second counter failed ...")
             
     else :
         fps = video_capture.get(cv2.CAP_PROP_FPS)
         print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+        
+    length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     
     while True:
         # Capture frame-by-frame
         ret, frame = video_capture.read()
         
-        if ret:
+        if not ret:
+            break
+        
+        frame_number += 1
+        
+        try:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        else:
+        except:
             gray = frame
 
         faces = faceCascade.detectMultiScale(
@@ -214,21 +222,9 @@ def face_detect(model, labels, args):
                 print (prediction + "\t" + "\t".join(map(lambda x: "%.2f" % x, probabilities)))
                 cv2.putText(frameOut, prediction, (x, y-2), font, 1, (255,255,255), 2)
 
-        if video_writer is None:
-            (height, width)= frameOut.shape[:2]
-            zeros = np.zeros((height, width), dtype="uint8")
-            (B, G, R) = cv2.split(frame)
-            R = cv2.merge([zeros, zeros, R])
-            G = cv2.merge([zeros, G, zeros])
-            B = cv2.merge([B, zeros, zeros])
-            video_output = np.zeros((height * 2, width * 2, 3), dtype="uint8")
-            video_output[0:height, 0:width] = frame
-            video_output[0:height, width:width * 2] = R
-            video_output[height:height * 2, width:width * 2] = G
-            video_output[height:height * 2, 0:width] = B
- 
             # write the output frame to file
-            video_writer.write(video_output)
+            print("Writing frame {} / {}".format(frame_number, length))
+            video_writer.write(frameOut)
 
     video_capture.release()
     video_writer.release()
