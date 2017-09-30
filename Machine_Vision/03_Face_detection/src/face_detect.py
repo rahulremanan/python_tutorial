@@ -22,10 +22,10 @@ while 1:
         eyes = eye_cascade.detectMultiScale(roi_gray, 1.2, 5, minSize = min_size_eye, flags=flags)        
         for (ex,ey,ew,eh) in eyes:
             #cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
-            p1 = int(ew/2 + ex)
-            p2 = int(eh/2 + ey)
-            h1 = int(ew/2)
-            h2 = int(eh/2)
+            p1 = int(ew + ex)
+            p2 = int(eh + ey)
+            h1 = int(ew)
+            h2 = int(eh)
             cv2.ellipse(roi_color, (p1, p2), (h1,h2), 0,0,360, (0,255,0), 2)
     cv2.imshow('img',img)
     k = cv2.waitKey(30) & 0xff

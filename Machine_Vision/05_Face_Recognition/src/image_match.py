@@ -14,6 +14,7 @@ if int(major_ver)  < 3 :
     sys.exit(1)
 
 source = '/home/info/Drag_Me_Down_LowRes.mp4'
+
 try:
     video_capture = cv2.VideoCapture(source)
     print ("Imported video using Open-CV ...")
@@ -31,7 +32,7 @@ face_encodings = []
 face_names = []
 frame_number = 0
 process_this_frame = True
-mf = 0.5
+inverse_scale_factor = 2
 
 w, h = int(video_capture.get(3)),int(video_capture.get(4))
 
@@ -41,13 +42,13 @@ print ("Source image height: "+ str(h))
 fps = video_capture.get(cv2.CAP_PROP_FPS)
 print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
+fourcc = cv2.VideoWriter_fourcc(*'MP4V')
 video_writer = cv2.VideoWriter(save_path,fourcc, fps, (w,h))
 
 reference_image_path = "/home/info/ref_img/"
 file_list = glob.glob(reference_image_path + '/*.jpg')
- 
-n_proc_frames = 250
+
+n_proc_frames = length
 resize_img = False
    
 while (video_capture.isOpened()):
@@ -57,8 +58,10 @@ while (video_capture.isOpened()):
     
     if resize_img ==True:
         # Resize frame of video to 1/4 size for faster face recognition processing
-        small_frame = cv2.resize(frame, (0, 0), fx=mf, fy=mf)
+        isf = inverse_scale_factor
+        small_frame = cv2.resize(frame, (0, 0), fx=(1/isf), fy=(1/isf))
     else:
+        isf = 1
         small_frame = frame
     # Only process every other frame of video to save time
     if frame_number <=n_proc_frames:
@@ -89,10 +92,10 @@ while (video_capture.isOpened()):
             # Display the results
             for (top, right, bottom, left), name in zip(face_locations, face_names):
                 # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-                top *= int(1/mf)
-                right *= int(1/mf)
-                bottom *= int(1/mf)
-                left *= int(1/mf)
+                top *= int(isf)
+                right *= int(isf)
+                bottom *= int(isf)
+                left *= int(isf)
                 # Draw an ellipse around the face
                 ex = left
                 ey = top
@@ -113,6 +116,9 @@ while (video_capture.isOpened()):
                 print("Processed frame {} / {}".format(frame_number, length))
             except:
                 print("Failed writing frame {} / {}".format(frame_number, length))
+    else:
+        print ("Processed "+ str(n_proc_frames) + " frames")
+        break
 
 # Release handle to read the video file or webcam
 video_capture.release()
