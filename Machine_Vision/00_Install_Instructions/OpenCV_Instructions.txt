@@ -103,6 +103,8 @@ $ sudo make -j $(nproc --all)
 $ sudo make install
 $ sudo ldconfig
 
+python3 -c "import cv2"
+
 # Rename the site package to cv2 for import into python as cv2
 cd /usr/local/lib/python3.5/dist-packages
 ls

@@ -216,6 +216,8 @@ def face_detect(model, labels, args):
             n_proc_frames = args.frame_limit[0]
         else:
             n_proc_frames = length
+            
+        print ("Processing total frames: " + str(n_proc_frames))
         
         if frame_number <=n_proc_frames:
             if  ret == True:

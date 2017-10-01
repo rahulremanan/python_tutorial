@@ -78,11 +78,13 @@ def predict(model, img, target_size):
   if img.size != target_size:
     img = img.resize(target_size)
 
-  x = image.img_to_array(img)
-  x = np.expand_dims(x, axis=0)
-  x = preprocess_input(x)
-  preds = model.predict(x)
-  return preds[0]
+  _x_ = image.img_to_array(img)
+  _x_ = np.expand_dims(_x_, axis=0)
+  _x_ = preprocess_input(_x_)
+  preds = model.predict(_x_)
+  probabilities = model.predict(_x_, batch_size=1).flatten()
+  prediction = labels[np.argmax(probabilities)]
+  return preds[0], prediction
 
 def plot_preds(image, preds, labels):
   output_loc = args.output_dir[0]
@@ -167,11 +169,14 @@ if __name__=="__main__":
   if args.image is not None:
     img = Image.open(args.image[0])
     preds = predict(model, img, target_size)
-    print (preds)
-    plot_preds(img, preds, labels)
+    print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
+    print (str(preds[1]))
+    plot_preds(img, preds[0], labels)
 
   if args.image_url is not None:
     response = requests.get(args.image_url[0])
     img = Image.open(BytesIO(response.content))
     preds = predict(model, img, target_size)
-    plot_preds(img, preds, labels)
+    print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
+    print (str(preds[1]))
+    plot_preds(img, preds[0], labels)
