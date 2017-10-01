@@ -105,37 +105,46 @@ def get_user_options():
                    help="path to image",
                    required = False,
                    type=lambda x: is_valid_file(a, x),
-                   nargs=1)
+                   nargs=1,
+                   default = ['/cat.jpg'])
     
-    a.add_argument("--image_url", help="url to image")
+    a.add_argument("--image_url", 
+                   help="url to image",
+                   nargs=1,
+                   default = ['https://goo.gl/571Pvn'],
+                   required = False)
     
     a.add_argument("--weights_file", 
                    help = "Specify pre-trained model weights for training ...", 
                    dest = "weights_file", 
                    required=False,
                    type=lambda x: is_valid_file(a, x),
-                   nargs=1)
+                   nargs=1,
+                   default = ['/weight.model'])
     
     a.add_argument("--config_file", 
                    help = "Specify pre-trained model configuration file ...", 
                    dest = "config_file",  
                    required=False,
                    type=lambda x: is_valid_file(a, x),
-                   nargs=1)
+                   nargs=1,
+                   default=['/model_config.json'])
     
     a.add_argument("--labels_file", 
                    help = "Specify class labels file ...", 
                    dest = "labels_file",  
                    required=False,
                    type=lambda x: is_valid_file(a, x),
-                   nargs=1)
+                   nargs=1,
+                   default = ['/labels.json'])
     
     a.add_argument("--output_directory", 
                    help = "Specify output folder ...", 
                    dest = "output_dir", 
                    required = True, 
                    type=lambda x: is_valid_dir(a, x),
-                   nargs=1)
+                   nargs=1,
+                   default = ['/'])
     
     args = a.parse_args()
     
