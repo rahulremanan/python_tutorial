@@ -8,10 +8,11 @@ import numpy as np
 import scipy.misc
 import skvideo.io
 import json
-import dataset
 import keras
+from keras.preprocessing import image
 from keras.models import model_from_json
 from keras.optimizers import SGD, RMSprop, Adagrad
+from keras.applications.inception_v3 import preprocess_input
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
@@ -120,6 +121,21 @@ def get_user_options():
                    nargs=1, 
                    type = string_to_bool)
     
+    a.add_argument("--frame_process", 
+                   help = "Specify if certain frames should be processed ...", 
+                   dest = "frame_proc", 
+                   required=True, 
+                   default=[False], 
+                   nargs=1, 
+                   type = string_to_bool)
+    
+    a.add_argument("--frame_limit", 
+                   help = "Maximum number of frames to be processed ...", 
+                   dest = "frame_limit", 
+                   required=False, 
+                   nargs=1, 
+                   type = int)
+    
     a.add_argument("--output_directory", 
                    help = "Specify output folder ...", 
                    dest = "output_dir", 
@@ -148,9 +164,6 @@ def face_detect(model, labels, args):
     
     frame_number = 0
     
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    video_writer = cv2.VideoWriter(save_path, fourcc, 30.0, (853,480), True)
-
     (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
 
     gen_predict(model)
@@ -170,62 +183,88 @@ def face_detect(model, labels, args):
             video_capture = cv2.VideoCapture(video_source)
         except:
             video_capture =  skvideo.io.vread(video_source)
-
+    
     if int(major_ver)  < 3 :
         try:
             fps = video_capture.get(cv2.cv.CV_CAP_PROP_FPS)
             print ("Frames per second using video.get(cv2.cv.CV_CAP_PROP_FPS): {0}".format(fps))
+            print ("This OpenCV version is unsupported ...")
+            print ("Please update the OpenCV version ...")
+            sys.exit(1)
         except:
             print ("Frames per second counter failed ...")
-            
+            sys.exit(1)
     else :
         fps = video_capture.get(cv2.CAP_PROP_FPS)
         print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
         
+    w, h = int(video_capture.get(3)),int(video_capture.get(4))
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    video_writer = cv2.VideoWriter(save_path, fourcc, fps, (w,h), True)
+
     length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     
-    while True:
+    while (video_capture.isOpened()):
         # Capture frame-by-frame
         ret, frame = video_capture.read()
         
-        if not ret:
-            break
-        
         frame_number += 1
         
-        try:
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        except:
-            gray = frame
+        frame_proc = args.frame_proc[0]
+        
+        if frame_proc == True:
+            n_proc_frames = args.frame_limit[0]
+        else:
+            n_proc_frames = length
+        
+        if frame_number <=n_proc_frames:
+            if  ret == True:
+                                
+                try:
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                except:
+                    gray = frame
+                
+                faces = faceCascade.detectMultiScale(
+                        gray,
+                        scaleFactor=1.1,
+                        minNeighbors=5,
+                        minSize=(30, 30),
+                        flags=cv2.CASCADE_SCALE_IMAGE
+                        )
 
-        faces = faceCascade.detectMultiScale(
-                gray,
-                scaleFactor=1.1,
-                minNeighbors=5,
-                minSize=(30, 30),
-                flags=cv2.CASCADE_SCALE_IMAGE
-                )
+                frameOut = np.array(frame)
+                # Draw a rectangle around the faces
+                for (x, y, w, h) in faces:
+                    if w>100 and h>100:
+                        cv2.rectangle(frameOut, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                        square = frame[max((y-h//2,0)):y+3*h//2, max((x-w//2,0)):x+3*w//2]
+                        square = scipy.misc.imresize(square.astype(np.float32), size=(n, n), interp='bilinear')
+                        
+                        try:
+                            _X = image.img_to_array(square)
+                            _X = np.expand_dims(_X, axis=0)
+                            _X = preprocess_input(_X)
+                            probabilities = model.predict(_X, batch_size=1).flatten()
+                            prediction = labels[np.argmax(probabilities)]
+                            print (prediction + "\t" + "\t".join(map(lambda x: "%.2f" % x, probabilities)))
+                            print (str(prediction))
+                            cv2.putText(frame, prediction, (x, y-2), font, 0.75, (255,255,255), 1)
+                            print ("Sucessfully generated a prediction ...")
+                        except:
+                            print ("Failed to create a prediction ...")
 
-        frameOut = np.array(frame)
-        # Draw a rectangle around the faces
-        for (x, y, w, h) in faces:
-            if w>100 and h>100:
-                cv2.rectangle(frameOut, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                square = frame[max((y-h//2,0)):y+3*h//2, max((x-w//2,0)):x+3*w//2]
-                square = scipy.misc.imresize(square.astype(np.float32), size=(n, n), interp='bilinear')
-                square = np.expand_dims(square, axis=0)
-                square = square.transpose((0, 3, 1, 2))
-                square = dataset.preprocess_input(square)
-
-                probabilities = model.predict(square, batch_size=1).flatten()
-                prediction = labels[np.argmax(probabilities)]
-                print (prediction + "\t" + "\t".join(map(lambda x: "%.2f" % x, probabilities)))
-                cv2.putText(frameOut, prediction, (x, y-2), font, 1, (255,255,255), 2)
-
-            # write the output frame to file
-            print("Writing frame {} / {}".format(frame_number, length))
-            video_writer.write(frameOut)
-
+                    try:
+                        # write the output frame to file
+                        video_writer.write(frameOut)
+                        print("Processed frame {} / {}".format(frame_number, length))
+                    except:
+                        print("Failed writing frame {} / {}".format(frame_number, length))
+                    
+            else:
+                print ("Processed "+ str(n_proc_frames) + " frames")
+                break
+            
     video_capture.release()
     video_writer.release()
 

@@ -48,7 +48,8 @@ def compile_model(model):
     
 def load_prediction_model(args):
     try:
-        print (args.config_file[0]) 
+        print ("Loaded prediction model configuration from: " + 
+               str(args.config_file[0]))
         with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
         model = model_from_json(model_json)
@@ -57,7 +58,8 @@ def load_prediction_model(args):
           sys.exit(1)
     try:
           model.load_weights(args.weights_file[0])
-          print ("Loaded model weights from: " + str(args.weights_file[0]))
+          print ("Loaded model weights from: " + 
+                 str(args.weights_file[0]))
     except:
           print ("Error loading model weights ...")
           sys.exit(1)
@@ -163,13 +165,13 @@ if __name__=="__main__":
       print ("Prediction model failed to load ...")
         
   if args.image is not None:
-    img = Image.open(args.image)
+    img = Image.open(args.image[0])
     preds = predict(model, img, target_size)
     print (preds)
     plot_preds(img, preds, labels)
 
   if args.image_url is not None:
-    response = requests.get(args.image_url)
+    response = requests.get(args.image_url[0])
     img = Image.open(BytesIO(response.content))
     preds = predict(model, img, target_size)
     plot_preds(img, preds, labels)

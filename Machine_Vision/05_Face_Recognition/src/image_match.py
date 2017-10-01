@@ -10,10 +10,11 @@ import sys
 (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
 
 if int(major_ver)  < 3 :
-    print ("Update OpenCV ...")
+    print ("This version of OpenCV is unsupported ...")
+    print ("Please update OpenCV ...")
     sys.exit(1)
 
-source = '/home/info/Drag_Me_Down_LowRes.mp4'
+source = '/home/info/Drag_Me_Down_LowRes.mp4v'
 
 try:
     video_capture = cv2.VideoCapture(source)
@@ -42,20 +43,21 @@ print ("Source image height: "+ str(h))
 fps = video_capture.get(cv2.CAP_PROP_FPS)
 print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
-fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
 video_writer = cv2.VideoWriter(save_path,fourcc, fps, (w,h))
 
 reference_image_path = "/home/info/ref_img/"
 file_list = glob.glob(reference_image_path + '/*.jpg')
 
-n_proc_frames = length
+n_proc_frames = 100
 resize_img = False
    
 while (video_capture.isOpened()):
     # Grab a single frame of video
     ret, frame = video_capture.read()
-    frame_number += 1
     
+    frame_number += 1
+       
     if resize_img ==True:
         # Resize frame of video to 1/4 size for faster face recognition processing
         isf = inverse_scale_factor

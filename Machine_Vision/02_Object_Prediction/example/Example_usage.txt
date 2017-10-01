@@ -1,0 +1,1 @@
+python3 prediction_cats_dogs.py --config_file /home/info/model/trained_2017_09_26-07_11_30_model.json --weights_file /home/info/model/trained_2017_09_26-07_11_30_weights.model --labels_file /home/info/model/trained_labels.json --output_directory /home/info/ --image /home/info/cat.jpg
