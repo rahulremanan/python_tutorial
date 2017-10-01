@@ -105,19 +105,17 @@ def get_user_options():
                    help="path to image",
                    required = False,
                    type=lambda x: is_valid_file(a, x),
-                   nargs=1,
-                   default = ['/cat.jpg'])
+                   nargs=1)
     
     a.add_argument("--image_url", 
                    help="url to image",
                    nargs=1,
-                   default = ['https://goo.gl/571Pvn'],
                    required = False)
     
     a.add_argument("--weights_file", 
                    help = "Specify pre-trained model weights for training ...", 
                    dest = "weights_file", 
-                   required=False,
+                   required=True,
                    type=lambda x: is_valid_file(a, x),
                    nargs=1,
                    default = ['/weight.model'])
@@ -125,7 +123,7 @@ def get_user_options():
     a.add_argument("--config_file", 
                    help = "Specify pre-trained model configuration file ...", 
                    dest = "config_file",  
-                   required=False,
+                   required=True,
                    type=lambda x: is_valid_file(a, x),
                    nargs=1,
                    default=['/model_config.json'])
@@ -133,7 +131,7 @@ def get_user_options():
     a.add_argument("--labels_file", 
                    help = "Specify class labels file ...", 
                    dest = "labels_file",  
-                   required=False,
+                   required=True,
                    type=lambda x: is_valid_file(a, x),
                    nargs=1,
                    default = ['/labels.json'])
