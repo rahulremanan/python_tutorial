@@ -28,8 +28,6 @@ def generate_timestamp():
     print ("Time stamp generated: "+timestring)
     return timestring
 
-timestr = generate_timestamp()
-
 def is_valid_file(parser, arg):
     if not os.path.isfile(arg):
         parser.error("The file %s does not exist ..." % arg)
@@ -86,7 +84,7 @@ def predict(model, img, target_size):
   prediction = labels[np.argmax(probabilities)]
   return preds[0], prediction
 
-def plot_preds(image, preds, labels):
+def plot_preds(image, preds, labels, timestr):
   output_loc = args.output_dir[0]
   output_file_preds = os.path.join(output_loc+"//preds_out_"+timestr+".png")
   fig = plt.figure()
@@ -171,7 +169,8 @@ if __name__=="__main__":
     preds = predict(model, img, target_size)
     print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
     print (str(preds[1]))
-    plot_preds(img, preds[0], labels)
+    timestr = generate_timestamp()
+    plot_preds(img, preds[0], labels, timestr)
 
   if args.image_url is not None:
     response = requests.get(args.image_url[0])
@@ -179,4 +178,5 @@ if __name__=="__main__":
     preds = predict(model, img, target_size)
     print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
     print (str(preds[1]))
-    plot_preds(img, preds[0], labels)
+    timestr = generate_timestamp()
+    plot_preds(img, preds[0], labels, timestr)
