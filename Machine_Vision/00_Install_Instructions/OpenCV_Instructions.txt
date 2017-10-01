@@ -58,10 +58,14 @@ $ cd ~
 $ git clone https://github.com/opencv/opencv_contrib.git
 $ cd opencv_contrib
 $ git checkout 3.1.0
+
 ---OR---
+
 # For the latest version from GitHub
 $ git checkout
+
 # Build the OpenCV installer using CMake
+
 $ cd ~/opencv
 $ mkdir build
 $ cd build
@@ -71,7 +75,9 @@ $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
 	-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
 	-D BUILD_EXAMPLES=ON ..
+
 # For installation without GTK and explicit python location pointers
+
 $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D WITH_GTK=OFF \
 	-D WITH_GTK3=OFF \
@@ -91,10 +97,12 @@ $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D BUILD_PROTOBUF=OFF \
 	-D UPDATE_PROTO_FILES=ON \
 	-D BUILD_EXAMPLES=ON ..
+
 # Install OpenCV in /usr/local/lib/python3.5/dist-packages/ folder
 $ sudo make -j $(nproc --all)
 $ sudo make install
 $ sudo ldconfig
+
 # Rename the site package to cv2 for import into python as cv2
 cd /usr/local/lib/python3.5/dist-packages
 ls

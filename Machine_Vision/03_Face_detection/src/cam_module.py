@@ -198,9 +198,9 @@ def face_detect(model, labels, args):
         fps = video_capture.get(cv2.CAP_PROP_FPS)
         print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
         
-    w, h = int(video_capture.get(3)),int(video_capture.get(4))
+    img_w, img_h = int(video_capture.get(3)),int(video_capture.get(4))
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    video_writer = cv2.VideoWriter(save_path, fourcc, fps, (w,h), True)
+    video_writer = cv2.VideoWriter(save_path, fourcc, fps, (img_w,img_h), True)
 
     length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     
@@ -233,11 +233,11 @@ def face_detect(model, labels, args):
                         flags=cv2.CASCADE_SCALE_IMAGE
                         )
 
-                frameOut = np.array(frame)
+#                frameOut = np.array(frame)
                 # Draw a rectangle around the faces
                 for (x, y, w, h) in faces:
                     if w>100 and h>100:
-                        cv2.rectangle(frameOut, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                         square = frame[max((y-h//2,0)):y+3*h//2, max((x-w//2,0)):x+3*w//2]
                         square = scipy.misc.imresize(square.astype(np.float32), size=(n, n), interp='bilinear')
                         
@@ -254,16 +254,16 @@ def face_detect(model, labels, args):
                         except:
                             print ("Failed to create a prediction ...")
 
-                    try:
-                        # write the output frame to file
-                        video_writer.write(frameOut)
-                        print("Processed frame {} / {}".format(frame_number, length))
-                    except:
-                        print("Failed writing frame {} / {}".format(frame_number, length))
+                try:
+                    # write the output frame to file
+                    video_writer.write(frame)
+                    print("Processed frame {} / {}".format(frame_number, length))
+                except:
+                    print("Failed writing frame {} / {}".format(frame_number, length))
                     
-            else:
-                print ("Processed "+ str(n_proc_frames) + " frames")
-                break
+        else:
+            print ("Processed "+ str(n_proc_frames) + " frames")
+            break
             
     video_capture.release()
     video_writer.release()
