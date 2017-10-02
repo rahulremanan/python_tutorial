@@ -220,6 +220,7 @@ def face_detect(model, labels, args):
     video_writer = cv2.VideoWriter(save_path, fourcc, fps, (img_w,img_h), True)
 
     length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    count = 0
     
     frame_proc = args.frame_proc[0]
         
@@ -254,7 +255,6 @@ def face_detect(model, labels, args):
 
 #                frameOut = np.array(frame)
                 # Draw a rectangle around the faces
-                count = 0
                 for (x, y, w, h) in faces:
                     if w>100 and h>100:
                         
@@ -285,7 +285,7 @@ def face_detect(model, labels, args):
                         
                         if gen_train_img ==True:
                             cv2.imwrite(os.path.join(args.output_dir[0]+"//"+str(random_number)+"frame%d.jpg" % count), square)
-                            print ("Saved frame with face detected:" + str(count))
+                            print ("Saved the frame: "+ str(count)+"with face detected ..." )
                             count += 1
                         
                         run_preds = args.run_preds[0]
@@ -301,7 +301,7 @@ def face_detect(model, labels, args):
                                 prediction = labels[np.argmax(probabilities)]
                                 print (prediction + "\t" + "\t".join(map(lambda x: "%.2f" % x, probabilities)))
                                 print (str(prediction))
-                                cv2.rectangle(frame, (x - 100, y - 2), (x + 100, y + 33), (0, 0, 255), cv2.FILLED)
+                                cv2.rectangle(frame, (p1 - 100, bottom - 2), (p1 + 100, bottom + 33), (0, 0, 255), cv2.FILLED)
                                 font = cv2.FONT_HERSHEY_DUPLEX
                                 cv2.putText(frame, prediction, (p1  - 94, bottom + 23 ), font, 0.75, (255, 255, 255), 1)
                                 print ("Sucessfully generated a prediction ...")
