@@ -14,7 +14,7 @@ if int(major_ver)  < 3 :
     print ("Please update OpenCV ...")
     sys.exit(1)
 
-source = '/home/info/Drag_Me_Down_LowRes.mp4v'
+source = '/home/info/Drag_Me_Down.mp4'
 
 try:
     video_capture = cv2.VideoCapture(source)
@@ -25,7 +25,8 @@ except:
     
 length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-save_path = "/home/info/proc_vid.mp4"
+#save_path = "/home/info/proc_vid.ogv"
+save_path = "/home/info/proc_vid.avi"
 
 # Initialize some variables
 face_locations = []
@@ -43,7 +44,8 @@ print ("Source image height: "+ str(h))
 fps = video_capture.get(cv2.CAP_PROP_FPS)
 print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
+#fourcc = cv2.VideoWriter_fourcc(*'THEO')
+fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 video_writer = cv2.VideoWriter(save_path,fourcc, fps, (w,h))
 
 reference_image_path = "/home/info/ref_img/"
@@ -77,7 +79,10 @@ while (video_capture.isOpened()):
                 for face_encoding in face_encodings:
                     for file_path in file_list:
                         reference_image = face_recognition.load_image_file(file_path)
-                        reference_face_encoding = face_recognition.face_encodings(reference_image)[0]
+                        try:
+                            reference_face_encoding = face_recognition.face_encodings(reference_image)[0]
+                        except:
+                            print("Failed processing face encodings ...")
                         name_ID = (os.path.splitext(basename(file_path))[0])
                         name_ID = name_ID.replace("_", " ")
                         # See if the face is a match for the known face(s)
