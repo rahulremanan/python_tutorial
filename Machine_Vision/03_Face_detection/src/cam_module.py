@@ -284,7 +284,7 @@ def face_detect(model, labels, args):
                         random_number = str(random_number)
                         
                         if gen_train_img ==True:
-                            cv2.imwrite(os.path.join(args.output_dir[0]+"//frame%d"+"_"+(random_number)+".jpg" % count), square)
+                            cv2.imwrite(os.path.join(args.output_dir[0]+"//"+str(random_number)+"frame%d.jpg" % count), square)
                             print ("Saved frame with face detected:" + str(count))
                             count += 1
                         
