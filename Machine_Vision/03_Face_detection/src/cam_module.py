@@ -10,6 +10,7 @@ import scipy.misc
 import skvideo.io
 import json
 import keras
+import gc
 from keras.preprocessing import image
 from keras.models import model_from_json
 from keras.optimizers import SGD, RMSprop, Adagrad
@@ -19,7 +20,6 @@ sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
 ada = Adagrad(lr=1e-7, epsilon=1e-08, decay=0.0)
 optimizer = sgd
-
 n = 224
 
 def generate_timestamp():
@@ -309,6 +309,8 @@ def face_detect(model, labels, args):
             
     video_capture.release()
     video_writer.release()
+    del (model, labels, args)
+    gc.collect()
 
 if __name__=="__main__":
     args = get_user_options()
@@ -328,4 +330,4 @@ if __name__=="__main__":
     except:
         print ("Prediction model failed to load ...")
         
-    face_detect(model, labels, args) 
+    face_detect(model, labels, args)
