@@ -270,10 +270,10 @@ def face_detect(model, labels, args):
                             print ("Saved the frame: "+ str(count)+"with face detected ..." )
                             count += 1
                         
-                        p1 = int(w + x)
-                        p2 = int(h + y)
-                        h1 = int(w)
-                        h2 = int(h)
+                        p1 = int(w/2 + x)
+                        p2 = int(h/2 + y)
+                        h1 = int(w/2)
+                        h2 = int(h/2)
                         cv2.ellipse(frame, (p1, p2), (h1,h2), 0,0,360, (0,255,0), 2)
 
                         run_preds = args.run_preds[0]
@@ -282,10 +282,12 @@ def face_detect(model, labels, args):
                             square = scipy.misc.imresize(square.astype(np.float32), size=(n, n), interp='bilinear')
                         
                             try:
-                                _X = image.img_to_array(square)
-                                _X = np.expand_dims(_X, axis=0)
-                                _X = preprocess_input(_X)
-                                probabilities = model.predict(_X, batch_size=1).flatten()
+                                _X_ = image.img_to_array(square)
+                                del (square)
+                                _X_ = np.expand_dims(_X_, axis=0)
+                                _X_ = preprocess_input(_X_)
+                                probabilities = model.predict(_X_, batch_size=1).flatten()
+                                del (_X_)
                                 prediction = labels[np.argmax(probabilities)]
                                 print (prediction + "\t" + "\t".join(map(lambda x: "%.2f" % x, probabilities)))
                                 print (str(prediction))
@@ -299,6 +301,7 @@ def face_detect(model, labels, args):
                 try:
                     # write the output frame to file
                     video_writer.write(frame)
+                    del (frame)
                     print("Processed frame {} / {}".format(frame_number, length))
                 except:
                     print("Failed writing frame {} / {}".format(frame_number, length))
@@ -314,20 +317,17 @@ def face_detect(model, labels, args):
 
 if __name__=="__main__":
     args = get_user_options()
-
     if ((not os.path.exists(args.config_file[0])) 
         or 
     (not os.path.exists(args.weights_file[0])) 
         or 
     (not os.path.exists(args.labels_file[0]))):
       print("Specified directories do not exist ...")
-      sys.exit(1)
-    
+      sys.exit(1)   
     print ("Loading neural network")
     try:
         model, labels = load_prediction_model(args)
         print ("Prediction model and class labels loaded ...")
     except:
         print ("Prediction model failed to load ...")
-        
     face_detect(model, labels, args)
