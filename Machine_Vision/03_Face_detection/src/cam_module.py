@@ -258,24 +258,6 @@ def face_detect(model, labels, args):
                 for (x, y, w, h) in faces:
                     if w>100 and h>100:
                         
-                        top = x
-                        right = y
-                        bottom = w
-                        left = h
-                        # Draw an ellipse around the face
-                        ex = left
-                        ey = top
-                        ew = int(abs(right - ex))
-                        eh = int(abs(bottom - ey))
-                        p1 = int(ew/2 + ex)
-                        p2 = int(eh/2 + ey)
-                        h1 = int(ew/2)
-                        h2 = int(eh/2)
-                        cv2.ellipse(frame, (p1, p2), (h1,h2), 0,0,360, (0,255,0), 2)
-                        # Draw a label with a name below the face
-                        cv2.rectangle(frame, (p1 - 100, bottom - 2), (p1 + 100, bottom + 33), (0, 0, 255), cv2.FILLED)
-                        font = cv2.FONT_HERSHEY_DUPLEX
-                        
                         square = frame[max((y-h//2,0)):y+3*h//2, max((x-w//2,0)):x+3*w//2]
                         
                         gen_train_img = args.gen_train_img[0]
@@ -288,6 +270,12 @@ def face_detect(model, labels, args):
                             print ("Saved the frame: "+ str(count)+"with face detected ..." )
                             count += 1
                         
+                        p1 = int(w + x)
+                        p2 = int(h + y)
+                        h1 = int(w)
+                        h2 = int(h)
+                        cv2.ellipse(frame, (p1, p2), (h1,h2), 0,0,360, (0,255,0), 2)
+
                         run_preds = args.run_preds[0]
                         
                         if run_preds ==True:
@@ -301,9 +289,9 @@ def face_detect(model, labels, args):
                                 prediction = labels[np.argmax(probabilities)]
                                 print (prediction + "\t" + "\t".join(map(lambda x: "%.2f" % x, probabilities)))
                                 print (str(prediction))
-                                cv2.rectangle(frame, (p1 - 100, bottom - 2), (p1 + 100, bottom + 33), (0, 0, 255), cv2.FILLED)
+                                cv2.rectangle(frame, (p1 - 100, y - 2), (p1 + 100, y + 33), (0, 0, 255), cv2.FILLED)
                                 font = cv2.FONT_HERSHEY_DUPLEX
-                                cv2.putText(frame, prediction, (p1  - 94, bottom + 23 ), font, 0.75, (255, 255, 255), 1)
+                                cv2.putText(frame, prediction, (p1  - 94, y + 23 ), font, 0.75, (255, 255, 255), 1)
                                 print ("Sucessfully generated a prediction ...")
                             except:
                                 print ("Failed to create a prediction ...")

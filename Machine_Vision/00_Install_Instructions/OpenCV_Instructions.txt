@@ -17,7 +17,7 @@ sudo apt-get -qq install libopencv-dev build-essential checkinstall cmake pkg-co
 git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
 cd ffmpeg
 ./configure --enable-nonfree --enable-pic --enable-shared
-make
+sudo make
 sudo make install
 
 # To fix videodev.h missing error
