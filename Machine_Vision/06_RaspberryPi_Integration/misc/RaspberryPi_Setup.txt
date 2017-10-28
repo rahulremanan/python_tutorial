@@ -1,0 +1,56 @@
+sudo nano  /etc/network/interfaces
+
+auto lo
+iface lo inet loopback
+
+auto wlan0
+iface wlan0 inet static
+address 192.168.1.150
+netmask 255.255.255.0
+gateway 192.168.1.1
+wpa-essid SSID_Name
+wpa-psk XXXXX
+dns-nameservers 8.8.8.8 192.168.1.1
+
+# Install PuTTY
+
+# Install nmap: https://nmap.org/download.html
+
+nmap -sn 192.168.3.*
+
+Download and install Apple Bonjour: https://support.apple.com/kb/DL999?viewlocale=en_US&locale=en_US
+
+# Connect Raspberry Pi to Ubuntu:
+sudo apt-get install dnsmasq
+
+# Wifi device not ready error:
+sudo apt-get install rfkill
+-- OR --
+# Download rfkill from: https://www.kernel.org/pub/software/network/rfkill/
+tar -xzf archive-name.tar.gz
+cd archive-name
+./configure
+make
+sudo make install
+
+rfkill unblock all
+sudo nano /var/lib/NetworkManager/NetworkManager.state
+** change any options from ‘false‘ to ‘true‘ to re-enable networking:
+sudo reboot
+rfkill list
+
+# Install SSH Server in Ubuntu:
+sudo apt-get install openssh-server
+sudo service ssh status
+sudo nano /etc/ssh/sshd_config
+sudo service ssh restart
+-- OR --
+sudo service ssh start
+sudo systemctl enable ssh
+
+# Install Screen
+sudo apt-get install screen
+
+#Get IP address:
+hostname -I
+sudo dpkg --configure -a

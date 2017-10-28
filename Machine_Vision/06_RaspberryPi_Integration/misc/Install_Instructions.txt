@@ -1,0 +1,5 @@
+01 -- Setup extra swap memory
+02 -- Install protocol buffer
+03 -- Install bazel build tool
+04 -- Install tensorflow
+05 -- Install OpenCV

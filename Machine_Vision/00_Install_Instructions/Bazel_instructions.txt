@@ -1,8 +1,12 @@
-# Install Protoc before installing bazel:
+# Install Protocol-buffer before installing bazel:
 
-git clone https://github.com/bazelbuild/bazel/
+wget https://github.com/bazelbuild/bazel/releases/download/0.7.0/bazel-0.7.0-dist.zip
+unzip -d bazel bazel-0.7.0-dist.zip
 
-nano scripts/bootstrap/compile.sh
+cd bazel
+
+-- For Raspberry Pi --
+sudo nano ./scripts/bootstrap/compile.sh
 
 Alt + G 117
 
@@ -20,9 +24,9 @@ run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
 
 # Edit tools/cpp/cc_configure.bzl :
 
-nano tools/cpp/lib_cc_configure.bzl 
+sudo nano ./tools/cpp/lib_cc_configure.bzl 
 
-# Specify CPU architecture by placing the line: return "arm" around line 133 (at the beginning of the _get_cpu_value function):
+# Specify CPU architecture by placing the line: return "arm" at the beginning of the get_cpu_value function (around line 133):
 
 ...
 """Compute the cpu_value based on the OS name."""
@@ -31,12 +35,14 @@ return "arm"
 
 # Compile Bazel from source:
 
+-- Compile Bazel --
+
 sudo ./compile.sh
 
 # Copy the new binary from output/bazel to /usr/local/bin directory.
 
 sudo cp output/bazel /usr/local/bin/bazel
 
-# Verify bazel installation by typing bazel in commandline:
+# Verify bazel installation:
 
 bazel
