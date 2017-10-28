@@ -1,22 +1,29 @@
 # Install Protocol-buffer before installing bazel:
 
-wget https://github.com/bazelbuild/bazel/releases/download/0.7.0/bazel-0.7.0-dist.zip
-unzip -d bazel bazel-0.7.0-dist.zip
+# Get bazel installation source files:
+# Note: A simple git clone won't work for newest versions of bazel since the developer build process now needs bazel.
+
+$wget https://github.com/bazelbuild/bazel/releases/download/0.7.0/bazel-0.7.0-dist.zip
+
+$unzip -d bazel bazel-0.7.0-dist.zip
 
 cd bazel
 
--- For Raspberry Pi --
-sudo nano ./scripts/bootstrap/compile.sh
+## Instructions specific for Raspberry Pi ##
+
+$sudo nano ./scripts/bootstrap/compile.sh
 
 Alt + G 117
 
-# Edit line 117:
+# Edit line 117 to set the maximum size of the Java heap to 500 MB, using the -J-Xmx500M flag:
+
+Change the original file from:
 
 run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
       -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VERSION" \
       -encoding UTF-8 "@${paramfile}"
 
-# Sets the maximum size of the Java heap to 500 MB, using the -J-Xmx500M flag:
+By adding  -J-Xmx500M at the end of the funtion:
 
 run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
       -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VERSION" \
@@ -24,7 +31,7 @@ run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
 
 # Edit tools/cpp/cc_configure.bzl :
 
-sudo nano ./tools/cpp/lib_cc_configure.bzl 
+$sudo nano ./tools/cpp/lib_cc_configure.bzl 
 
 # Specify CPU architecture by placing the line: return "arm" at the beginning of the get_cpu_value function (around line 133):
 
@@ -33,16 +40,16 @@ sudo nano ./tools/cpp/lib_cc_configure.bzl
 return "arm"
 ...
 
-# Compile Bazel from source:
+## Resume bazel build process ##
 
--- Compile Bazel --
+# Compile bazel from source:
 
-sudo ./compile.sh
+$sudo ./compile.sh
 
 # Copy the new binary from output/bazel to /usr/local/bin directory.
 
-sudo cp output/bazel /usr/local/bin/bazel
+$sudo cp output/bazel /usr/local/bin/bazel
 
 # Verify bazel installation:
 
-bazel
+$bazel
