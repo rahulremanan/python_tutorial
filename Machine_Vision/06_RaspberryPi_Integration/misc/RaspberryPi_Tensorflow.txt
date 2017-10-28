@@ -1,0 +1,61 @@
+# Clone the TensorFlow repository and move into the directory:
+
+git clone --recurse-submodules https://github.com/tensorflow/tensorflow.git
+cd tensorflow
+git checkout
+
+# One-liner to change references of 64-bit program implementations to 32-bit implementations:
+
+grep -Rl 'lib64' | xargs sed -i 's/lib64/lib/g'
+
+# Delete a particular line in tensorflow/core/platform/platform.h :
+
+sudo nano tensorflow/core/platform/platform.h
+
+Alt + G 48 return 
+
+define IS_MOBILE_PLATFORM (around line 48):
+
+#elif defined(__arm__)
+#define PLATFORM_POSIX
+...
+#define IS_MOBILE_PLATFORM   <----- DELETE THIS LINE
+
+# This prevents our Raspberry Pi device (which has an ARM CPU) from being recognized as a mobile device.
+
+Adjust protocol to access Numeric JS library- to unencyrpted connection. For mysterious reasons Cloudflare security certificates don't work properly over ssl connection. Fix this in the Bazel WORKSPACE file:
+
+sudo nano WORKSPACE
+
+Alt + G 283, change from https to http:
+
+http_file(
+  name = "numericjs_numeric_min_js",
+  url = "http://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js",
+)
+
+# Configure the build:
+
+./configure
+
+Please specify the location of python. [Default is /usr/bin/python]: /usr/bin/python
+Please specify optimization flags to use during compilation when bazel option "--config=opt" is specified [Default is -march=native]: 
+Do you wish to use jemalloc as the malloc implementation? [Y/n] Y
+Do you wish to build TensorFlow with Google Cloud Platform support? [y/N] N
+Do you wish to build TensorFlow with Hadoop File System support? [y/N] N
+Do you wish to build TensorFlow with the XLA just-in-time compiler (experimental)? [y/N] N
+Please input the desired Python library path to use. Default is [/usr/local/lib/python2.7/dist-packages]
+Do you wish to build TensorFlow with OpenCL support? [y/N] N
+Do you wish to build TensorFlow with CUDA support? [y/N] N
+
+# Build tensorflow with the following flags:
+
+bazel build -c opt --copt="-mfpu=neon-vfpv4" --copt="-funsafe-math-optimizations" --copt="-ftree-vectorize" --copt="-fomit-frame-pointer" --local_resources 1024,1.0,1.0 --verbose_failures tensorflow/tools/pip_package:build_pip_package
+
+# Create a Python wheel.
+
+bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+
+# Install tensorflow from the wheel file:
+
+sudo pip install /tmp/tensorflow_pkg/tensorflow-1.1.0-cp27-none-linux_armv7l.whl

@@ -40,3 +40,16 @@ sudo nano /etc/fstab
 
 Save the swap device ID /dev/XXX information to remove the device safely after the tensorflow installation
 
+-- Turning off swap memory --
+
+# Turn off your drive as swap:
+
+sudo swapoff /dev/XXX
+
+# Remove the edits made to /etc/fstab referencing the swap device:
+
+sudo nano /etc/fstab
+
+# Reboot your device:
+
+sudo reboot

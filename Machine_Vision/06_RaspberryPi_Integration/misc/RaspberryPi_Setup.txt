@@ -1,3 +1,5 @@
+# Add a wireless network to Raspberry Pi
+
 sudo nano  /etc/network/interfaces
 
 auto lo
@@ -53,4 +55,7 @@ sudo apt-get install screen
 
 #Get IP address:
 hostname -I
+
+# Fix broken package manager that returns held back packages:
 sudo dpkg --configure -a
+sudo apt install **list**
