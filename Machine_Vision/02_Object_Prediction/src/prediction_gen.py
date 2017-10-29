@@ -15,6 +15,7 @@ from keras.preprocessing import image
 from keras.applications.inception_v3 import preprocess_input
 from keras.models import model_from_json
 from keras.optimizers import SGD, RMSprop, Adagrad
+from keras.preprocessing.image import ImageDataGenerator
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
@@ -84,7 +85,22 @@ def predict(model, img, target_size):
   prediction = labels[np.argmax(probabilities)]
   return preds[0], prediction
 
-def plot_preds(image, preds, labels, timestr):
+def predict_gen(model, preds_dir, target_size, batch_size=1):
+    preds_datagen = ImageDataGenerator(rescale=1. / 255)
+    preds_generator = preds_datagen.flow_from_directory(args.preds_dir[0],
+    target_size=target_size,
+    batch_size=batch_size,
+    shuffle=False,
+    class_mode='categorical')
+    print(preds_generator.filenames)
+    preds = model.predict_generator(preds_generator, steps=len(preds_generator.filenames), max_queue_size=10, workers=1, use_multiprocessing=False, verbose=1)
+    p = []
+    for prediction in preds:
+        probabilities = prediction.flatten()
+        p.append(labels[np.argmax(probabilities)])       
+    return preds, p
+
+def plot_preds(preds, labels, timestr):
   output_loc = args.output_dir[0]
   output_file_preds = os.path.join(output_loc+"//preds_out_"+timestr+".png")
   fig = plt.figure()
@@ -144,6 +160,22 @@ def get_user_options():
                    nargs=1,
                    default = ['/'])
     
+    a.add_argument("--prediction_directory", 
+                   help = "Specify prediction folder ...", 
+                   dest = "preds_dir", 
+                   required = False, 
+                   type=lambda x: is_valid_dir(a, x),
+                   nargs=1,
+                   default = ['/'])
+    
+    a.add_argument("--batch_size", 
+                   help = "Specify prediction sample size ...", 
+                   dest = "batch_size", 
+                   required = True, 
+                   type=int,
+                   nargs=1,
+                   default = [1])
+    
     args = a.parse_args()
     
     return args
@@ -151,7 +183,7 @@ def get_user_options():
 if __name__=="__main__":
   args = get_user_options()
   
-  if args.image is None and args.image_url is None:
+  if args.image is None and args.image_url and args.preds_dir is None:
     args.print_help()
     sys.exit(1)
 
@@ -177,7 +209,13 @@ if __name__=="__main__":
     print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
     print (str(preds[1]))
     timestr = generate_timestamp()
-    plot_preds(img, preds[0], labels, timestr)
+    plot_preds(preds[0], labels, timestr)
+    
+  if args.preds_dir is not None:
+    preds_dir = args.preds_dir[0]
+    batches = args.batch_size[0]
+    preds = predict_gen(model, preds_dir, target_size, batches)
+    print (preds)
 
   if args.image_url is not None:
     response = requests.get(args.image_url[0])
@@ -186,4 +224,4 @@ if __name__=="__main__":
     print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
     print (str(preds[1]))
     timestr = generate_timestamp()
-    plot_preds(img, preds[0], labels, timestr)
+    plot_preds(preds[0], labels, timestr)
