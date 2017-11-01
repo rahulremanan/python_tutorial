@@ -2,7 +2,7 @@
 
 git clone --recurse-submodules https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-git checkout
+git checkout r1.1
 
 # One-liner to change references of 64-bit program implementations to 32-bit implementations:
 
