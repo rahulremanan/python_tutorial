@@ -113,6 +113,10 @@ $ sudo ldconfig
 
 python3 -c "import cv2"
 
+-- Find OpenCV installer --
+
+find . -type f -exec grep "cv2.python" '{}' \; -print
+
 # Rename the site package to cv2 for import into python as cv2
 cd /usr/local/lib/python3.5/dist-packages
 ls
@@ -143,3 +147,9 @@ $ python3
 >>> from distutils.sysconfig import get_python_inc
 >>> get_python_inc() 
 >>> ctrl+D or exit()
+
+-- Uninstall OpenCV --
+
+sudo find / -name "*opencv*" -exec sudo rm -i {} \;
+sudo find / -name "*opencv*" -exec sudo rm -rf {} \;
+sudo apt-get autoremove opencv-doc opencv-data libopencv-dev libopencv2.4-java libopencv2.4-jni python-opencv libopencv-core2.4 libopencv-gpu2.4 libopencv-ts2.4 libopencv-photo2.4 libopencv-contrib2.4 libopencv-imgproc2.4 libopencv-superres2.4 libopencv-stitching2.4 libopencv-ocl2.4 libopencv-legacy2.4 libopencv-ml2.4 libopencv-video2.4 libopencv-videostab2.4 libopencv-objdetect2.4 libopencv-calib3d2.4
