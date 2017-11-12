@@ -4,7 +4,7 @@ whereis boost
 
 ## Install boost
 
-mkdir boot
+mkdir boost
 cd boost
 sudo apt-get install -y build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev
 download boost tar file
