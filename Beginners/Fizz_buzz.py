@@ -22,4 +22,4 @@ def fizz_buzz(start, end):
 fb = (fizz_buzz(start, end))
 
 for item in fb:
-    print ("Number = ", item["number"], "; fizz buzz State = ", item["fizz buzz state"])
+    print ("Number = ", item["number"], "; fizz buzz state = ", item["fizz buzz state"])
