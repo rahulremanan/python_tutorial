@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-n = 600851475143
-# n=int(input("Enter an integer:"))
+# n = 600851475143
+n=int(input("Enter an integer:"))
 print("Factors are:")
 i=1
 while(i<=n):
