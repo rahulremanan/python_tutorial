@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-
+import math
 # n = 600851475143
 n=int(input("Enter an integer:"))
 print("Factors are:")
 i=1
-while(i<=n):
+while(i<=math.ceil(n**0.5)):
     k=0
     if(n%i==0):
         j=1
