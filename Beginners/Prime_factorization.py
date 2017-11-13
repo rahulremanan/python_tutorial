@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 import math
-
 n=int(input("Enter an integer:"))
-
 def is_prime(n = 600851475143):
     i=1
     prime_factors = [1]
@@ -18,8 +16,10 @@ def is_prime(n = 600851475143):
                 prime_factors.append(i)
         i=i+1
     if len(prime_factors)==1:
-        return (True, prime_factors)
+        is_prime_num = True
     else:
-        return (False, prime_factors)
-    
+        is_prime_num = False
+    return {"Is prime": is_prime_num, "Prime factors": prime_factors}
 print (is_prime(n))
+print (is_prime(n)["Is prime"])
+print (is_prime(n)["Prime factors"])
