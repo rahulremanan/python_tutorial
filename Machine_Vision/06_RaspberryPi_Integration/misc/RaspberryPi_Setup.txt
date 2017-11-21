@@ -59,3 +59,12 @@ hostname -I
 # Fix broken package manager that returns held back packages:
 sudo dpkg --configure -a
 sudo apt install **list**
+
+# Enable ports for SSH:
+sudo ufw enable
+sudo ufw allow 22
+sudo ufw allow ssh
+
+# SSH config:
+# https://ubuntuforums.org/showthread.php?t=1558871
+sudo grep Port /etc/ssh/sshd_config
