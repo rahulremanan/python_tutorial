@@ -80,7 +80,9 @@ def setup_to_transfer_learn(model, base_model, optimizer):
 
 def add_new_last_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
   x = base_model.output
+  x = Dropout(dropout)(x)
   x = GlobalAveragePooling2D()(x)
+  x = Dropout(dropout)(x)
   x = Dense(FC_SIZE, activation='relu')(x)
   x = Dropout(dropout)(x)
   x = Dense(FC_SIZE, activation='relu')(x)
