@@ -19,20 +19,21 @@ import PIL
 from collections import defaultdict
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
 from keras.models import Model, model_from_json
-from keras.layers import Dense, GlobalAveragePooling2D
+from keras.layers import Dense, GlobalAveragePooling2D, Dropout
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, RMSprop, Adagrad
 
 IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Fixed input image size for Inception version 3
 DEFAULT_EPOCHS = 100
 DEFAULT_BATCHES = 20
-FC_SIZE = 1024
+FC_SIZE = 4096
+dropout = 0.1
 NB_LAYERS_TO_FREEZE = 169
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
-ada = Adagrad(lr=1e-7, epsilon=1e-08, decay=0.0)
-optimizer = sgd
+ada = Adagrad(lr=1e-3, epsilon=1e-08, decay=0.0)
+optimizer = ada
 
 def generate_timestamp():
     timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
@@ -80,7 +81,10 @@ def setup_to_transfer_learn(model, base_model, optimizer):
 def add_new_last_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
   x = base_model.output
   x = GlobalAveragePooling2D()(x)
-  x = Dense(FC_SIZE, activation='relu')(x)                                      # New fully connected layer, random init
+  x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dropout(dropout)(x)
+  x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dropout(dropout)(x)                                      # New fully connected layer, random init
   predictions = Dense(nb_classes, activation='softmax')(x)                      # New softmax layer
   model = Model(inputs=base_model.input, outputs=predictions)
   return model
