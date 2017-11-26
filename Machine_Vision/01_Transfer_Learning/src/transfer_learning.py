@@ -27,13 +27,14 @@ IM_WIDTH, IM_HEIGHT = 299, 299                                                  
 DEFAULT_EPOCHS = 100
 DEFAULT_BATCHES = 20
 FC_SIZE = 4096
-dropout = 0.1
+DEFAULT_DROPOUT = 0.1
 NB_LAYERS_TO_FREEZE = 169
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
 ada = Adagrad(lr=1e-3, epsilon=1e-08, decay=0.0)
-optimizer = ada
+    
+DEFAULT_OPTIMIZER = ada
 
 def generate_timestamp():
     timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
@@ -78,7 +79,11 @@ def setup_to_transfer_learn(model, base_model, optimizer):
                 loss='categorical_crossentropy', metrics=['accuracy'])
   return model
 
-def add_new_last_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
+def add_new_last_layer(base_model, nb_classes):                                # Add the fully connected convolutional neural network layer
+  try:
+      dropout = args.dropout[0]
+  except:
+      dropout = DEFAULT_DROPOUT
   x = base_model.output
   x = Dropout(dropout)(x)
   x = GlobalAveragePooling2D()(x)
@@ -193,7 +198,22 @@ def plot_training(args, name, history):
          + str(output_file_loss))
   plt.close()
         
-def train(args):                                                                # Transfer learning and fine-tuning for training
+def train(args): 
+  optimizer = args.optimizer[0]
+  lr = args.learning_rate[0]
+  decay = args.decay[0]
+  if optimizer == 'sgd' or optimizer == 'SGD' or optimizer == 'Sgd':
+    optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
+    print ("Using SGD as the optimizer ...")
+  elif optimizer == 'rms' or optimizer == 'SGD' or optimizer == 'RMSprop' or optimizer == 'rmsprop' or optimizer == 'Rmsprop':
+    optimizer = RMSprop(lr=lr, rho=0.9, epsilon=1e-08, decay=decay)
+    print ("Using RMSProp as the optimizer ...")
+  elif optimizer == 'ada' or optimizer == 'ADA' or optimizer == 'Ada':
+    optimizer = Adagrad(lr=lr, epsilon=1e-08, decay=decay)
+    print ("Using Adagrad as the optimizer ...")
+  else:
+      optimizer = DEFAULT_OPTIMIZER
+                                                               # Transfer learning and fine-tuning for training
   nb_train_samples = get_nb_files(args.train_dir[0])
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
   
@@ -414,6 +434,37 @@ def get_user_options():
                    type = string_to_bool,
                    nargs=1)
     
+    a.add_argument("--dropout", 
+                   help = "Specify values for dropout function ...", 
+                   dest = "dropout", 
+                   required=False, 
+                   default=[0.4], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--learning_rate", 
+                   help = "Specify values for learning rate ...", 
+                   dest = "learning_rate", 
+                   required=False, 
+                   default=[1e-07], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--decay", 
+                   help = "Specify values for decay function ...", 
+                   dest = "decay", 
+                   required=False, 
+                   default=[0.0], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--optimizer", 
+                   help = "Specify the type of optimizer to choose from. Options are: rms, ada and sgd ...", 
+                   dest = "optimizer", 
+                   required=False, 
+                   default=['rms'], 
+                   nargs=1)
+    
     args = a.parse_args()
     
     return args
@@ -429,7 +480,7 @@ if __name__=="__main__":
       print("Specified directories do not exist ...")
       sys.exit(1)
     
-    train_model = args.train_model[0]  
+    train_model = args.train_model[0]
     
     if train_model ==True:
         print ("Training sesssion initiated ...")

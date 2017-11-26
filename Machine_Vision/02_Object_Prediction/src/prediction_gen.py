@@ -20,7 +20,7 @@ from keras.preprocessing.image import ImageDataGenerator
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
 ada = Adagrad(lr=1e-7, epsilon=1e-08, decay=0.0)
-optimizer = sgd
+optimizer = ada
 
 target_size = (229, 229)                                                        # Fixed size for InceptionV3 architecture
 
