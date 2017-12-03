@@ -8,7 +8,7 @@
 
 <!--https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/ Keep this handy-->
 
-**NLP Table of Contents**
+## NLP Table of Contents:
 
 1. [Example 1: One hot encoding](https://github.com/rahulremanan/python_tutorial/tree/master/NLP/01-One_hot_encoding)
 2. [Example 2: Twitter Bot using a LSTM model](https://github.com/rahulremanan/python_tutorial/tree/master/NLP/02-Twitter_bot)
