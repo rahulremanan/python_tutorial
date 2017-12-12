@@ -106,7 +106,7 @@ def plot_preds(preds, labels, timestr):
   fig = plt.figure()
   plt.axis('on')
   labels = labels
-  plt.barh([0, 1], preds, alpha=0.5)
+  plt.barh(list(range(0, len(labels))), preds, alpha=0.5)
   plt.yticks(list(range(0, len(labels))), labels)
   plt.xlabel('Probability')
   plt.xlim(0,1.01)
