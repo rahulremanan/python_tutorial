@@ -91,6 +91,10 @@ def add_new_last_layer(base_model, nb_classes):                                #
   x = Dense(FC_SIZE, activation='relu')(x)
   x = Dropout(dropout)(x)
   x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dropout(dropout)(x)
+  x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dropout(dropout)(x)
+  x = Dense(FC_SIZE, activation='relu')(x)
   x = Dropout(dropout)(x)                                      # New fully connected layer, random init
   predictions = Dense(nb_classes, activation='softmax')(x)                      # New softmax layer
   model = Model(inputs=base_model.input, outputs=predictions)
