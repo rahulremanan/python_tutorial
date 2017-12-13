@@ -1,7 +1,7 @@
 # Transfer learning using Keras and Tensorflow.
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
-# License: MIT open source license (
+# License: MIT open source license
 # Repository: https://github.com/rahulremanan/python_tutorial
 import argparse
 import os
@@ -28,7 +28,7 @@ DEFAULT_EPOCHS = 100
 DEFAULT_BATCHES = 20
 FC_SIZE = 4096
 DEFAULT_DROPOUT = 0.1
-NB_LAYERS_TO_FREEZE = 169
+DEFAULT_NB_LAYERS_TO_FREEZE = 169
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
@@ -88,11 +88,11 @@ def add_new_last_layer(base_model, nb_classes):                                #
   x = Dropout(dropout)(x)
   x = GlobalAveragePooling2D()(x)
   x = Dropout(dropout)(x)
-  x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dense(FC_SIZE*4, activation='relu')(x)
   x = Dropout(dropout)(x)
-  x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dense(FC_SIZE*3, activation='relu')(x)
   x = Dropout(dropout)(x)
-  x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dense(FC_SIZE*2, activation='relu')(x)
   x = Dropout(dropout)(x)
   x = Dense(FC_SIZE, activation='relu')(x)
   x = Dropout(dropout)(x)                                      # New fully connected layer, random init
@@ -100,10 +100,10 @@ def add_new_last_layer(base_model, nb_classes):                                #
   model = Model(inputs=base_model.input, outputs=predictions)
   return model
 
-def setup_to_finetune(model, optimizer):                                        # Freeze the bottom NB_LAYERS and retrain the remaining top layers
-  for layer in model.layers[:NB_LAYERS_TO_FREEZE]:
+def setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS):                                        # Freeze the bottom NB_LAYERS and retrain the remaining top layers
+  for layer in model.layers[:NB_FROZEN_LAYERS]:
      layer.trainable = False
-  for layer in model.layers[NB_LAYERS_TO_FREEZE:]:
+  for layer in model.layers[NB_FROZEN_LAYERS:]:
      layer.trainable = True
   model.compile(optimizer=optimizer, loss='categorical_crossentropy', 
                 metrics=['accuracy'])
@@ -203,16 +203,16 @@ def plot_training(args, name, history):
   plt.close()
         
 def train(args): 
-  optimizer = args.optimizer[0]
+  optimizer_val = args.optimizer_val[0]
   lr = args.learning_rate[0]
   decay = args.decay[0]
-  if optimizer == 'sgd' or optimizer == 'SGD' or optimizer == 'Sgd':
+  if optimizer_val == 'sgd' or optimizer_val == 'SGD' or optimizer_val == 'Sgd':
     optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
     print ("Using SGD as the optimizer ...")
-  elif optimizer == 'rms' or optimizer == 'SGD' or optimizer == 'RMSprop' or optimizer == 'rmsprop' or optimizer == 'Rmsprop':
+  elif optimizer_val == 'rms' or optimizer_val == 'SGD' or optimizer_val == 'RMSprop' or optimizer_val == 'rmsprop' or optimizer_val == 'Rmsprop':
     optimizer = RMSprop(lr=lr, rho=0.9, epsilon=1e-08, decay=decay)
     print ("Using RMSProp as the optimizer ...")
-  elif optimizer == 'ada' or optimizer == 'ADA' or optimizer == 'Ada':
+  elif optimizer_val == 'ada' or optimizer_val == 'ADA' or optimizer_val == 'Ada':
     optimizer = Adagrad(lr=lr, epsilon=1e-08, decay=decay)
     print ("Using Adagrad as the optimizer ...")
   else:
@@ -312,9 +312,14 @@ def train(args):
       model = model
       print ("Tabula rasa ...")
       
+  try:
+      NB_FROZEN_LAYERS = args.frozen_layers[0]
+  except:
+      NB_FROZEN_LAYERS = DEFAULT_NB_LAYERS_TO_FREEZE
+      
   if fine_tune_model == True:
       print ("Fine tuning Inception v3 ...")
-      setup_to_finetune(model, optimizer)
+      setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS)
   else:
       print ("Transfer learning using Inception v3 ...")
       setup_to_transfer_learn(model, base_model, optimizer)
@@ -464,9 +469,17 @@ def get_user_options():
     
     a.add_argument("--optimizer", 
                    help = "Specify the type of optimizer to choose from. Options are: rms, ada and sgd ...", 
-                   dest = "optimizer", 
+                   dest = "optimizer_val", 
                    required=False, 
                    default=['rms'], 
+                   nargs=1)
+    
+    a.add_argument("--frozen_layers", 
+                   help = "Specify the number of bottom layers to freeze during fine-tuning ...", 
+                   dest = "frozen_layers", 
+                   required=False, 
+                   default=[169],
+                   type = int,
                    nargs=1)
     
     args = a.parse_args()
