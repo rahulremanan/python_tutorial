@@ -203,9 +203,11 @@ def plot_training(args, name, history):
   plt.close()
         
 def train(args): 
+    
   optimizer_val = args.optimizer_val[0]
   lr = args.learning_rate[0]
   decay = args.decay[0]
+  
   if optimizer_val == 'sgd' or optimizer_val == 'SGD' or optimizer_val == 'Sgd':
     optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
     print ("Using SGD as the optimizer ...")
@@ -475,10 +477,10 @@ def get_user_options():
                    nargs=1)
     
     a.add_argument("--frozen_layers", 
-                   help = "Specify the number of bottom layers to freeze during fine-tuning ...", 
+                   help = "Specify the number of frozen bottom layers during fine-tuning ...", 
                    dest = "frozen_layers", 
                    required=False, 
-                   default=[169],
+                   default=[DEFAULT_NB_LAYERS_TO_FREEZE],
                    type = int,
                    nargs=1)
     
