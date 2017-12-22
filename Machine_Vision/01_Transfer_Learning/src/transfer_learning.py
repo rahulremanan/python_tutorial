@@ -1,3 +1,4 @@
+#!/usr/bin/python3.6
 # Transfer learning using Keras and Tensorflow.
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
@@ -19,7 +20,8 @@ import PIL
 from collections import defaultdict
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
 from keras.models import Model, model_from_json
-from keras.layers import Dense, GlobalAveragePooling2D, Dropout
+from keras.layers import Dense, GlobalAveragePooling2D, Dropout, BatchNormalization
+from keras.layers.merge import concatenate
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, RMSprop, Adagrad
 
@@ -79,28 +81,60 @@ def setup_to_transfer_learn(model, base_model, optimizer):
                 loss='categorical_crossentropy', metrics=['accuracy'])
   return model
 
-def add_new_last_layer(base_model, nb_classes):                                # Add the fully connected convolutional neural network layer
+def add_new_last_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
+  
   try:
       dropout = args.dropout[0]
   except:
       dropout = DEFAULT_DROPOUT
-  x = base_model.output
-  x = Dropout(dropout)(x)
+      
+  bm = base_model.output
+  
+  x = Dropout(dropout)(bm)
   x = GlobalAveragePooling2D()(x)
   x = Dropout(dropout)(x)
-  x = Dense(FC_SIZE*4, activation='relu')(x)
-  x = Dropout(dropout)(x)
-  x = Dense(FC_SIZE*3, activation='relu')(x)
-  x = Dropout(dropout)(x)
-  x = Dense(FC_SIZE*2, activation='relu')(x)
-  x = Dropout(dropout)(x)
+  x = BatchNormalization()(x)
   x = Dense(FC_SIZE, activation='relu')(x)
-  x = Dropout(dropout)(x)                                      # New fully connected layer, random init
-  predictions = Dense(nb_classes, activation='softmax')(x)                      # New softmax layer
+  x = Dropout(dropout)(x)
+  
+  x1 = Dense(FC_SIZE, activation='relu', name="fc_dense1")(x)
+  x1 = Dropout(dropout, name = 'dropout1')(x1)
+  x1 = BatchNormalization(name="fc_batch_norm1")(x1)
+  x1 = Dense(FC_SIZE, activation='relu', name="fc_dense2")(x1)
+  x1 = Dropout(dropout, name = 'dropout2')(x1)
+
+  x2 = Dense(FC_SIZE, activation='relu', name="fc_dense3")(x)
+  x2 = Dropout(dropout, name = 'dropout3')(x2)
+  x2 = BatchNormalization(name="fc_batch_norm2")(x2)
+  x2 = Dense(FC_SIZE, activation='relu', name="fc_dense4")(x2)
+  x2 = Dropout(dropout, name = 'dropout4')(x2)
+
+  x12 = concatenate([x1, x2], name = 'mixed11')
+  x12 = Dropout(dropout, name = 'dropout5')(x12)
+  x12 = Dense(FC_SIZE//16, activation='relu', name = 'fc_dense5')(x12)
+  x12 = Dropout(dropout, name = 'dropout6')(x12)
+  x12 = BatchNormalization(name="fc_batch_norm3")(x12)
+  x12 = Dense(FC_SIZE//32, activation='relu', name = 'fc_dense6')(x12)
+  x12 = Dropout(dropout, name = 'dropout7')(x12)
+  
+  x3 = GlobalAveragePooling2D( name = 'global_avg_pooling2')(bm)
+  x3 = Dense(2048, activation='relu', name = 'fc_dense7')(x3)
+  x3 = Dropout(dropout, name = 'dropout8')(x3)
+  x3 = BatchNormalization(name="fc_batch_norm4")(x3)
+  x3 = Dense(2048, activation='relu', name = 'fc_dense8')(x3)
+  x3 = Dropout(dropout, name = 'dropout9')(x3)
+  
+  xout = concatenate([x12, x3], name ='mixed12')
+  xout = Dense(FC_SIZE//32, activation='relu', name = 'fc_dense9')(xout)
+  xout = Dropout(dropout, name = 'dropout10')(xout)
+  
+  predictions = Dense(nb_classes, activation='softmax', name='prediction')(xout)                      # New softmax layer
+  
   model = Model(inputs=base_model.input, outputs=predictions)
+  
   return model
 
-def setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS):                                        # Freeze the bottom NB_LAYERS and retrain the remaining top layers
+def setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS):                      # Freeze the bottom NB_LAYERS and retrain the remaining top layers
   for layer in model.layers[:NB_FROZEN_LAYERS]:
      layer.trainable = False
   for layer in model.layers[NB_FROZEN_LAYERS:]:
@@ -113,8 +147,8 @@ def save_model(args, name, model):
     file_loc = args.output_dir[0]
     file_pointer = os.path.join(file_loc+"//trained_"+ timestr)
     model.save_weights(os.path.join(file_pointer + "_weights"+str(name)+".model"))
-    # serialize model to JSON
-    model_json = model.to_json()
+    
+    model_json = model.to_json()                                                # Serialize model to JSON
     with open(os.path.join(file_pointer+"_config"+str(name)+".json"), "w") as json_file:
         json_file.write(model_json)
     print ("Saved the trained model weights to: " + 
@@ -219,7 +253,7 @@ def train(args):
     print ("Using Adagrad as the optimizer ...")
   else:
       optimizer = DEFAULT_OPTIMIZER
-                                                               # Transfer learning and fine-tuning for training
+                                                                                # Transfer learning and fine-tuning for training
   nb_train_samples = get_nb_files(args.train_dir[0])
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
   
@@ -287,17 +321,10 @@ def train(args):
   
   labels = generate_labels(args)
   
-  model_summary_ = args.model_summary[0]
-  
-  if model_summary_ == True:
-      print (model.summary())
-  else:
-      print ("Successfully loaded Inception version 3 for training ...")
-    
   load_weights_ = args.load_weights[0]
   fine_tune_model = args.fine_tune[0]
   
-  if load_weights_ == True:      
+  if load_weights_ == True:     
       try:
           with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
@@ -329,6 +356,13 @@ def train(args):
   print ("Initializing training with  class labels: " + 
          str(labels))
   
+  model_summary_ = args.model_summary[0]
+  
+  if model_summary_ == True:
+      print (model.summary())
+  else:
+      print ("Successfully loaded Inception version 3 for training ...")
+  
   model_train = model.fit_generator(train_generator,
                   epochs=nb_epoch,
                   steps_per_epoch=nb_train_samples // batch_size,
@@ -343,7 +377,6 @@ def train(args):
       save_model(args, "_tl_", model)
       generate_plot(args, "_tl_", model_train)
       
-  
 def get_user_options():
     a = argparse.ArgumentParser()
     
