@@ -14,19 +14,14 @@ import json
 from keras.preprocessing import image
 from keras.applications.inception_v3 import preprocess_input
 from keras.models import model_from_json
-from keras.optimizers import SGD, RMSprop, Adagrad
 from keras.preprocessing.image import ImageDataGenerator
 
-sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
-rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
-ada = Adagrad(lr=1e-7, epsilon=1e-08, decay=0.0)
-optimizer = ada
-
-target_size = (229, 229)                                                        # Fixed size for InceptionV3 architecture
+target_size = (299, 299)                                                        # Fixed size for InceptionV3 architecture
 
 def generate_timestamp():
     timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
-    print ("Time stamp generated: "+timestring)
+    if verbose == True:
+        print ("Time stamp generated: "+timestring)
     return timestring
 
 def is_valid_file(parser, arg):
@@ -47,52 +42,61 @@ def compile_model(model):
     
 def load_prediction_model(args):
     try:
-        print ("Loaded prediction model configuration from: " + 
+        if args.verbose == True:
+            print ("Loaded prediction model configuration from: " + \
                str(args.config_file[0]))
         with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
         model = model_from_json(model_json)
     except:
-          print ("Please specify a model configuration file ...")
-          sys.exit(1)
+        if args.verbose == True:
+            print ("Please specify a model configuration file ...")
+        sys.exit(1)
     try:
-          model.load_weights(args.weights_file[0])
-          print ("Loaded model weights from: " + 
+        model.load_weights(args.weights_file[0])
+        if args.verbose == True:
+            print ("Loaded model weights from: " + 
                  str(args.weights_file[0]))
     except:
-          print ("Error loading model weights ...")
-          sys.exit(1)
+        if args.verbose == True:
+            print ("Error loading model weights ...")
+        sys.exit(1)
     try:
-        print (args.labels_file[0])
+        if args.verbose == True:
+            print (args.labels_file[0])
         with open(args.labels_file[0]) as json_file:
             labels = json.load(json_file)
-        print ("Loaded labels from: " + str(args.labels_file[0]))
+        if args.verbose == True:
+            print ("Loaded labels from: " + str(args.labels_file[0]))
     except:
-        print ("No labels loaded ...")
+        if args.verbose == True:
+            print ("No labels loaded ...")
         sys.exit(1)
     return model, labels
 
-def predict(model, img, target_size):
-  print ("Running prediction model on the image file ...")
-  if img.size != target_size:
-    img = img.resize(target_size)
+def predict(model, img, target_size, verbose):
+    if verbose == True:
+        print ("Running prediction model on the image file ...")
+    if img.size != target_size:
+        img = img.resize(target_size)
 
-  _x_ = image.img_to_array(img)
-  _x_ = np.expand_dims(_x_, axis=0)
-  _x_ = preprocess_input(_x_)
-  preds = model.predict(_x_)
-  probabilities = model.predict(_x_, batch_size=1).flatten()
-  prediction = labels[np.argmax(probabilities)]
-  return preds[0], prediction
+    _x_ = image.img_to_array(img)
+    _x_ = np.expand_dims(_x_, axis=0)
+    _x_ = preprocess_input(_x_)
+    preds = model.predict(_x_)
+    probabilities = model.predict(_x_, batch_size=1).flatten()
+    prediction = labels[np.argmax(probabilities)]
+    return preds[0], prediction
 
-def predict_gen(model, preds_dir, target_size, batch_size=1):
+def predict_gen(model, preds_dir, target_size, verbose, batch_size=1):
     preds_datagen = ImageDataGenerator(rescale=1. / 255)
     preds_generator = preds_datagen.flow_from_directory(args.preds_dir[0],
     target_size=target_size,
     batch_size=batch_size,
     shuffle=False,
     class_mode='categorical')
-    print(preds_generator.filenames)
+    if verbose == True:
+        print(preds_generator.filenames)
     preds = model.predict_generator(preds_generator, steps=len(preds_generator.filenames), max_queue_size=10, workers=1, use_multiprocessing=False, verbose=1)
     p = []
     for prediction in preds:
@@ -100,9 +104,9 @@ def predict_gen(model, preds_dir, target_size, batch_size=1):
         p.append(labels[np.argmax(probabilities)])       
     return preds, p
 
-def plot_preds(preds, labels, filestr):
+def plot_preds(preds, labels, timestr):
   output_loc = args.output_dir[0]
-  output_file_preds = os.path.join(output_loc+"//preds_out_"+filestr+".png")
+  output_file_preds = os.path.join(output_loc+"//preds_out_"+timestr+".png")
   fig = plt.figure()
   plt.axis('on')
   labels = labels
@@ -112,7 +116,6 @@ def plot_preds(preds, labels, filestr):
   plt.xlim(0,1.01)
   plt.tight_layout()
   fig.savefig(output_file_preds, dpi=fig.dpi)
-  plt.close()
   
 def get_user_options():
     a = argparse.ArgumentParser()
@@ -125,9 +128,18 @@ def get_user_options():
                    nargs=1)
     
     a.add_argument("--image_url", 
+                   dest = "image_url",
                    help="url to image",
                    nargs=1,
                    required = False)
+    
+    a.add_argument("--verbose", 
+                   dest = "verbose",
+                   help="set verbose for detailed steps",
+                   nargs=1,
+                   required = False,
+                   type= bool,
+                   default = False)
     
     a.add_argument("--weights_file", 
                    help = "Specify pre-trained model weights for training ...", 
@@ -181,48 +193,56 @@ def get_user_options():
     return args
 
 if __name__=="__main__":
-  args = get_user_options()
+    args = get_user_options()
+    
+    try:
+        verbose = args.verbose
+    except:
+        versbose = False
   
-  if args.image is None and args.image_url and args.preds_dir is None:
-    args.print_help()
-    sys.exit(1)
+    if args.image is None and args.image_url and args.preds_dir is None:
+        args.print_help()
+        sys.exit(1)
 
-  if ((not os.path.exists(args.config_file[0])) 
+    if ((not os.path.exists(args.config_file[0])) 
         or 
     (not os.path.exists(args.weights_file[0])) 
         or 
     (not os.path.exists(args.labels_file[0]))):
-      print("Specified directories do not exist ...")
-      sys.exit(1)
+        print("Specified directories do not exist ...")
+        sys.exit(1)
     
-  print ("Loading neural network ...")
+    if verbose == True:
+        print ("Loading neural network ...")
 
-  try:
-      model, labels = load_prediction_model(args)
-      print ("Prediction model and class labels loaded ...")
-  except:
-      print ("Prediction model failed to load ...")
+    try:
+        model, labels = load_prediction_model(args)
+        print ("Prediction model and class labels loaded ...")
+    except:
+        print ("Prediction model failed to load ...")
         
-  if args.image is not None:
-    img = Image.open(args.image[0])
-    preds = predict(model, img, target_size)
-    print (str(args.image[0]))
-    print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
-    print (str(preds[1]))
-    timestr = generate_timestamp()
-    plot_preds(preds[0], labels, timestr)
+    if args.image is not None:
+        img = Image.open(args.image[0])
+        preds = predict(model, img, target_size, verbose)
+        print (str(args.image[0]))
+        print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
+        if verbose == True:
+            print ("The image is most likely :" + str(preds[1]) + " breast tissue ")
+        timestr = generate_timestamp()
+        plot_preds(preds[0], labels, timestr)
     
-  elif args.preds_dir is not None:
-    preds_dir = args.preds_dir[0]
-    batches = args.batch_size[0]
-    preds = predict_gen(model, preds_dir, target_size, batches)
-    print (preds)
+    elif args.preds_dir is not None:
+        preds_dir = args.preds_dir[0]
+        batches = args.batch_size[0]
+        preds = predict_gen(model, preds_dir, target_size, verbose, batches)
+        print (preds)
 
-  elif args.image_url is not None:
-    response = requests.get(args.image_url[0])
-    img = Image.open(BytesIO(response.content))
-    preds = predict(model, img, target_size)
-    print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
-    print (str(preds[1]))
-    filestr = generate_timestamp()
-    plot_preds(preds[0], labels, filestr)
+    elif args.image_url is not None:
+        response = requests.get(args.image_url[0])
+        img = Image.open(BytesIO(response.content))
+        preds = predict(model, img, target_size, verbose)
+        print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
+        if verbose == True:
+            print ("The image is most likely :" + str(preds[1]) + " breast tissue ")
+        timestr = generate_timestamp()
+        plot_preds(preds[0], labels, timestr)
