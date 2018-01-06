@@ -227,7 +227,7 @@ if __name__=="__main__":
         print (str(args.image[0]))
         print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
         if verbose == True:
-            print ("The image is most likely :" + str(preds[1]) + " breast tissue ")
+            print ("The image is most likely :" + str(preds[1]))
         timestr = generate_timestamp()
         plot_preds(preds[0], labels, timestr)
     
@@ -243,6 +243,6 @@ if __name__=="__main__":
         preds = predict(model, img, target_size, verbose)
         print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
         if verbose == True:
-            print ("The image is most likely :" + str(preds[1]) + " breast tissue ")
+            print ("The image is most likely :" + str(preds[1]))
         timestr = generate_timestamp()
         plot_preds(preds[0], labels, timestr)
