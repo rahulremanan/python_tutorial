@@ -217,7 +217,8 @@ if __name__=="__main__":
 
     try:
         model, labels = load_prediction_model(args)
-        print ("Prediction model and class labels loaded ...")
+        if verbose == True:
+            print ("Prediction model and class labels loaded ...")
     except:
         print ("Prediction model failed to load ...")
         
