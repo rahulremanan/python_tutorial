@@ -206,6 +206,7 @@ if __name__=="__main__":
   if args.image is not None:
     img = Image.open(args.image[0])
     preds = predict(model, img, target_size)
+    print (str(args.image[0]))
     print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
     print (str(preds[1]))
     timestr = generate_timestamp()

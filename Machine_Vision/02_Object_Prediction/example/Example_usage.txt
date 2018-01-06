@@ -1,3 +1,13 @@
 python3 prediction_cats_dogs.py --config_file /home/info/model/trained_2017_09_26-07_11_30_model.json --weights_file /home/info/model/trained_2017_09_26-07_11_30_weights.model --labels_file /home/info/model/trained_labels.json --output_directory /home/info/ --image /home/info/cat.jpg
 
 python3 prediction_gen.py --config_file /home/info/model/trained_2017_09_27-04_28_50_config_tl_.json --weights_file /home/info/model/trained_2017_10_24-14_19_35_weights_ft_.model --labels_file /home/info/model/trained_labels.json --output_directory /home/info/ --prediction_directory /home/info/preds/ --batch_size 1
+
+for file in ../data/ICIAR/test/benign/*.jpg; \
+do python3 prediction_gen.py \
+--config_file ../model/model_efc.json \
+--weights_file ../model/trained_weights_42i.model \
+--labels_file ../model/trained_labels.json \
+--output_directory ./output/ \
+--image "$file" \
+--batch_size 1 \
+>> output.txt; done
