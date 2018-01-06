@@ -100,9 +100,9 @@ def predict_gen(model, preds_dir, target_size, batch_size=1):
         p.append(labels[np.argmax(probabilities)])       
     return preds, p
 
-def plot_preds(preds, labels, timestr):
+def plot_preds(preds, labels, filestr):
   output_loc = args.output_dir[0]
-  output_file_preds = os.path.join(output_loc+"//preds_out_"+timestr+".png")
+  output_file_preds = os.path.join(output_loc+"//preds_out_"+filestr+".png")
   fig = plt.figure()
   plt.axis('on')
   labels = labels
@@ -112,6 +112,7 @@ def plot_preds(preds, labels, timestr):
   plt.xlim(0,1.01)
   plt.tight_layout()
   fig.savefig(output_file_preds, dpi=fig.dpi)
+  plt.close()
   
 def get_user_options():
     a = argparse.ArgumentParser()
@@ -165,8 +166,7 @@ def get_user_options():
                    dest = "preds_dir", 
                    required = False, 
                    type=lambda x: is_valid_dir(a, x),
-                   nargs=1,
-                   default = ['/'])
+                   nargs=1)
     
     a.add_argument("--batch_size", 
                    help = "Specify prediction sample size ...", 
@@ -211,17 +211,17 @@ if __name__=="__main__":
     timestr = generate_timestamp()
     plot_preds(preds[0], labels, timestr)
     
-  if args.preds_dir is not None:
+  elif args.preds_dir is not None:
     preds_dir = args.preds_dir[0]
     batches = args.batch_size[0]
     preds = predict_gen(model, preds_dir, target_size, batches)
     print (preds)
 
-  if args.image_url is not None:
+  elif args.image_url is not None:
     response = requests.get(args.image_url[0])
     img = Image.open(BytesIO(response.content))
     preds = predict(model, img, target_size)
     print (preds[1] + "\t" + "\t".join(map(lambda x: "%.2f" % x, preds[0])))
     print (str(preds[1]))
-    timestr = generate_timestamp()
-    plot_preds(preds[0], labels, timestr)
+    filestr = generate_timestamp()
+    plot_preds(preds[0], labels, filestr)
