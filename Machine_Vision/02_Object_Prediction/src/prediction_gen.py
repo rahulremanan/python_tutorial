@@ -89,7 +89,7 @@ def predict(model, img, target_size, verbose):
     return preds[0], prediction
 
 def predict_gen(model, preds_dir, target_size, verbose, batch_size=1):
-    preds_datagen = ImageDataGenerator(rescale=1. / 255)
+    preds_datagen = ImageDataGenerator()
     preds_generator = preds_datagen.flow_from_directory(args.preds_dir[0],
     target_size=target_size,
     batch_size=batch_size,
@@ -97,7 +97,7 @@ def predict_gen(model, preds_dir, target_size, verbose, batch_size=1):
     class_mode='categorical')
     if verbose == True:
         print(preds_generator.filenames)
-    preds = model.predict_generator(preds_generator, steps=len(preds_generator.filenames), max_queue_size=10, workers=1, use_multiprocessing=False, verbose=1)
+    preds = model.predict_generator(preds_generator, steps=len(preds_generator.filenames), max_queue_size=1, workers=1, use_multiprocessing=False, verbose=1)
     p = []
     for prediction in preds:
         probabilities = prediction.flatten()
