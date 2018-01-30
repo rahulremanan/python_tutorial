@@ -102,4 +102,5 @@ export PYTHONPATH=/usr/local/lib/python3.6/site-packages:/usr/local/lib/python3.
 ## Keras installation:
 git clone https://github.com/keras-team/keras.git
 cd keras
-sudo python setup.py install
+sudo pip3 install scipy
+sudo python3 setup.py install
