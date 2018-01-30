@@ -80,7 +80,7 @@ sudo bazel build -c opt --copt=-msse4.1 --copt=-msse4.2 --copt=-mavx --copt=-mav
 sudo bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 cd /tmp/tensorflow_pkg
 ls
-sudo pip3 install /tmp/tensorflow_pkg/tensorflow-1.4.0-cp36-cp36m-linux_x86_64.whl
+sudo pip3 install /tmp/tensorflow_pkg/tensorflow-1.5.0rc1-cp36-cp36m-linux_x86_64.whl
 
 ## Fix for "module 'enum' has no attribute 'IntFlag'" error for tensorflow:
 
@@ -98,3 +98,8 @@ export PYTHONPATH=[this is where you paste the corrected paths, no square bracke
 
 export PYTHONPATH=/usr/local/lib/python3.6/site-packages:/usr/local/lib/python3.6/site-packages:/usr/local/lib/python3.6/site-packages:/usr/local/lib/python3.6/dist-packages
 
+
+## Keras installation:
+git clone https://github.com/keras-team/keras.git
+cd keras
+sudo python setup.py install
