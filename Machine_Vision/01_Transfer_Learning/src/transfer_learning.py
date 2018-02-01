@@ -277,15 +277,20 @@ def train(args):
       sys.exit(1)
       
   nb_epoch = int(args.epoch[0])
-  batch_size = int(args.batch[0])
+  batch_size = int(args.batch[0])    
+  train_aug = args.train_aug[0] 
   
-  train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
+  if train_aug==True:
+    train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
       rotation_range=30,
       width_shift_range=0.2,
       height_shift_range=0.2,
       shear_range=0.2,
       zoom_range=0.2,
       horizontal_flip=True)
+  else:
+      train_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
+    
   
   test_aug = args.test_aug[0]  
   
@@ -299,7 +304,7 @@ def train(args):
           zoom_range=0.2,
           horizontal_flip=True)
   else:
-      test_datagen = ImageDataGenerator(rescale=1. / 255)
+      test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
       
   print ("Generating training data: ... ")
 
@@ -457,6 +462,14 @@ def get_user_options():
     a.add_argument("--test_augmentation", 
                    help = "Specify image augmentation for test dataset ...", 
                    dest = "test_aug", 
+                   required=False, 
+                   default=[False], 
+                   nargs=1, 
+                   type = string_to_bool)
+    
+    a.add_argument("--train_augmentation", 
+                   help = "Specify image augmentation for train dataset ...", 
+                   dest = "train_aug", 
                    required=False, 
                    default=[False], 
                    nargs=1, 
