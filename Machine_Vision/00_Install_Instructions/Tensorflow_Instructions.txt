@@ -22,6 +22,8 @@ which gcc
 gcc --version
 g++ --version
 
+-- Optional GCC Downgrade --
+
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 16
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 16
 
@@ -76,11 +78,12 @@ sudo bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
 
 sudo bazel build -c opt --copt=-msse4.1 --copt=-msse4.2 --copt=-mavx --copt=-mavx2 --copt=-mfma //tensorflow/tools/pip_package:build_pip_package
 
+-- Build the pip installer package --
 
 sudo bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 cd /tmp/tensorflow_pkg
 ls
-sudo pip3 install /tmp/tensorflow_pkg/tensorflow-1.5.0rc1-cp36-cp36m-linux_x86_64.whl
+sudo pip3 install /tmp/tensorflow_pkg/tensorflow-1.6.0rc0-cp36-cp36m-linux_x86_64.whl
 
 ## Fix for "module 'enum' has no attribute 'IntFlag'" error for tensorflow:
 
