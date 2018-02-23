@@ -20,7 +20,7 @@ sudo apt install libjasper1 libjasper-dev
 
 -- Use this for face_recognition --
 
-sudo apt-get -qq install build-essential checkinstall cmake pkg-config yasm libjpeg-dev libjasper-dev libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev libxine2-dev gstreamer1.0-dev gstreamer-plugins-base1.0-dev libv4l-dev python-dev python-numpy libtbb-dev libqt4-dev libgtk2.0-dev libfaac-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev x264 v4l-utils
+sudo apt-get -qq install build-essential checkinstall cmake pkg-config yasm libjpeg-dev libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev libxine2-dev gstreamer1.0-dev gstreamer-plugins-base1.0-dev libv4l-dev python-dev python-numpy libtbb-dev libqt4-dev libgtk2.0-dev libfaac-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev x264 v4l-utils
 
 -- Compile ffmpeg from source --
 
@@ -57,6 +57,8 @@ $ source ~/.bashrc
 $ mkvirtualenv OpenCV
 # Install numpy for math calculations
 $ sudo rm -rf ~/.cache/pip/
+
+# Install numpy
 $ pip install numpy
 ---OR---
 $ sudo pip3 install -U numpy 
@@ -113,7 +115,7 @@ $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D PYTHON_INCLUDE_DIR=/usr/include/python3.6m/ \
 	-D INSTALL_C_EXAMPLES=ON \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
-	-D OPENCV_EXTRA_MODULES_PATH=/home/remanan_rahul/opencv_contrib/modules \
+	-D OPENCV_EXTRA_MODULES_PATH=/home/ubuntu/opencv_contrib/modules \
 	-D BUILD_PROTOBUF=OFF \
 	-D UPDATE_PROTO_FILES=ON \
 	-D BUILD_EXAMPLES=ON ..
