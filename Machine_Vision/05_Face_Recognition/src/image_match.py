@@ -6,6 +6,7 @@ from os.path import basename
 import skvideo.io
 import glob
 import sys
+import subprocess
 
 (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
 
@@ -26,7 +27,7 @@ except:
 length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
 #save_path = "/home/info/proc_vid.ogv"
-save_path = "/home/info/proc_vid.avi"
+save_path = "/home/info/proc_vid.mp4"
 
 # Initialize some variables
 face_locations = []
@@ -45,14 +46,16 @@ fps = video_capture.get(cv2.CAP_PROP_FPS)
 print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
 #fourcc = cv2.VideoWriter_fourcc(*'THEO')
-fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-video_writer = cv2.VideoWriter(save_path,fourcc, fps, (w,h))
+#fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+video_writer = cv2.VideoWriter(save_path,fourcc, fps, (w,h), True)
 
 reference_image_path = "/home/info/ref_img/"
 file_list = glob.glob(reference_image_path + '/*.jpg')
 
-n_proc_frames = 100
+n_proc_frames = length
 resize_img = False
+verbose = True
    
 while (video_capture.isOpened()):
     # Grab a single frame of video
@@ -81,8 +84,15 @@ while (video_capture.isOpened()):
                         reference_image = face_recognition.load_image_file(file_path)
                         try:
                             reference_face_encoding = face_recognition.face_encodings(reference_image)[0]
+                            if verbose == True:
+                                print ("Processed face encodings ...")
+                            else:
+                                pass
                         except:
-                            print("Failed processing face encodings ...")
+                            if verbose == True:
+                                print("Failed processing face encodings ...")
+                            else:
+                                pass
                         name_ID = (os.path.splitext(basename(file_path))[0])
                         name_ID = name_ID.replace("_", " ")
                         # See if the face is a match for the known face(s)
@@ -130,3 +140,8 @@ while (video_capture.isOpened()):
 # Release handle to read the video file or webcam
 video_capture.release()
 video_writer.release()
+
+cmd = 'ffmpeg -i %s -i audio.wav -shortest -c:v copy -c:a aac -b:a 256k  %s' % (source, save_path)
+subprocess.call(cmd, shell=True)
+print('Muxing completed ...')
+print('Saved output file to: %s')(save_path)
