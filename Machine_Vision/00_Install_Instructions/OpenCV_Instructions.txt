@@ -35,6 +35,8 @@ cd ffmpeg
 sudo make
 sudo make install
 
+-- Optional --
+
 # To fix videodev.h missing error
 # Generate a symbolic link
 $ sudo ln -s /usr/include/libv4l1-videodev.h   /usr/include/linux/videodev.h 
