@@ -81,6 +81,7 @@ $ sudo pip3 install face_recognition
 
 $ sudo pip3 install git+https://github.com/ageitgey/face_recognition
 
+# Verify installation:
 $ python3 -c "import face_recognition"
 
 -- OR --
