@@ -1,0 +1,18 @@
+# Changing user accounts:
+
+$ whoami
+user1
+$ su - user2
+Password:
+$ whoami
+user2
+$ exit
+logout
+
+# Changing user account passwords:
+
+$ sudo passwd -user1
+-- Enter new password --
+$ sudo passwd
+-- To change root user password --
+
