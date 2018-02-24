@@ -1,0 +1,2 @@
+sudo pip3 install altair jupyter pandas vega seaborn ipympl
+sudo jupyter nbextension enable --py --sys-prefix ipympl
