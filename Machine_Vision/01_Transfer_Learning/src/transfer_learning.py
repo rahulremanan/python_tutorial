@@ -188,8 +188,8 @@ def generate_labels(args):
     val_labels = sorted(dv.keys())
     
     if set(labels) == set (val_labels):
-        print("Training labels: " + labels)
-        print("Validation labels: " + val_labels)
+        print("Training labels: " + str(labels))
+        print("Validation labels: " + str(val_labels))
         with open(os.path.join(file_pointer+".json"), "w") as json_file:
             json.dump(labels, json_file)
     else:
