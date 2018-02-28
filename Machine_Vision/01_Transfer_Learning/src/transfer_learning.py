@@ -188,9 +188,13 @@ def generate_labels(args):
     val_labels = sorted(dv.keys())
     
     if set(labels) == set (val_labels):
+        print("Training labels: " + labels)
+        print("Validation labels: " + val_labels)
         with open(os.path.join(file_pointer+".json"), "w") as json_file:
             json.dump(labels, json_file)
     else:
+      print("Training labels: " + str(labels))
+      print("Validation labels: " + str(val_labels))
       print ("Mismatched training and validation data labels ...")
       print ("Sub-folder names do not match between training and validation directories ...")
       sys.exit(1)
