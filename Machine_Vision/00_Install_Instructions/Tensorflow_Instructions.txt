@@ -107,7 +107,7 @@ export PYTHONPATH=/usr/local/lib/python3.6/site-packages:/usr/local/lib/python3.
 
 ## Keras installation:
 
-sudo pip3 install h5py scipy
+sudo pip3 install h5py scipy matplotlib
 
 git clone https://github.com/keras-team/keras.git
 cd keras
