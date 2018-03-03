@@ -60,6 +60,8 @@ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++ 12
 
 After compiling TensorFlow you can use previous version of gcc calling above command with proper path to /usr/bin/gcc-6 -priority
 
+## Configure installer:
+
 ./configure
 sudo bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
 
@@ -104,7 +106,9 @@ export PYTHONPATH=/usr/local/lib/python3.6/site-packages:/usr/local/lib/python3.
 
 
 ## Keras installation:
+
+sudo pip3 install h5py scipy
+
 git clone https://github.com/keras-team/keras.git
 cd keras
-sudo pip3 install scipy
 sudo python3 setup.py install
