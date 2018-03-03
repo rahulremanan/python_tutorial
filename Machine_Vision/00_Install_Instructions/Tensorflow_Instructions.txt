@@ -18,6 +18,7 @@ python3
 >>> import sys
 >>> print(sys.executable)
 >>> print(sys.path)
+>>> ctrl+D
 which gcc
 gcc --version
 g++ --version
