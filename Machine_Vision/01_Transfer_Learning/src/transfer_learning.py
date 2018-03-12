@@ -18,12 +18,19 @@ import tensorflow
 import keras
 import PIL
 from collections import defaultdict
-from keras.applications.inception_v3 import InceptionV3, preprocess_input
-from keras.models import Model, model_from_json
-from keras.layers import Dense, GlobalAveragePooling2D, Dropout, BatchNormalization
+from keras.applications.inception_v3 import InceptionV3,    \
+                                            preprocess_input
+from keras.models import Model,                             \
+                         model_from_json
+from keras.layers import Dense,                             \
+                         GlobalAveragePooling2D,            \
+                         Dropout,                           \
+                         BatchNormalization
 from keras.layers.merge import concatenate
 from keras.preprocessing.image import ImageDataGenerator
-from keras.optimizers import SGD, RMSprop, Adagrad
+from keras.optimizers import SGD,                           \
+                             RMSprop,                       \
+                             Adagrad
 
 IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Fixed input image size for Inception version 3
 DEFAULT_EPOCHS = 100
@@ -128,7 +135,9 @@ def add_new_last_layer(base_model, nb_classes):                                 
   xout = Dense(FC_SIZE//32, activation='relu', name = 'fc_dense9')(xout)
   xout = Dropout(dropout, name = 'dropout10')(xout)
   
-  predictions = Dense(nb_classes, activation='softmax', name='prediction')(xout)                      # New softmax layer
+  predictions = Dense(nb_classes,           \
+                      activation='softmax', \
+                      name='prediction')(xout)                      # New softmax layer
   
   model = Model(inputs=base_model.input, outputs=predictions)
   
@@ -213,9 +222,11 @@ def plot_training(args, name, history):
   output_loc = args.output_dir[0]
   
   output_file_acc = os.path.join(output_loc+
-                                 "//training_plot_acc_"+timestr+str(name)+".png")
+                                 "//training_plot_acc_" + 
+                                 timestr+str(name)+".png")
   output_file_loss = os.path.join(output_loc+
-                                  "//training_plot_loss_"+timestr+str(name)+".png")
+                                  "//training_plot_loss_" + 
+                                  timestr+str(name)+".png")
   fig_acc = plt.figure()
   plt.plot(history.history['acc'])
   plt.plot(history.history['val_acc'])
@@ -246,13 +257,13 @@ def train(args):
   lr = args.learning_rate[0]
   decay = args.decay[0]
   
-  if optimizer_val == 'sgd' or optimizer_val == 'SGD' or optimizer_val == 'Sgd':
+  if optimizer_val.lower() == 'sgd' :
     optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
     print ("Using SGD as the optimizer ...")
-  elif optimizer_val == 'rms' or optimizer_val == 'SGD' or optimizer_val == 'RMSprop' or optimizer_val == 'rmsprop' or optimizer_val == 'Rmsprop':
+  elif optimizer_val.lower() == 'rms' or optimizer_val.lower() == 'rmsprop':
     optimizer = RMSprop(lr=lr, rho=0.9, epsilon=1e-08, decay=decay)
     print ("Using RMSProp as the optimizer ...")
-  elif optimizer_val == 'ada' or optimizer_val == 'ADA' or optimizer_val == 'Ada':
+  elif optimizer_val.lower() == 'ada':
     optimizer = Adagrad(lr=lr, epsilon=1e-08, decay=decay)
     print ("Using Adagrad as the optimizer ...")
   else:
