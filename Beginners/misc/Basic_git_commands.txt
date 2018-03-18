@@ -1,0 +1,7 @@
+$ git add.
+$ git commit -a
+$ git remote add origin https://github.com/MoadComputer/python_tutorial
+$ git remote set-url origin git://https://github.com/MoadComputer/
+$ git remote -v
+$ git push origin master
+$ git remote add origin https://github.com/rahulremanan/python_tutorial

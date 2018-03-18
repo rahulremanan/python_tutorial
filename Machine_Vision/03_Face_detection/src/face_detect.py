@@ -2,7 +2,7 @@
 #!/usr/bin/python3.5
 import numpy as np
 import cv2
-face_cascade = cv2.CascadeClassifier('D:\\haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('D:\\haarcascade_frontalface.xml')
 eye_cascade = cv2.CascadeClassifier('D:\\haarcascade_eye.xml')
 cap = cv2.VideoCapture(0)
 scale_factor = 1.1

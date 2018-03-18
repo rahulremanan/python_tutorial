@@ -119,8 +119,8 @@ $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D PYTHON_INCLUDE_DIR=/usr/include/python3.6m/ \
 	-D INSTALL_C_EXAMPLES=ON \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
-	-D OPENCV_EXTRA_MODULES_PATH= /home/remanan_rahul/opencv_contrib/modules \
-	-D BUILD_PROTOBUF=OFF \
+	-D OPENCV_EXTRA_MODULES_PATH= /home/ubuntu/opencv_contrib/modules \
+	-D BUILD_PROTOBUF=ON \
 	-D UPDATE_PROTO_FILES=ON \
 	-D BUILD_EXAMPLES=ON ..
 
