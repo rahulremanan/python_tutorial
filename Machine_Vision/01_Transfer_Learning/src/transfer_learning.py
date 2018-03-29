@@ -31,6 +31,9 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD,                           \
                              RMSprop,                       \
                              Adagrad
+from keras.callbacks import EarlyStopping,   \
+                            ModelCheckpoint, \
+                            ReduceLROnPlateau
 
 IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Fixed input image size for Inception version 3
 DEFAULT_EPOCHS = 100
@@ -382,13 +385,29 @@ def train(args):
       print (model.summary())
   else:
       print ("Successfully loaded Inception version 3 for training ...")
+      
+  earlystopper = EarlyStopping(patience=5, verbose=1)
+  checkpointer = ModelCheckpoint(checkpointer_savepath, 
+                               verbose=1,  
+                               save_best_only=True)
+  learning_rate_reduction = ReduceLROnPlateau(monitor='val_acc', 
+                                            patience=2,
+                                            mode = 'min',
+                                            epsilon=1e-4, 
+                                            cooldown=1,
+                                            verbose=1, 
+                                            factor=0.5, 
+                                            min_lr=1e-5)
   
   model_train = model.fit_generator(train_generator,
-                  epochs=nb_epoch,
-                  steps_per_epoch=nb_train_samples // batch_size,
-                  validation_data=validation_generator,
-                  validation_steps=nb_val_samples // batch_size,
-                  class_weight='auto')
+                                    epochs=nb_epoch,
+                                    validation_data=validation_generator,
+                                    class_weight='auto',
+                                    validation_split=0.125, 
+                                    batch_size=64, 
+                                    callbacks=[earlystopper, 
+                                               learning_rate_reduction, 
+                                               checkpointer])
   
   if fine_tune_model == True:
       save_model(args, "_ft_", model)
