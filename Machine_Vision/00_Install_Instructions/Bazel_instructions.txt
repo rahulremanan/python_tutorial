@@ -13,37 +13,6 @@ $unzip -d bazel bazel-0.11.1-dist.zip
 
 cd bazel
 
-## Instructions specific for Raspberry Pi ##
-
-$sudo nano ./scripts/bootstrap/compile.sh
-
-Alt + G 117
-
-# Edit line 117 to set the maximum size of the Java heap to 500 MB, using the -J-Xmx500M flag:
-
-Change the original file from:
-
-run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
-      -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VERSION" \
-      -encoding UTF-8 "@${paramfile}"
-
-By adding  -J-Xmx500M at the end of the funtion:
-
-run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
-      -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VERSION" \
-      -encoding UTF-8 "@${paramfile}" -J-Xmx500M
-
-# Edit tools/cpp/lib_cc_configure.bzl :
-
-$sudo nano ./tools/cpp/lib_cc_configure.bzl 
-
-# Specify CPU architecture by placing the line: return "arm" at the beginning of the get_cpu_value function (around line 133):
-
-...
-"""Compute the cpu_value based on the OS name."""
-return "arm"
-...
-
 ## Resume bazel build process ##
 
 # Compile bazel from source:

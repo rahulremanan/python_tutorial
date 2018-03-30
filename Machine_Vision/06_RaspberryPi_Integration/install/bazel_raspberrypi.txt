@@ -25,9 +25,9 @@ run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
       -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VERSION" \
       -encoding UTF-8 "@${paramfile}" -J-Xmx500M
 
-Finally, we have to add one thing to tools/cpp/cc_configure.bzl - open it up for editing:
+Finally, we have to add one thing to tools /cpp/lib_cc_configure.bzl :
 
-nano tools/cpp/cc_configure.bzl
+$sudo nano ./tools/cpp/lib_cc_configure.bzl 
 
 Place the line return "arm" around line 133 (at the beginning of the _get_cpu_value function):
 
@@ -37,19 +37,5 @@ Alt+G 133
 """Compute the cpu_value based on the OS name."""
 return "arm"
 ...
-
-## Resume bazel build process ##
-
-# Compile bazel from source:
-
-$sudo ./compile.sh
-
-# Copy the new binary from output/bazel to /usr/local/bin directory.
-
-$sudo cp output/bazel /usr/local/bin/bazel
-
-# Verify bazel installation:
-
-$bazel
 
 sudo pip3 install --upgrade pip enum34
