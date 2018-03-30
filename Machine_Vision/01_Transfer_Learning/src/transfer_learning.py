@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/python3.6
 # Transfer learning using Keras and Tensorflow.
-# Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
+# Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team).
 # For more information contact: info@moad.computer
 # License: MIT open source license
 # Repository: https://github.com/rahulremanan/python_tutorial
+
 import argparse
 import os
 import time

@@ -5,7 +5,11 @@
 
 $wget https://github.com/bazelbuild/bazel/releases/download/0.7.0/bazel-0.7.0-dist.zip
 
+$wget https://github.com/bazelbuild/bazel/releases/download/0.11.1/bazel-0.11.1-dist.zip
+
 $unzip -d bazel bazel-0.7.0-dist.zip
+
+$unzip -d bazel bazel-0.11.1-dist.zip
 
 cd bazel
 
@@ -29,7 +33,7 @@ run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
       -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VERSION" \
       -encoding UTF-8 "@${paramfile}" -J-Xmx500M
 
-# Edit tools/cpp/cc_configure.bzl :
+# Edit tools/cpp/lib_cc_configure.bzl :
 
 $sudo nano ./tools/cpp/lib_cc_configure.bzl 
 

@@ -1,3 +1,42 @@
+# Assign swap memory from a swap file in the disk:
+
+Insert a USB drive, and find the drive path for the device:
+
+## Add 10Gb of swap space:
+    Checks current swap space by running free command (It must be around 10GB.).
+
+    Checks the swap partition
+
+    sudo fdisk -l
+    /dev/hda8       none            swap    sw              0       0
+
+    Make swap space and enable it:
+    sudo swapoff -a
+    sudo /sbin/mkswap /dev/hda8
+    sudo swapon -a
+
+If your swap disk size is not enough you would like to create swap file and use it:
+
+    Create swap file:
+    sudo fallocate -l 10g /mnt/10GB.swap
+    sudo chmod 600 /mnt/10GB.swap
+
+    OR
+
+    sudo dd if=/dev/zero of=/mnt/10GB.swap bs=1024 count=10485760
+    sudo chmod 600 /mnt/10GB.swap
+
+    Mount swap file:
+    sudo mkswap /mnt/10GB.swap
+
+    Enable swap file:
+    sudo swapon /mnt/10GB.swap
+
+## Verify swap size:
+    swapon -s
+
+-- Unverified --
+
 # Assign swap memory:
 
 Insert a USB drive, and find the drive path for the device:

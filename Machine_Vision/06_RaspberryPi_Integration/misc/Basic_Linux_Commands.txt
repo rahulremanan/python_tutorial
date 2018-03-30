@@ -1,0 +1,12 @@
+# Change password:
+passwd {user-name}
+
+# Start ssh server at reboot:
+sudo update-rc.d ssh defaults
+systemctl enable ssh.socket
+
+# Enable ssh as a service:
+sudo service ssh
+
+# Change password on next boot:
+chage -d 0 {user-name}
