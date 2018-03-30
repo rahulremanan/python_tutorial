@@ -385,26 +385,29 @@ def train(args):
       print (model.summary())
   else:
       print ("Successfully loaded Inception version 3 for training ...")
+        
+  checkpointer_savepath = os.path.join(args.output_dir[0]     +       
+                                       'checkpoint/Transfer_learn_' +       
+                                       str(IM_WIDTH)  + '_'  + 
+                                       str(IM_HEIGHT) + '_'  + '.h5')
       
   earlystopper = EarlyStopping(patience=5, verbose=1)
   checkpointer = ModelCheckpoint(checkpointer_savepath, 
-                               verbose=1,  
-                               save_best_only=True)
+                                 verbose=1,  
+                                 save_best_only=True)
   learning_rate_reduction = ReduceLROnPlateau(monitor='val_acc', 
-                                            patience=2,
-                                            mode = 'min',
-                                            epsilon=1e-4, 
-                                            cooldown=1,
-                                            verbose=1, 
-                                            factor=0.5, 
-                                            min_lr=1e-5)
+                                              patience=2,
+                                              mode = 'min',
+                                              epsilon=1e-4, 
+                                              cooldown=1,
+                                              verbose=1, 
+                                              factor=0.5, 
+                                              min_lr=lr)
   
   model_train = model.fit_generator(train_generator,
                                     epochs=nb_epoch,
                                     validation_data=validation_generator,
-                                    class_weight='auto',
-                                    validation_split=0.125, 
-                                    batch_size=64, 
+                                    class_weight='auto', 
                                     callbacks=[earlystopper, 
                                                learning_rate_reduction, 
                                                checkpointer])
