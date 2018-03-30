@@ -387,7 +387,7 @@ def train(args):
       print ("Successfully loaded Inception version 3 for training ...")
         
   checkpointer_savepath = os.path.join(args.output_dir[0]     +       
-                                       'checkpoint/Transfer_learn_' +       
+                                       '/checkpoint/Transfer_learn_' +       
                                        str(IM_WIDTH)  + '_'  + 
                                        str(IM_HEIGHT) + '_'  + '.h5')
       
