@@ -404,7 +404,7 @@ def train(args):
                                               cooldown=1,
                                               verbose=1, 
                                               factor=0.5, 
-                                              min_lr=lr)
+                                              min_lr=lr*1e-2)
   
   model_train = model.fit_generator(train_generator,
                                     epochs=nb_epoch,
