@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python3.6
 # Transfer learning using Keras and Tensorflow.
-# Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team).
+# Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
 # License: MIT open source license
 # Repository: https://github.com/rahulremanan/python_tutorial
@@ -23,7 +23,8 @@ from collections import defaultdict
 from keras.applications.inception_v3 import InceptionV3,    \
                                             preprocess_input
 from keras.models import Model,                             \
-                         model_from_json
+                         model_from_json                    \
+                         load_model
 from keras.layers import Dense,                             \
                          GlobalAveragePooling2D,            \
                          Dropout,                           \
@@ -349,7 +350,7 @@ def train(args):
   load_weights_ = args.load_weights[0]
   fine_tune_model = args.fine_tune[0]
   
-  if load_weights_ == True:     
+  if load_weights_ == True and load_checkpointer == False:     
       try:
           with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
@@ -365,7 +366,25 @@ def train(args):
   else:
       model = model
       print ("Tabula rasa ...")
-      
+    
+  checkpointer_savepath = os.path.join(args.output_dir[0]     +       
+                                       '/checkpoint/Transfer_learn_' +       
+                                       str(IM_WIDTH)  + '_'  + 
+                                       str(IM_HEIGHT) + '_'  + '.h5')
+  
+  load_checkpoint = args.load_checkpoint[0]
+    
+  if load_checkpoint == True:     
+      try:
+          model = load_model(checkpointer_savepath)
+          print ("Loaded model from checkpoint: " + str(checkpointer_savepath))
+      except:
+          print ("Error loading model checkpoint ...")
+          print ("Loaded default model weights ...")
+  else:
+      model = model
+      print ("Tabula rasa ...")
+ 
   try:
       NB_FROZEN_LAYERS = args.frozen_layers[0]
   except:
@@ -388,11 +407,6 @@ def train(args):
   else:
       print ("Successfully loaded Inception version 3 for training ...")
         
-  checkpointer_savepath = os.path.join(args.output_dir[0]     +       
-                                       '/checkpoint/Transfer_learn_' +       
-                                       str(IM_WIDTH)  + '_'  + 
-                                       str(IM_HEIGHT) + '_'  + '.h5')
-      
   earlystopper = EarlyStopping(patience=5, verbose=1)
   checkpointer = ModelCheckpoint(checkpointer_savepath, 
                                  verbose=1,  
@@ -487,6 +501,15 @@ def get_user_options():
                    dest = "load_weights", 
                    required=False, 
                    default=[False], 
+                   nargs=1, 
+                   type = string_to_bool)
+    
+    
+    a.add_argument("--load_checkpoint", 
+                   help = "Specify if checkpointed weights are to be used ...", 
+                   dest = "load_checkpoint", 
+                   required=False, 
+                   default=[True], 
                    nargs=1, 
                    type = string_to_bool)
     
