@@ -23,7 +23,7 @@ from collections import defaultdict
 from keras.applications.inception_v3 import InceptionV3,    \
                                             preprocess_input
 from keras.models import Model,                             \
-                         model_from_json                    \
+                         model_from_json,                    \
                          load_model
 from keras.layers import Dense,                             \
                          GlobalAveragePooling2D,            \
@@ -349,8 +349,9 @@ def train(args):
   
   load_weights_ = args.load_weights[0]
   fine_tune_model = args.fine_tune[0]
-  
-  if load_weights_ == True and load_checkpointer == False:     
+  load_checkpoint = args.load_checkpoint[0]
+   
+  if load_weights_ == True and load_checkpoint == False:     
       try:
           with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
@@ -372,8 +373,7 @@ def train(args):
                                        str(IM_WIDTH)  + '_'  + 
                                        str(IM_HEIGHT) + '_'  + '.h5')
   
-  load_checkpoint = args.load_checkpoint[0]
-    
+ 
   if load_checkpoint == True:     
       try:
           model = load_model(checkpointer_savepath)
@@ -392,6 +392,7 @@ def train(args):
       
   if fine_tune_model == True:
       print ("Fine tuning Inception v3 ...")
+      print ("Frozen layers: " + str(NB_FROZEN_LAYERS))
       setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS)
   else:
       print ("Transfer learning using Inception v3 ...")
@@ -407,7 +408,7 @@ def train(args):
   else:
       print ("Successfully loaded Inception version 3 for training ...")
         
-  earlystopper = EarlyStopping(patience=5, verbose=1)
+  earlystopper = EarlyStopping(patience=6, verbose=1)
   checkpointer = ModelCheckpoint(checkpointer_savepath, 
                                  verbose=1,  
                                  save_best_only=True)
