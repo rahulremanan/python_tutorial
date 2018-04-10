@@ -10,7 +10,7 @@ sudo apt-get install -y autoconf automake libtool gcc-4.8 g++-4.8
 
 # Downgrade compilers to version 4.8:
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 101
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
 
 # Download the dependencies, install the required packages and build protobuf:
@@ -36,6 +36,11 @@ make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI OPTFLAGS="-Os"
 
 make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI \
  OPTFLAGS="-Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" CXX=g++-4.8
+
+# Reset compiler versions:
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 101
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 101
 
 # Reset make file:
 
