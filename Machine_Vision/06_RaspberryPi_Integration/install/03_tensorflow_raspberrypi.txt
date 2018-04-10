@@ -22,6 +22,9 @@ make
 sudo make install
 sudo ldconfig  # refresh shared library cache
 cd ../../../../..
+
+# Add contrib module path:
+
 export HOST_NSYNC_LIB=`tensorflow/contrib/makefile/compile_nsync.sh`
 export TARGET_NSYNC_LIB="$HOST_NSYNC_LIB"
 
@@ -33,6 +36,10 @@ make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI OPTFLAGS="-Os"
 
 make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI \
  OPTFLAGS="-Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" CXX=g++-4.8
+
+# Reset make file:
+
+make -f tensorflow/contrib/makefile/Makefile clean
 
 -- Using Bazel --
 -- Not tested --
