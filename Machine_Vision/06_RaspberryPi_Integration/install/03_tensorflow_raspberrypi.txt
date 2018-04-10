@@ -6,12 +6,12 @@ cd tensorflow
 -- Recommended method --
 
 tensorflow/contrib/makefile/download_dependencies.sh
-sudo apt-get install -y autoconf automake libtool gcc-4.8 g++-4.8
+sudo apt-get install -y autoconf automake libtool gcc-6 g++-6
 
 # Downgrade compilers to version 4.8:
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 101
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 100
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 100
 
 # Download the dependencies, install the required packages and build protobuf:
 
@@ -35,12 +35,12 @@ make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI OPTFLAGS="-Os"
 # Extra optimizations for Raspberry Pi's 2 and 3, to run the tensorflow code faster:
 
 make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI \
- OPTFLAGS="-Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" CXX=g++-4.8
+ OPTFLAGS="-Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" CXX=g++-6
 
 # Reset compiler versions:
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 101
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 101
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-x.x 101
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-x.x 101
 
 # Reset make file:
 
