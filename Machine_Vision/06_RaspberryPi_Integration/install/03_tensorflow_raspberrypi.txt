@@ -2,6 +2,10 @@
 git clone --recurse-submodules https://github.com/tensorflow/tensorflow.git
 cd tensorflow
 
+# Download all dependencies:
+
+sudo tensorflow/contrib/makefile/download_dependencies.sh
+
 -- Using tensorflow make file --
 -- Recommended method --
 
@@ -37,6 +41,10 @@ make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI OPTFLAGS="-Os"
 make -f tensorflow/contrib/makefile/Makefile HOST_OS=PI TARGET=PI \
  OPTFLAGS="-Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" CXX=g++-6
 
+# Move all files to python dist-packages folder:
+
+sudo cp -r ./tensorflow/tensorflow/ /usr/local/lib/python3.5/dist-packages/
+
 # Reset compiler versions:
 
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-x.x 101
@@ -45,6 +53,7 @@ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-x.x 101
 # Reset make file:
 
 make -f tensorflow/contrib/makefile/Makefile clean
+
 
 -- Using Bazel --
 -- Not tested --

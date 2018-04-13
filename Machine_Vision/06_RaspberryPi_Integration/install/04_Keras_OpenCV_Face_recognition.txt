@@ -1,0 +1,20 @@
+-- Install keras --
+
+# Install dependencies:
+
+$ sudo apt-get install python3-scipy
+
+$ sudo apt-get install -y libblas-dev liblapack-dev python3-dev libatlas-base-dev gfortran python3-setuptools python3-scipy python3-h5py 
+$ sudo pip3 install matplotlib pillow scikit-learn scikit-image scikit-video
+
+# Install keras from source:
+
+$ git clone https://github.com/keras-team/keras.git
+$ cd keras
+$ sudo python3 setup.py install
+
+# Update Python path:
+
+$ PYTHONPATH="${PYTHONPATH}:/usr/local/lib/python3.5/dist-packages/"
+$ export PYTHONPATH
+$ export PYTHONPATH=/home/pi/tensorflow/:$PYTHONPATH

@@ -10,6 +10,9 @@ $ sudo make check
 $ sudo make install
 $ sudo ldconfig
 
+# Check installation:
+$ protoc --version
+
 # Remove protobuf
 $ sudo apt-get remove --purge libprotobuf-dev
 $ sudo pip3 uninstall protobuf
