@@ -8,7 +8,7 @@ $ whereis boost
 
 $ mkdir boost
 $ cd boost
-$ sudo apt-get install -y build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev
+$ sudo apt-get install -y build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev python3-dev
 
 # Download boost tar file: 
 
