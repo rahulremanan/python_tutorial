@@ -1,13 +1,13 @@
 sudo apt-get update
-sudo apt-get install pkg-config zip g++ zlib1g-dev unzip
-sudo apt-get install -y python3-pip python3-numpy swig python3-dev
+sudo apt-get install -y pkg-config zip g++ zlib1g-dev unzip python3-pip python3-numpy swig python3-dev libpython-all-dev:armhf
 sudo pip3 install wheel
 
 mkdir tf
 cd tf
 
-wget https://github.com/bazelbuild/bazel/releases/download/0.11.1/bazel-0.11.1-dist.zip
-unzip -d bazel-0.11.1-dist.zip
+wget https://github.com/bazelbuild/bazel/releases/download/0.12.0/bazel-0.12.0-dist.zip
+mkdir ./bazel
+unzip -d ./bazel bazel-0.12.0-dist.zip
 
 nano scripts/bootstrap/compile.sh
 
@@ -39,3 +39,16 @@ return "arm"
 ...
 
 sudo pip3 install --upgrade pip enum34
+
+# Compile bazel:
+
+cd ./bazel
+sudo ./compile.sh
+
+# Copy the bazel binary:
+
+sudo cp output/bazel /usr/local/bin/bazel
+
+# Verify bazel installation:
+
+bazel

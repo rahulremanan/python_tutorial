@@ -1,0 +1,206 @@
+sudo apt-get update
+
+sudo apt-get install -y libasound2-dev build-essential cmake pkg-config libavcodec-dev libavformat-dev libswscale-dev python-dev python-numpy python3-dev python3-numpy libgtk2.0-dev checkinstall libjpeg-dev libdc1394-22-dev libxine2-dev libtbb-dev libqt4-dev libtheora-dev libvorbis-dev libxvidcore-dev libv4l-dev gstreamer1.0-dev gstreamer-plugins-base1.0-dev libopencore-amrnb-dev libopencore-amrwb-dev v4l-utils
+
+-- Optional plugins --
+
+sudo apt-get install libgudev-1.0-dev libxt-dev libvorbis-dev libcdparanoia-dev libpango1.0-dev libtheora-dev libvisual-0.4-dev iso-codes libgtk-3-dev libraw1394-dev libiec61883-dev libavc1394-dev libv4l-dev libcairo2-dev libcaca-dev libspeex-dev libpng-dev libshout3-dev libjpeg-dev libaa1-dev libflac-dev libdv4-dev libtag1-dev libwavpack-dev libpulse-dev libsoup2.4-dev libbz2-dev libcdaudio-dev libdc1394-22-dev ladspa-sdk libass-dev libcurl4-gnutls-dev libdca-dev libdirac-dev libdvdnav-dev libexempi-dev libexif-dev libfaad-dev libgme-dev libgsm1-dev libiptcdata0-dev libkate-dev libmimic-dev libmms-dev libmodplug-dev libmpcdec-dev libofa0-dev libopus-dev librsvg2-dev librtmp-dev libschroedinger-dev libslv2-dev libsndfile1-dev libsoundtouch-dev libspandsp-dev libx11-dev libxvidcore-dev libzbar-dev libzvbi-dev liba52-0.7.4-dev libcdio-dev libdvdread-dev libmad0-dev libmp3lame-dev libmpeg2-4-dev libopencore-amrnb-dev libopencore-amrwb-dev libsidplay1-dev libtwolame-dev libx264-dev
+
+# Install YASM:
+
+wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+tar xzvf yasm-1.3.0.tar.gz
+cd yasm-1.3.0
+./configure
+make
+make install
+
+-- Function to install YASM --
+
+function build_yasm {
+    # an assembler used by x264 and ffmpeg
+    cd /usr/src
+
+    wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+    tar xzvf yasm-1.3.0.tar.gz
+    cd yasm-1.3.0
+    ./configure
+    make
+    make install
+}
+
+# Install X264:
+
+git clone git://git.videolan.org/x264
+
+cd x264
+
+./configure --disable-asm --enable-shared
+make
+make install
+
+-- Function that installs X264 --
+
+function build_h264 {
+    # h.264 video encoder
+    cd /usr/src
+    git clone git://git.videolan.org/x264
+    cd x264
+
+    ./configure --disable-asm --enable-shared
+    make
+    make install
+}
+
+
+# Install LAME Mp3 encoder:
+
+wget https://iweb.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+tar xzvf lame-3.100.tar.gz
+cd lame-3.100
+./configure
+make
+make install
+
+-- Function to install LAME Mp3 encoder --
+
+function build_lame {
+    # mp3 audio encoder
+    cd /usr/src
+    wget https://iweb.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+    tar xzvf lame-3.100.tar.gz
+    cd lame-3.100
+    ./configure
+    make
+    make install
+}
+
+# Install AAC encoder:
+
+wget http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
+tar xzvf faac-1.28.tar.gz
+cd faac-1.28
+
+nano +126 common/mp4v2/mpeg4ip.h;
+
+Delete the line: char"strcasestr"
+
+./configure
+make
+make install
+
+-- Function to install AAC encoder --
+
+function build_faac {
+    # aac encoder
+    cd /usr/src
+    wget http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
+    tar xzvf faac-1.28.tar.gz
+    cd faac-1.28
+    ./configure
+    make
+    make install
+}
+
+-- Compile ffmpeg from source --
+
+## Non-free flag will make the ffmpeg package non-distributable
+git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
+--OR--
+wget http://ffmpeg.org/releases/ffmpeg-3.3.4.tar.gz
+tar -xzf ffmpeg-3.3.4.tar.xz
+
+cd ffmpeg
+./configure --enable-nonfree --enable-pic --enable-shared
+
+./configure --enable-shared --enable-pic --enable-gpl --prefix=/usr --enable-nonfree --enable-libmp3lame --enable-libx264 --enable-version3 --disable-mmx
+
+sudo make
+sudo make install
+
+
+# Install numpy
+$ pip install numpy
+---OR---
+$ sudo pip3 install numpy 
+
+-- Clone and install OpenCV from source --
+
+# Clone the github OpenCV repository
+$ cd ~
+$ git clone https://github.com/opencv/opencv.git
+$ cd opencv
+$ git checkout 
+
+# Clone the github OpenCV contribute repository for access to standard keypoint detectors and local invariant descriptors (such as SIFT, SURF, etc.) and newer OpenCV 3.0 features like text detection
+
+$ cd ~
+$ git clone https://github.com/opencv/opencv_contrib.git
+$ cd opencv_contrib
+$ git checkout
+
+# Build the OpenCV installer using CMake
+
+$ cd ~/opencv
+$ mkdir build
+$ cd build
+$ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
+	-D CMAKE_INSTALL_PREFIX=/usr/local \
+	-D INSTALL_C_EXAMPLES=ON \
+	-D INSTALL_PYTHON_EXAMPLES=ON \
+	-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+	-D BUILD_EXAMPLES=ON ..
+
+# For installation without GTK and explicit python location pointers
+
+-- Python3 --
+
+$ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
+	-D WITH_GTK=OFF \
+	-D WITH_GTK3=OFF \
+	-D WITH_TBB=ON \
+	-D BUILD_NEW_PYTHON_SUPPORT=ON \
+	-D CMAKE_INSTALL_PREFIX=/usr/local \
+	-D PYTHON_EXECUTABLE=/usr/bin/python3.5 \
+	-D WITH_V4L=ON \
+	-D WITH_QT=ON \
+	-D WITH_OPENGL=ON \
+	-D PYTHON_PACKAGES=/usr/local/lib/python3.5/dist-packages/ \
+ 	-D PYTHON_LIBRARY=/usr/lib/arm-linux-gnueabihf/libpython3.5m.so \
+        -D PYTHON_INCLUDE_DIR=/usr/include/python3.5m/ \
+	-D INSTALL_C_EXAMPLES=ON \
+	-D INSTALL_PYTHON_EXAMPLES=ON \
+	-D OPENCV_EXTRA_MODULES_PATH= ../opencv_contrib/modules \
+	-D BUILD_PROTOBUF=ON \
+	-D UPDATE_PROTO_FILES=ON \
+	-D BUILD_EXAMPLES=ON ..
+
+-- Python2.7 --
+
+sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
+	-D WITH_GTK=OFF \
+	-D WITH_GTK3=OFF \
+	-D WITH_TBB=ON \
+	-D BUILD_NEW_PYTHON_SUPPORT=ON \
+	-D CMAKE_INSTALL_PREFIX=/usr/local \
+	-D PYTHON_EXECUTABLE=/usr/bin/python \
+	-D WITH_V4L=ON \
+	-D WITH_QT=ON \
+	-D WITH_OPENGL=ON \
+	-D PYTHON_PACKAGES=/usr/local/lib/python2.7/dist-packages/ \
+	-D PYTHON_LIBRARY=/usr/lib/arm-linux-gnueabihf/libpython2.7m.so \
+	-D PYTHON_INCLUDE_DIR=/usr/include/python2.7/ \
+	-D INSTALL_C_EXAMPLES=ON \
+	-D INSTALL_PYTHON_EXAMPLES=ON \
+	-D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules \
+	-D BUILD_PROTOBUF=OFF \
+	-D UPDATE_PROTO_FILES=ON \
+	-D BUILD_EXAMPLES=ON ..
+
+# Install OpenCV in /usr/local/lib/python3.6/dist-packages/ or /usr/local/lib/python2.7/dist-packages/ folder
+$ sudo make -j $(nproc --all)
+$ sudo make install
+$ sudo ldconfig
+
+python3 -c "import cv2"
+python -c "import cv2"

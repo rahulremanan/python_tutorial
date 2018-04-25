@@ -4,7 +4,7 @@
 
 $ sudo apt-get install python3-scipy
 
-$ sudo apt-get install -y libblas-dev liblapack-dev python3-dev libatlas-base-dev gfortran python3-setuptools python3-scipy python3-h5py 
+$ sudo apt-get install -y libblas-dev liblapack-dev python3-dev libatlas-base-dev gfortran python3-setuptools python3-scipy python3-h5py python3-yaml
 $ sudo pip3 install matplotlib pillow scikit-learn scikit-image scikit-video
 
 # Install keras from source:
