@@ -22,10 +22,15 @@ $ ./b2 --clean-all -n
 
 If this is the first time installing boost, it should return an error: -bash: 
 $ ./b2: No such file or directory
+
+# Install boost for Python3
 $ ./bootstrap.sh --prefix=/usr/ --with-python=/usr/bin/python3
 $ ./b2 -a --with-python --buildid=3
 $ n=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $NF}'`
 $ sudo ./b2 -a --with=all -j $n install
+
+# Test boost installation:
+$ whereis boost
 
 -- Not tested --
 
