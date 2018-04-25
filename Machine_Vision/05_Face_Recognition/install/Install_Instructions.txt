@@ -40,7 +40,7 @@ $ cd /usr/boost_1_64_0 && \
 $ echo "using python : 3.5 ;" >> /home/info/site-config.jam && \
 $ sudo sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/local.conf'
 $ sudo ./b2 --with=all -j $n install
-$ b2 --with-python toolset=gcc stage
+$ sudo ./b2 --with-python toolset=gcc stage
 
 -- Not tested --
 
