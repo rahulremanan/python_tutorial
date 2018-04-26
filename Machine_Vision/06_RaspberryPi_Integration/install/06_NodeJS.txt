@@ -1,0 +1,15 @@
+# Download NodeJS source:
+
+wget https://nodejs.org/dist/v4.0.0/node-v4.0.0-linux-armv6l.tar.gz 
+tar -xvf node-v4.0.0-linux-armv6l.tar.gz 
+cd node-v4.0.0-linux-armv6l
+
+# For RPi Model B:
+
+wget https://nodejs.org/dist/v4.0.0/node-v4.0.0-linux-armv7l.tar.gz 
+tar -xvf node-v4.0.0-linux-armv7l.tar.gz 
+cd node-v4.0.0-linux-armv7l
+
+# Copy NodeJS to /usr/local/ :
+
+sudo cp -R * /usr/local/

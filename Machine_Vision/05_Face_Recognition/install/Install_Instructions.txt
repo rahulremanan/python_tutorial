@@ -64,10 +64,11 @@ $ sudo cmake .. -DDLIB_USE_CUDA=0 -DUSE_AVX_INSTRUCTIONS=1
 $ sudo cmake --build . --config Release
 $ sudo make install
 $ sudo ldconfig
-$ cd ..
-$ pkg-config --libs --cflags dlib-1
 
 # In dlib root directory
+
+$ cd ..
+$ sudo pkg-config --libs --cflags dlib-1
 $ sudo python3 setup.py install
 
 -- OR --
