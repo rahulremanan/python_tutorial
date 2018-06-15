@@ -1,19 +1,32 @@
 # -*- coding: utf-8 -*-
 #"""
-#Created on Tue Jul 18 20:19:28 2017
+#Created on Tue Jul 15 18:21:28 2018
 #
-#@author: Rahul
+#@author: Dr. Rahul Remanan
+#@email: info@moad.computer
 #"""
 from __future__ import print_function
-verbose=1
+verbose = False
+
+import os 
+import random
+
 import keras
-from keras.callbacks import ModelCheckpoint
+
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
-from keras.layers import LSTM
+from keras.layers import Dense, \
+                         Activation,\
+                         Dropout, \
+                         LSTM, \
+                         GRU, \
+                         Bidirectional, \
+                         TimeDistributed, \
+                         BatchNormalization
 from keras.optimizers import RMSprop
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import pairwise_distances
+
 
 import numpy as np
 import twitter # pip install python-twitter
@@ -21,23 +34,36 @@ import twitter # pip install python-twitter
 # Fetching tweets
 
 def get_tweets():
-    api = twitter.api(consumer_key='enter consumer key',
-                      consumer_secret='enter consumer secret',
-                      access_token_key='enter access token key',
-                      access_token_secret='enter access token secret')
+    consumer_key='Enter consumer key'
+    consumer_secret='Enter consumer secret'
+    access_token_key='Enter access token key'
+    access_token_secret='Enter access token secret'
+    
+    api = twitter.Api(consumer_key,
+                      consumer_secret,
+                      access_token_key,
+                      access_token_secret)
+    
     tweets = []
     max_id = None
     for _ in range(100):
         tweets.extend(list(api.GetUserTimeline(screen_name='doctorsroom',
                                                max_id=max_id,
-                                               count=200,
-                                               include_rts=False,
+                                               count=2000,
+                                               include_rts=True,
                                                exclude_replies=True)))
         max_id = tweets[-1].id
     return [tweet.text for tweet in tweets]
 
-#np.save(file='./doctorsroom_tweets.npy', arr=get_tweets())
-get_tweets=np.load(file='./doctorsroom_tweets.npy')
+save_tweets = True
+if save_tweets:
+    np.save(file='./doctorsroom_tweets.npy', arr=get_tweets())    
+    
+load_tweets = False
+if load_tweets:
+  get_tweets=np.load(file='./doctorsroom_tweets.npy')
+else:
+    get_tweets = get_tweets()
 
 # Creating the corpus
 
@@ -106,14 +132,47 @@ X, y = one_hot_encode(sequences, next_chars, char_to_idx)
 
 # Create an LSTM model
 
-def build_model(hidden_layer_size=128, dropout=0.2, learning_rate=0.01, verbose=0):
+batch_size=5
+
+def build_model(unit_size=34, 
+                dropout=0.75, 
+                learning_rate=1e-4, 
+                verbose=False,
+                enable_dropout = True,
+                enable_batchnormalization = False,
+                layer_depth = 200,
+                activation = 'relu',
+                batch_size = batch_size):
     model = Sequential()
-    model.add(LSTM(hidden_layer_size, return_sequences=True, input_shape=(MAX_SEQ_LENGTH, N_CHARS)))
-    model.add(Dropout(dropout))
-    model.add(LSTM(hidden_layer_size, return_sequences=False))
+    model.add(Bidirectional(GRU(unit_size, 
+                                 return_sequences=True), 
+                                 input_shape=(MAX_SEQ_LENGTH, N_CHARS), batch_size = batch_size))
+    model.add(TimeDistributed(Dropout(dropout)))
+    for i in range(layer_depth):
+      model.add(Bidirectional(GRU(units= unit_size,
+                return_sequences=True,
+                activation=activation,
+                stateful=False)))
+      if enable_dropout == True:
+        model.add(Dropout(dropout))
+      if enable_batchnormalization == True:
+        model.add(TimeDistributed(BatchNormalization()))
+    
+    model.add(GRU(units= unit_size,
+              return_sequences=False,
+              activation=activation,
+              stateful=False))
+    
+    if enable_dropout == True:
+      model.add(Dropout(dropout))
+    
+    model.add(Dense(units=4096, 
+                    activation=activation,
+                    use_bias=True))
     model.add(Dropout(dropout))
     model.add(Dense(N_CHARS, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=learning_rate))
+    model.compile(loss='categorical_crossentropy', 
+                  optimizer=RMSprop(lr=learning_rate))
     if verbose:
         print('Model Summary:')
         model.summary()
@@ -121,17 +180,41 @@ def build_model(hidden_layer_size=128, dropout=0.2, learning_rate=0.01, verbose=
 
 model = build_model(verbose=verbose)
 
+checkpointer_path = './weights.hdf5'
+load_checkpointer = False
+
+if os.path.exists(checkpointer_path) and load_checkpointer:
+  model.load_weights(checkpointer_path)
+
 # Training a model
 
-def train_model(model, X, y, batch_size=128, nb_epoch=60, verbose=0):
-    checkpointer = ModelCheckpoint(filepath="weights.hdf5", monitor='loss', verbose=verbose, save_best_only=True, mode='min')
-    model.fit(X, y, batch_size=batch_size, epochs=nb_epoch, verbose=verbose, callbacks=[checkpointer])
+def train_model(model, X, y, batch_size=batch_size, nb_epoch=60, verbose=0):
+    checkpointer = ModelCheckpoint(filepath=checkpointer_path, 
+                                   monitor='loss', 
+                                   verbose=verbose, 
+                                   save_best_only=True, 
+                                   mode='min')
+    early_stopper = EarlyStopping(monitor='loss', 
+                                  min_delta=0, 
+                                  patience=4, 
+                                  verbose=0, 
+                                  mode='auto')
+    reduce_lr = ReduceLROnPlateau(monitor='loss', 
+                                  factor=0.5, 
+                                  patience=1, 
+                                  min_lr=1e-16, 
+                                  verbose=1)
+    model.fit(X, y, 
+              batch_size=batch_size, 
+              epochs=nb_epoch, 
+              verbose=verbose, 
+              callbacks=[checkpointer, 
+                         early_stopper])
 
 train_model(model, X, y, verbose=verbose)
-
 # Set random seed
 
-np.random.seed(1337)
+np.random.seed(random.randint(1, 10**4))
 
 def sample(preds):
     preds = np.asarray(preds).astype('float64')
@@ -143,7 +226,16 @@ def sample(preds):
 
 # Generate a tweet
 
-def generate_tweets(model, corpus, char_to_idx, idx_to_char, n_tweets=10, verbose=0): 
+# Generate a tweet
+
+def generate_tweets(model, 
+                    corpus, 
+                    char_to_idx, 
+                    idx_to_char, 
+                    n_tweets=10,
+                    batch_size = batch_size,
+                    use_bidirectional = True,
+                    verbose=0): 
     model.load_weights('weights.hdf5')
     tweets = []
     spaces_in_corpus = np.array([idx for idx in range(CORPUS_LENGTH) if corpus[idx] == ' '])
@@ -162,8 +254,9 @@ def generate_tweets(model, corpus, char_to_idx, idx_to_char, n_tweets=10, verbos
             x = np.zeros((1, MAX_SEQ_LENGTH, N_CHARS))
             for t, char in enumerate(sequence):
                 x[0, t, char_to_idx[char]] = 1.0
-
-            preds = model.predict(x, verbose=0)[0]
+            if use_bidirectional:
+              x = np.resize(x, (batch_size, x.shape[1], x.shape[2]))
+            preds = model.predict(x, batch_size = None, verbose=0, steps = batch_size)[0]
             next_idx = sample(preds)
             next_char = idx_to_char[next_idx]
 
@@ -175,7 +268,11 @@ def generate_tweets(model, corpus, char_to_idx, idx_to_char, n_tweets=10, verbos
         tweets.append(tweet)
     return tweets
 
-tweets = generate_tweets(model, corpus, char_to_idx, idx_to_char, verbose=verbose)
+tweets = generate_tweets(model, 
+                         corpus, 
+                         char_to_idx, 
+                         idx_to_char, 
+                         verbose=verbose)
 
 # Evaluate the model
 
