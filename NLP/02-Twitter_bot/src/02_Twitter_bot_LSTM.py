@@ -209,7 +209,8 @@ def train_model(model, X, y, batch_size=batch_size, nb_epoch=60, verbose=0):
               epochs=nb_epoch, 
               verbose=verbose, 
               callbacks=[checkpointer, 
-                         early_stopper])
+                         early_stopper,
+                         reduce_lr])
 
 train_model(model, X, y, verbose=verbose)
 # Set random seed
