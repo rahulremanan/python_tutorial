@@ -40,7 +40,7 @@ from keras.callbacks import EarlyStopping,   \
                             ModelCheckpoint, \
                             ReduceLROnPlateau
 
-IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Fixed input image size for Inception version 3
+IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Default input image size for Inception v3 and v4 architecture
 DEFAULT_EPOCHS = 100
 DEFAULT_BATCHES = 20
 FC_SIZE = 4096
@@ -96,7 +96,7 @@ def setup_to_transfer_learn(model, base_model, optimizer):
                 loss='categorical_crossentropy', metrics=['accuracy'])
   return model
 
-def add_new_last_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
+def add_top_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
   
   try:
       dropout = args.dropout[0]
@@ -260,6 +260,9 @@ def plot_training(args, name, history):
   plt.close()
         
 def train(args): 
+  
+  if not os.path.exists(args.output_dir[0]):
+    os.makedirs(args.output_dir[0])
     
   optimizer_val = args.optimizer_val[0]
   lr = args.learning_rate[0]
@@ -308,8 +311,6 @@ def train(args):
      str((args.base_model[0]).lower()) == 'inception_v4' or \
      str((args.base_model[0]).lower()) == 'inception_resnet':
       preprocess_input = preprocess_input_inceptionv4
-      
-      print ('Base model: Inception version 4')
   else:
       preprocess_input = preprocess_input_inceptionv3
   
@@ -358,15 +359,15 @@ def train(args):
      str((args.base_model[0]).lower()) == 'inception_resnet':
       base_model = InceptionResNetV2(weights='imagenet', \
                                      include_top=False)
-      
-      print ('Base model: Inception version 4')
+      base_model_name = 'Inception version 4'
   else:
-      base_model = InceptionV3(weights='imagenet', include_top=False)               # Model argument: include_top=False excludes the final FC layer
+      base_model = InceptionV3(weights='imagenet', 
+                               include_top=False)               # Model argument: include_top=False excludes the final FC layer
+      base_model_name = 'Inception version 3'
+  print ('Base model: ' + str(base_model_name))
   
-      print ('Base model: Inception version 3')
-  
-  model = add_new_last_layer(base_model, nb_classes)
-  print ("Base model for transfer learning: Inception version 3 ...")
+  model = add_top_layer(base_model, nb_classes)
+  print ("New top layer added to: " + str(base_model_name))
   
   labels = generate_labels(args)
   
