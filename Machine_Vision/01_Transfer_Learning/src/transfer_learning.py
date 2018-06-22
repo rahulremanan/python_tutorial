@@ -648,7 +648,6 @@ def get_user_options():
 
 if __name__=="__main__":
     args = get_user_options()
-
     if ((not os.path.exists(args.train_dir[0])) 
         or 
     (not os.path.exists(args.val_dir[0])) 
@@ -656,9 +655,7 @@ if __name__=="__main__":
     (not os.path.exists(args.output_dir[0]))):
       print("Specified directories do not exist ...")
       sys.exit(1)
-    
     train_model = args.train_model[0]
-    
     if train_model ==True:
         print ("Training sesssion initiated ...")
         train(args)
