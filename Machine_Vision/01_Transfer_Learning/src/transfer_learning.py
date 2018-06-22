@@ -398,8 +398,12 @@ def train(args):
           model = load_model(checkpointer_savepath)
           print ("Loaded model from checkpoint: " + str(checkpointer_savepath))
       except:
-          print ("Error loading model checkpoint ...")
-          print ("Loaded default model weights ...")
+          if os.path.exists(args.saved_chkpnt[0]):
+            model = load_model(args.saved_chkpnt[0])
+            print ('Loaded saved checkpoint file ...')
+          else:
+            print ("Error loading model checkpoint ...")
+            print ("Loaded default model weights ...")
   else:
       model = model
       print ("Tabula rasa ...")
@@ -493,6 +497,13 @@ def get_user_options():
     a.add_argument("--weights_file", 
                    help = "Specify pre-trained model weights for training ...", 
                    dest = "weights_file", 
+                   required=False,
+                   type=lambda x: is_valid_file(a, x),
+                   nargs=1)
+    
+    a.add_argument("--checkpoints_file", 
+                   help = "Specify saved checkpoint weights for resuming training ...", 
+                   dest = "saved_chkpnt", 
                    required=False,
                    type=lambda x: is_valid_file(a, x),
                    nargs=1)

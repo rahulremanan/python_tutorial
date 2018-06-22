@@ -3,6 +3,7 @@ sudo python3 transfer_learning.py -h
 
 # Example usage: 
 sudo python3 transfer_learning.py \
+        --base_model Inception_V4
 	     --training_directory ./train \
 	     --validation_directory ./val \
 	     --epochs 10 \
@@ -10,19 +11,20 @@ sudo python3 transfer_learning.py \
 	     --output_directory ./output \
 	     --train_model True \
 	     --load_weights True \
-             --load_checkpoint True \
+        --load_checkpoint True \
 	     --fine_tune True \
 	     --test_augmentation True \
 	     --train_augmentation True \
 	     --plot False \
 	     --summary False \
 	     --dropout 0.6 \
-             --learning_rate 1e-5 \
+        --learning_rate 1e-5 \
 	     --decay 0.0 \
-             --optimizer ada \
-             --frozen_layers 170 \
-             --weights_file ./output/trained_2018_03_27-10_42_23_weights_ft_.model \
+        --optimizer ada \
+        --frozen_layers 170 \
+        --weights_file ./output/trained_2018_03_27-10_42_23_weights_ft_.model \
 	     --config_file ./output/trained_2018_03_27-10_42_23_config_ft_.json
+        --checkpoints_file ./output/checkpoint/transfer_learn_299_299_.h5
 
 
 # Example usage using GPU:
