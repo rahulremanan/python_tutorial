@@ -429,7 +429,7 @@ def train(args):
   if model_summary_ == True:
       print (model.summary())
   else:
-      print ("Successfully loaded Inception version 3 for training ...")
+      print ("Successfully loaded deep neural network classifier for training ...")
         
   earlystopper = EarlyStopping(patience=6, verbose=1)
   checkpointer = ModelCheckpoint(checkpointer_savepath, 
