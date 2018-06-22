@@ -373,6 +373,11 @@ def train(args):
   load_weights_ = args.load_weights[0]
   fine_tune_model = args.fine_tune[0]
   load_checkpoint = args.load_checkpoint[0]
+  
+  checkpointer_savepath = os.path.join(args.output_dir[0]     +       
+                                       '/checkpoint/Transfer_learn_' +       
+                                       str(IM_WIDTH)  + '_'  + 
+                                       str(IM_HEIGHT) + '_'  + '.h5')
    
   if load_weights_ == True and load_checkpoint == False:     
       try:
@@ -387,17 +392,7 @@ def train(args):
       except:
           print ("Error loading model weights ...")
           print ("Loaded default model weights ...")
-  else:
-      model = model
-      print ("Tabula rasa ...")
-    
-  checkpointer_savepath = os.path.join(args.output_dir[0]     +       
-                                       '/checkpoint/Transfer_learn_' +       
-                                       str(IM_WIDTH)  + '_'  + 
-                                       str(IM_HEIGHT) + '_'  + '.h5')
-  
- 
-  if load_checkpoint == True:     
+  elif load_checkpoint == True:     
       try:
           model = load_model(checkpointer_savepath)
           print ("Loaded model from checkpoint: " + str(checkpointer_savepath))
@@ -414,11 +409,11 @@ def train(args):
       NB_FROZEN_LAYERS = DEFAULT_NB_LAYERS_TO_FREEZE
       
   if fine_tune_model == True:
-      print ("Fine tuning Inception v3 ...")
+      print ("Fine tuning Inception architecture ...")
       print ("Frozen layers: " + str(NB_FROZEN_LAYERS))
       setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS)
   else:
-      print ("Transfer learning using Inception v3 ...")
+      print ("Transfer learning using Inception architecture ...")
       setup_to_transfer_learn(model, base_model, optimizer)
             
   print ("Initializing training with  class labels: " + 
