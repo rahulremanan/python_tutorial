@@ -426,6 +426,9 @@ def train(args):
   else:
       print ("Successfully loaded deep neural network classifier for training ...")
         
+  if not os.path.exists(os.path.join(args.output_dir[0] + '/checkpoint/')):
+    os.makedirs(os.path.join(args.output_dir[0] + '/checkpoint/'))
+    
   earlystopper = EarlyStopping(patience=6, verbose=1)
   checkpointer = ModelCheckpoint(checkpointer_savepath, 
                                  verbose=1,  
