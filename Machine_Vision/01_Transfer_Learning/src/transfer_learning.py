@@ -11,13 +11,22 @@ import os
 import time
 import sys
 import glob
-import h5py
+try:
+    import h5py
+except:
+    print ('Package h5py needed for saving model weights ...')
+    sys.exit(1)
 import json
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import tensorflow
-import keras
+try:
+    import tensorflow
+    import keras
+except:
+    print ('This code uses tensorflow deep-learning framework and keras api ...')
+    print ('Install tensorflow and keras to train the classifier ...')
+    sys.exit(1)
 import PIL
 from collections import defaultdict
 from keras.applications.inception_v3 import InceptionV3,    \
