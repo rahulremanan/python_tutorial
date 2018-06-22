@@ -21,7 +21,9 @@ import keras
 import PIL
 from collections import defaultdict
 from keras.applications.inception_v3 import InceptionV3,    \
-                                            preprocess_input
+                                            preprocess_input as preprocess_input_inceptionv3
+from keras.applications.inception_resnet_v2 import InceptionResNetV2,    \
+                                            preprocess_input as preprocess_input_inceptionv4
 from keras.models import Model,                             \
                          model_from_json,                    \
                          load_model
@@ -301,6 +303,16 @@ def train(args):
   batch_size = int(args.batch[0])    
   train_aug = args.train_aug[0] 
   
+  
+  if str((args.base_model[0]).lower()) == 'inceptionv4' or  \
+     str((args.base_model[0]).lower()) == 'inception_v4' or \
+     str((args.base_model[0]).lower()) == 'inception_resnet':
+      preprocess_input = preprocess_input_inceptionv4
+      
+      print ('Base model: Inception version 4')
+  else:
+      preprocess_input = preprocess_input_inceptionv3
+  
   if train_aug==True:
     train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
       rotation_range=30,
@@ -341,7 +353,18 @@ def train(args):
     batch_size=batch_size,
     class_mode='categorical')
   
-  base_model = InceptionV3(weights='imagenet', include_top=False)               # Model argument: include_top=False excludes the final FC layer
+  if str((args.base_model[0]).lower()) == 'inceptionv4' or  \
+     str((args.base_model[0]).lower()) == 'inception_v4' or \
+     str((args.base_model[0]).lower()) == 'inception_resnet':
+      base_model = InceptionResNetV2(weights='imagenet', \
+                                     include_top=False)
+      
+      print ('Base model: Inception version 4')
+  else:
+      base_model = InceptionV3(weights='imagenet', include_top=False)               # Model argument: include_top=False excludes the final FC layer
+  
+      print ('Base model: Inception version 3')
+  
   model = add_new_last_layer(base_model, nb_classes)
   print ("Base model for transfer learning: Inception version 3 ...")
   
@@ -583,6 +606,13 @@ def get_user_options():
                    dest = "optimizer_val", 
                    required=False, 
                    default=['rms'], 
+                   nargs=1)
+    
+    a.add_argument("--base_model", 
+                   help = "Specify the type of base model classifier to build the neural network. Options are: Inception_v4 or Inception_v3", 
+                   dest = "base_model", 
+                   required=False, 
+                   default=['Inception_V4'], 
                    nargs=1)
     
     a.add_argument("--frozen_layers", 
