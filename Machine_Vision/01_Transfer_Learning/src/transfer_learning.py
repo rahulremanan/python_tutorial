@@ -88,7 +88,22 @@ def string_to_bool(val):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected ...')
-
+        
+def activation_val(val):
+    if val.lower() in ('hard_sigmoid',
+                       'elu',
+                       'linear',
+                       'relu', 
+                       'selu', 
+                       'sigmoid',
+                       'softmax',
+                       'softplus',
+                       'sofsign',
+                       'tanh'):
+        return True
+    else:
+        raise argparse.ArgumentTypeError('Unexpected activation function. Expected values are:  hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...')
+        
 def get_nb_files(directory):
   if not os.path.exists(directory):
     return 0
@@ -108,9 +123,19 @@ def setup_to_transfer_learn(model, base_model, optimizer):
 def add_top_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
   
   try:
-      dropout = args.dropout[0]
+      dropout = float(args.dropout[0])
   except:
       dropout = DEFAULT_DROPOUT
+      print ('Invalid input for dropout ...')
+      
+  try:
+      activation = str(args.activation[0]).lower
+      print ('Building model using default activation function: ' + str(activation))
+  except:
+      activation = 'relu'
+      print ('Invalid input for activation function ...')
+      print ('Choice of activation functions: hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...')
+      print ('Building model using default activation function: relu')
       
   bm = base_model.output
   
@@ -118,38 +143,38 @@ def add_top_layer(base_model, nb_classes):                                 # Add
   x = GlobalAveragePooling2D()(x)
   x = Dropout(dropout)(x)
   x = BatchNormalization()(x)
-  x = Dense(FC_SIZE, activation='relu')(x)
+  x = Dense(FC_SIZE, activation=activation)(x)
   x = Dropout(dropout)(x)
   
-  x1 = Dense(FC_SIZE, activation='relu', name="fc_dense1")(x)
+  x1 = Dense(FC_SIZE, activation=activation, name="fc_dense1")(x)
   x1 = Dropout(dropout, name = 'dropout1')(x1)
   x1 = BatchNormalization(name="fc_batch_norm1")(x1)
-  x1 = Dense(FC_SIZE, activation='relu', name="fc_dense2")(x1)
+  x1 = Dense(FC_SIZE, activation=activation, name="fc_dense2")(x1)
   x1 = Dropout(dropout, name = 'dropout2')(x1)
 
-  x2 = Dense(FC_SIZE, activation='relu', name="fc_dense3")(x)
+  x2 = Dense(FC_SIZE, activation=activation, name="fc_dense3")(x)
   x2 = Dropout(dropout, name = 'dropout3')(x2)
   x2 = BatchNormalization(name="fc_batch_norm2")(x2)
-  x2 = Dense(FC_SIZE, activation='relu', name="fc_dense4")(x2)
+  x2 = Dense(FC_SIZE, activation=activation, name="fc_dense4")(x2)
   x2 = Dropout(dropout, name = 'dropout4')(x2)
 
   x12 = concatenate([x1, x2], name = 'mixed11')
   x12 = Dropout(dropout, name = 'dropout5')(x12)
-  x12 = Dense(FC_SIZE//16, activation='relu', name = 'fc_dense5')(x12)
+  x12 = Dense(FC_SIZE//16, activation=activation, name = 'fc_dense5')(x12)
   x12 = Dropout(dropout, name = 'dropout6')(x12)
   x12 = BatchNormalization(name="fc_batch_norm3")(x12)
-  x12 = Dense(FC_SIZE//32, activation='relu', name = 'fc_dense6')(x12)
+  x12 = Dense(FC_SIZE//32, activation=activation, name = 'fc_dense6')(x12)
   x12 = Dropout(dropout, name = 'dropout7')(x12)
   
   x3 = GlobalAveragePooling2D( name = 'global_avg_pooling2')(bm)
-  x3 = Dense(2048, activation='relu', name = 'fc_dense7')(x3)
+  x3 = Dense(2048, activation=activation, name = 'fc_dense7')(x3)
   x3 = Dropout(dropout, name = 'dropout8')(x3)
   x3 = BatchNormalization(name="fc_batch_norm4")(x3)
-  x3 = Dense(2048, activation='relu', name = 'fc_dense8')(x3)
+  x3 = Dense(2048, activation=activation, name = 'fc_dense8')(x3)
   x3 = Dropout(dropout, name = 'dropout9')(x3)
   
   xout = concatenate([x12, x3], name ='mixed12')
-  xout = Dense(FC_SIZE//32, activation='relu', name = 'fc_dense9')(xout)
+  xout = Dense(FC_SIZE//32, activation= activation, name = 'fc_dense9')(xout)
   xout = Dropout(dropout, name = 'dropout10')(xout)
   
   predictions = Dense(nb_classes,           \
@@ -602,6 +627,14 @@ def get_user_options():
                    required=False, 
                    default=[0.4], 
                    type = float,
+                   nargs=1)
+    
+    a.add_argument("--activation", 
+                   help = "Specify values for activation function. Available activation functions are: hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...", 
+                   dest = "activation", 
+                   required=False, 
+                   default=['relu'], 
+                   type = activation_val,
                    nargs=1)
     
     a.add_argument("--learning_rate", 
