@@ -20,6 +20,7 @@ sudo python3 transfer_learning.py \
 	     --dropout 0.6 \
         --learning_rate 1e-5 \
 	     --decay 0.0 \
+        --epsilon 1e-2 \
         --optimizer ada \
         --frozen_layers 170 \
         --weights_file ./output/trained_2018_03_27-10_42_23_weights_ft_.model \
@@ -28,4 +29,27 @@ sudo python3 transfer_learning.py \
 
 
 # Example usage using GPU:
-CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py --training_directory /home/info/train --validation_directory /home/info/val --load_weights True --batches 20 --epochs 5 --output_directory /home/info/model --train_model True --fine_tune False --test_augmentation True --plot True --summary False --load_weights True --dropout 0.75 --learning_rate 1e-04 --decay 0.75 --optimizer sgd --frozen_layers 81 --weights_file /home/info/model/trained_2017_09_27-04_28_50_weights_tl_.model --config_file /home/info/model/trained_2017_09_27-04_28_50_config_tl_.json
+CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
+                                --base_model Inception_V4
+                        	     --training_directory ./train \
+                        	     --validation_directory ./val \
+                        	     --epochs 10 \
+                        	     --batches 16 \
+                        	     --output_directory ./output \
+                        	     --train_model True \
+                        	     --load_weights True \
+                                --load_checkpoint True \
+                        	     --fine_tune True \
+                        	     --test_augmentation True \
+                        	     --train_augmentation True \
+                        	     --plot False \
+                        	     --summary False \
+                        	     --dropout 0.6 \
+                                --learning_rate 1e-5 \
+                        	     --decay 0.0 \
+                                --epsilon 1e-2 \
+                                --optimizer ada \
+                                --frozen_layers 170 \
+                                --weights_file ./output/trained_2018_03_27-10_42_23_weights_ft_.model \
+                        	     --config_file ./output/trained_2018_03_27-10_42_23_config_ft_.json
+                                --checkpoints_file ./output/checkpoint/transfer_learn_299_299_.h5

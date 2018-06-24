@@ -301,15 +301,16 @@ def train(args):
   optimizer_val = args.optimizer_val[0]
   lr = args.learning_rate[0]
   decay = args.decay[0]
+  epsilon = args.epsilon[0]
   
   if optimizer_val.lower() == 'sgd' :
     optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
     print ("Using SGD as the optimizer ...")
   elif optimizer_val.lower() == 'rms' or optimizer_val.lower() == 'rmsprop':
-    optimizer = RMSprop(lr=lr, rho=0.9, epsilon=1e-08, decay=decay)
+    optimizer = RMSprop(lr=lr, rho=0.9, epsilon=epsilon, decay=decay)
     print ("Using RMSProp as the optimizer ...")
   elif optimizer_val.lower() == 'ada':
-    optimizer = Adagrad(lr=lr, epsilon=1e-08, decay=decay)
+    optimizer = Adagrad(lr=lr, epsilon=epsilon, decay=decay)
     print ("Using Adagrad as the optimizer ...")
   else:
       optimizer = DEFAULT_OPTIMIZER
@@ -626,6 +627,14 @@ def get_user_options():
                    dest = "dropout", 
                    required=False, 
                    default=[0.4], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--epsilon", 
+                   help = "Specify values for epsilon function ...", 
+                   dest = "epsilon", 
+                   required=False, 
+                   default=[1e-8], 
                    type = float,
                    nargs=1)
     
