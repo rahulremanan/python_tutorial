@@ -63,6 +63,12 @@ ada = Adagrad(lr=1e-3, epsilon=1e-08, decay=0.0)
 DEFAULT_OPTIMIZER = ada
 
 def generate_timestamp():
+    """ A function to generate time-stamp information.
+        Calling the function returns a string formatted current system time.
+        Eg: 2018_10_10_10_10_10
+    
+        Example usage: generate_timestamp() 
+    """    
     timestring = time.strftime("%Y_%m_%d-%H_%M_%S")
     print ("Time stamp generated: " + timestring)
     return timestring
@@ -70,6 +76,27 @@ def generate_timestamp():
 timestr = generate_timestamp()
 
 def is_valid_file(parser, arg):
+    """
+        A function that checks if a give file path contains a valid file or not.
+        The function returns the full file path if there is a valid file persent.
+        If there is no valid file present at a file path location, it returns a parser error message.
+        Takse two positional arguments: parser and arg
+        
+        Example usage: 
+            import argsparse
+            
+            a = argparse.ArgumentParser()
+            a.add_argument("--file_path", 
+                              help = "Check if a file exists in the specified file path ...", 
+                              dest = "file_path", 
+                              required=False,
+                              type=lambda x: is_valid_file(a, x),
+                              nargs=1)
+            
+            args = a.parse_args()
+            
+            args = get_user_options()
+    """
     if not os.path.isfile(arg):
         parser.error("The file %s does not exist ..." % arg)
     else:
@@ -167,10 +194,10 @@ def add_top_layer(base_model, nb_classes):                                 # Add
   x12 = Dropout(dropout, name = 'dropout7')(x12)
   
   x3 = GlobalAveragePooling2D( name = 'global_avg_pooling2')(bm)
-  x3 = Dense(2048, activation=activation, name = 'fc_dense7')(x3)
+  x3 = Dense(FC_SIZE//2, activation=activation, name = 'fc_dense7')(x3)
   x3 = Dropout(dropout, name = 'dropout8')(x3)
   x3 = BatchNormalization(name="fc_batch_norm4")(x3)
-  x3 = Dense(2048, activation=activation, name = 'fc_dense8')(x3)
+  x3 = Dense(FC_SIZE//2, activation=activation, name = 'fc_dense8')(x3)
   x3 = Dropout(dropout, name = 'dropout9')(x3)
   
   xout = concatenate([x12, x3], name ='mixed12')
