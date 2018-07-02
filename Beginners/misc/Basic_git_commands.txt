@@ -10,3 +10,8 @@ $ git remote add origin https://github.com/rahulremanan/python_tutorial
 $ git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch FOLDERNAME" -- --all
 $ git commit --amend -CHEAD
 $ git push origin master
+
+# Track large files:
+$ git lfs install
+$ git lfs track "*.h5"
+$ git add .gitattributes
