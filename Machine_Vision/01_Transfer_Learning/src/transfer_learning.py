@@ -158,8 +158,8 @@ def add_top_layer(base_model, nb_classes):                                 # Add
       print ('Invalid input for dropout ...')
       
   try:
-      activation = str(args.activation[0]).lower
-      print ('Building model using default activation function: ' + str(activation))
+      activation = str(args.activation[0]).lower()
+      print ('Building model using activation function: ' + str(activation))
   except:
       activation = 'relu'
       print ('Invalid input for activation function ...')
