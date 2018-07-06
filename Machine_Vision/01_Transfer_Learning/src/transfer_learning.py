@@ -78,9 +78,11 @@ timestr = generate_timestamp()
 def is_valid_file(parser, arg):
     """
         A function that checks if a give file path contains a valid file or not.
+        
         The function returns the full file path if there is a valid file persent.
         If there is no valid file present at a file path location, it returns a parser error message.
-        Takse two positional arguments: parser and arg
+        
+        Takes two positional arguments: parser and arg
         
         Example usage: 
             import argsparse
@@ -442,7 +444,7 @@ def train(args):
                                        str(IM_WIDTH)  + '_'  + 
                                        str(IM_HEIGHT) + '_'  + '.h5')
    
-  if load_weights_ == True and load_checkpoint == False:     
+  if load_weights_ == True:     
       try:
           with open(args.config_file[0]) as json_file:
               model_json = json_file.read()
@@ -454,8 +456,9 @@ def train(args):
           print ("Loaded model weights from: " + str(args.weights_file[0]))
       except:
           print ("Error loading model weights ...")
+          print ("Tabula rasa ...")
           print ("Loaded default model weights ...")
-  elif load_checkpoint == True:     
+  elif load_checkpoint == True and os.path.exists(checkpointer_savepath):     
       try:
           model = load_model(checkpointer_savepath)
           print ("Loaded model from checkpoint: " + str(checkpointer_savepath))
@@ -465,10 +468,12 @@ def train(args):
             print ('Loaded saved checkpoint file ...')
           else:
             print ("Error loading model checkpoint ...")
+            print ("Tabula rasa ...")
             print ("Loaded default model weights ...")
   else:
       model = model
       print ("Tabula rasa ...")
+      print ("Loaded default model weights ...")
  
   try:
       NB_FROZEN_LAYERS = args.frozen_layers[0]
