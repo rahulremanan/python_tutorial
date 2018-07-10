@@ -63,7 +63,8 @@ ada = Adagrad(lr=1e-3, epsilon=1e-08, decay=0.0)
 DEFAULT_OPTIMIZER = ada
 
 def generate_timestamp():
-    """ A function to generate time-stamp information.
+    """ 
+        A function to generate time-stamp information.
         Calling the function returns a string formatted current system time.
         Eg: 2018_10_10_10_10_10
     
@@ -100,20 +101,77 @@ def is_valid_file(parser, arg):
             args = get_user_options()
     """
     if not os.path.isfile(arg):
-        parser.error("The file %s does not exist ..." % arg)
+        try:
+            parser.error("The file %s does not exist ..." % arg)
+        except:
+            if parser != None:
+                print ("No valid argument parser found ...")
+                print ("The file %s does not exist ..." % arg)
+            else:
+                print ("The file %s does not exist ..." % arg)
     else:
         return arg
     
 def is_valid_dir(parser, arg):
+    """
+        This function checks if a directory exists or not.
+        It can be used inside the argument parser.
+        
+        Example usage: 
+            
+            import argsparse
+            
+            a = argparse.ArgumentParser()
+            a.add_argument("--dir_path", 
+                              help = "Check if a file exists in the specified file path ...", 
+                              dest = "file_path", 
+                              required=False,
+                              type=lambda x: is_valid_dir(a, x),
+                              nargs=1)
+            
+            args = a.parse_args()
+            
+            args = get_user_options() 
+    """
     if not os.path.isdir(arg):
-        parser.error("The folder %s does not exist ..." % arg)
+        try:
+            parser.error("The folder %s does not exist ..." % arg)
+        except:
+            if parser != None:
+                print ("No valid argument parser found")
+                print ("The folder %s does not exist ..." % arg)
+            else:
+                print ("The folder %s does not exist ..." % arg)
     else:
         return arg
     
 def string_to_bool(val):
-    if val.lower() in ('yes', 'true', 't', 'y', '1', 'yeah'):
+    """
+        A function that checks if an user argument is boolean or not.
+        
+        Example usage:
+            
+            
+                import argsparse
+            
+                a = argparse.ArgumentParser()
+                
+                a.add_argument("--some_bool_arg", 
+                   help = "Specify a boolean argument ...", 
+                   dest = "some_bool_arg", 
+                   required=False, 
+                   default=[True], 
+                   nargs=1, 
+                   type = string_to_bool)
+                
+            args = a.parse_args()
+            
+            args = get_user_options()
+            
+    """
+    if val.lower() in ('yes', 'true', 't', 'y', '1', 'yeah', 'yup'):
         return True
-    elif val.lower() in ('no', 'false', 'f', 'n', '0', 'none'):
+    elif val.lower() in ('no', 'false', 'f', 'n', '0', 'none', 'nope'):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected ...')
@@ -146,11 +204,19 @@ def setup_to_transfer_learn(model, base_model, optimizer):
   for layer in base_model.layers:
     layer.trainable = False
   model.compile(optimizer=optimizer, 
-                loss='categorical_crossentropy', metrics=['accuracy'])
+                loss='categorical_crossentropy', 
+                metrics=['accuracy'])
   return model
 
-def add_top_layer(base_model, nb_classes):                                 # Add the fully connected convolutional neural network layer
-  
+def add_top_layer(args, base_model, nb_classes):
+  """
+    This functions adds a fully connected convolutional neural network layer to a base model.
+    
+    The required input arguments for this function are: args, base_model and nb_classes.
+        args: argument inputs the user arguments to be passed to the function,
+        base_model: argument inputs the base model architecture to be added to the top layer,
+        nb_classes: argument inputs the total number of classes for the output layer.    
+  """
   try:
       dropout = float(args.dropout[0])
   except:
@@ -208,13 +274,23 @@ def add_top_layer(base_model, nb_classes):                                 # Add
   
   predictions = Dense(nb_classes,           \
                       activation='softmax', \
-                      name='prediction')(xout)                      # New softmax layer
+                      name='prediction')(xout) # Softmax output layer
   
   model = Model(inputs=base_model.input, outputs=predictions)
   
   return model
 
-def setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS):                      # Freeze the bottom NB_LAYERS and retrain the remaining top layers
+def setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS):
+  """
+      A function that freezes the bottom NB_LAYERS and retrain the remaining top layers.
+      
+      The required input arguments for this function are: model, optimizer and NB_FROZEN_LAYERS.
+          model: inputs a model architecture with base layers to be frozen during training,
+          optimizer: inputs an choice of optimizer values for compiling the model,
+          NB_FROZEN_LAYERS: inputs a number that selects the total number of base layers to be frozen during training.
+      
+  """
+                     
   for layer in model.layers[:NB_FROZEN_LAYERS]:
      layer.trainable = False
   for layer in model.layers[NB_FROZEN_LAYERS:]:
@@ -430,7 +506,7 @@ def train(args):
       base_model_name = 'Inception version 3'
   print ('Base model: ' + str(base_model_name))
   
-  model = add_top_layer(base_model, nb_classes)
+  model = add_top_layer(args, base_model, nb_classes)
   print ("New top layer added to: " + str(base_model_name))
   
   labels = generate_labels(args)
