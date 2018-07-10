@@ -507,7 +507,7 @@ def train(args):
                                  save_best_only=True)
   learning_rate_reduction = ReduceLROnPlateau(monitor='val_acc', 
                                               patience=2,
-                                              mode = 'min',
+                                              mode = 'max',
                                               epsilon=1e-4, 
                                               cooldown=1,
                                               verbose=1, 
