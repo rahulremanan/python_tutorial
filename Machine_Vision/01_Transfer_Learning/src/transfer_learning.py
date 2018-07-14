@@ -755,7 +755,8 @@ def get_user_options():
                    nargs=1)
     
     a.add_argument("--activation", 
-                   help = "Specify values for activation function. Available activation functions are: hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...", 
+                   help = "Specify values for activation function.\
+                           Available activation functions are: hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...", 
                    dest = "activation", 
                    required=False, 
                    default=['relu'], 
