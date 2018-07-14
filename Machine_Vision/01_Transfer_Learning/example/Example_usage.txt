@@ -37,6 +37,7 @@ CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
                         	     --batches 16 \
                         	     --output_directory ./output \
                         	     --train_model True \
+                                --load_truncated False \ 
                         	     --load_weights True \
                                 --load_checkpoint True \
                         	     --fine_tune True \
