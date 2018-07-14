@@ -673,6 +673,14 @@ def get_user_options():
                    nargs=1, 
                    type = string_to_bool)
     
+    a.add_argument("--load_truncated", 
+                   help = "Specify if truncated image loading should be supported ...", 
+                   dest = "load_truncated", 
+                   required=False, 
+                   default=[False], 
+                   nargs=1, 
+                   type = string_to_bool)
+    
     a.add_argument("--load_weights", 
                    help = "Specify if pre-trained model should be loaded ...", 
                    dest = "load_weights", 
@@ -806,6 +814,9 @@ if __name__=="__main__":
       print("Specified directories do not exist ...")
       sys.exit(1)
     train_model = args.train_model[0]
+    if args.load_truncated[0]:
+        from PIL import ImageFile
+        ImageFile.LOAD_TRUNCATED_IMAGES = True
     if train_model ==True:
         print ("Training sesssion initiated ...")
         train(args)
