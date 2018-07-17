@@ -399,6 +399,18 @@ def plot_training(args, name, history):
   plt.close()
         
 def train(args): 
+  """
+    A function that takes the user arguments and initiates a training session of the neural network.
+    
+    This function takes only one input: args
+    
+    Example usage:
+            
+        if train_model == True:
+            print ("Training sesssion initiated ...")
+            train(args)
+  """    
+
   
   if not os.path.exists(args.output_dir[0]):
     os.makedirs(args.output_dir[0])
