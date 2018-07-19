@@ -3,12 +3,16 @@ sudo apt install linux-headers-$(uname -r)
 sudo apt-get update
 sudo apt-get upgrade
 
-# Download CUDA
-wget --"<pointer>" -c
+# Install CUDA dev-tools
+sudo apt-get install nvidia-cuda-dev nvidia-cuda-toolkit nvidia-nsight
+nvcc --version
+
+# Download CUDA 8.0
+wget "https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64-deb" -c
 
 # Install CUDA 8.0
 # Change into the folder with the files you downloaded
-sudo dpkg -i cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64.deb # install the downloaded package
+sudo dpkg -i cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64-deb # install the downloaded package
 sudo apt update # update your package list
 sudo apt upgrade
 sudo apt install cuda # install cuda
@@ -16,10 +20,6 @@ sudo apt install cuda # install cuda
 --OR--
 
 sudo apt-get install cuda
-
-# Install CUDA dev-tools
-sudo apt-get install nvidia-cuda-dev nvidia-cuda-toolkit nvidia-nsight
-nvcc --version
 
 # Download cuDNN
 wget --"<pointer>" -c

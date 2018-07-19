@@ -63,11 +63,11 @@ After compiling TensorFlow you can use previous version of gcc calling above com
 ## Configure installer:
 
 ./configure
-sudo bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
+sudo bazel build -c opt --config=cuda --copt=-msse4.1 --copt=-msse4.2 --copt=-mavx --copt=-mavx2 --copt=-mfma //tensorflow/tools/pip_package:build_pip_package
 
 --OR--
 
-sudo bazel build -c opt --config=cuda --copt=-msse4.1 --copt=-msse4.2 --copt=-mavx --copt=-mavx2 --copt=-mfma //tensorflow/tools/pip_package:build_pip_package
+sudo bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
 
 --OR--
 
