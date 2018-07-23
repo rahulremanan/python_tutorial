@@ -454,7 +454,7 @@ def train(args):
     optimizer = Adamax(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, decay=decay)
     print ("Using Adamax variant of Adam as the optimizer ...")
   elif optimizer_val.lower() == 'nadam':  
-    optimizer = Nadam(lr=lr, beta_1=0.9, beta_2=0.999, epsilonepsilon, schedule_decay=decay)
+    optimizer = Nadam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, schedule_decay=decay)
     print ("Using Nesterov Adam optimizer ...\
            \n decay arguments is passed on to schedule_decay variable ...")
   else:
