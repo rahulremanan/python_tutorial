@@ -432,12 +432,12 @@ def train(args):
   elif optimizer_val.lower() == 'rms' or optimizer_val.lower() == 'rmsprop':
     optimizer = RMSprop(lr=lr, rho=0.9, epsilon=epsilon, decay=decay)
     print ("Using RMSProp as the optimizer ...")
-  elif optimizer_val.lower() == 'ada':
+  elif optimizer_val.lower() == 'ada' or optimizer_val.lower() == 'adagrad':
     optimizer = Adagrad(lr=lr, epsilon=epsilon, decay=decay)
     print ("Using Adagrad as the optimizer ...")
-  elif optimizer_val.lower() == 'adelta':
-    optimizer = Adadelta(lr=lr, rho=0.95, epsilon=None, decay=decay)
-    print ("Using Adadelta as the optimizer ...")  
+  elif optimizer_val.lower() == 'adelta' or optimizer_val.lower() == 'adadelta':
+    optimizer = Adadelta(lr=lr, rho=0.95, epsilon=None, decay=0.0)
+    print ("Using Adadelta as the optimizer ...")
   else:
       optimizer = DEFAULT_OPTIMIZER
                                                                                 # Transfer learning and fine-tuning for training
