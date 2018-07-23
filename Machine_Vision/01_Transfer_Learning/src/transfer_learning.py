@@ -1,5 +1,5 @@
+# !/usr/bin/python3.6
 # -*- coding: utf-8 -*-
-#!/usr/bin/python3.6
 # Transfer learning using Keras and Tensorflow.
 # Written by Rahul Remanan and MOAD (https://www.moad.computer) machine vision team.
 # For more information contact: info@moad.computer
@@ -44,7 +44,8 @@ from keras.layers.merge import concatenate
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD,                           \
                              RMSprop,                       \
-                             Adagrad
+                             Adagrad,                       \
+                             Adadelta
 from keras.callbacks import EarlyStopping,   \
                             ModelCheckpoint, \
                             ReduceLROnPlateau
@@ -103,12 +104,15 @@ def is_valid_file(parser, arg):
     if not os.path.isfile(arg):
         try:
             parser.error("The file %s does not exist ..." % arg)
+            return None
         except:
             if parser != None:
                 print ("No valid argument parser found ...")
                 print ("The file %s does not exist ..." % arg)
+                return None
             else:
                 print ("The file %s does not exist ..." % arg)
+                return None
     else:
         return arg
     
@@ -135,13 +139,15 @@ def is_valid_dir(parser, arg):
     """
     if not os.path.isdir(arg):
         try:
-            parser.error("The folder %s does not exist ..." % arg)
+            return parser.error("The folder %s does not exist ..." % arg)
         except:
             if parser != None:
                 print ("No valid argument parser found")
                 print ("The folder %s does not exist ..." % arg)
+                return None
             else:
                 print ("The folder %s does not exist ..." % arg)
+                return None
     else:
         return arg
     
@@ -429,6 +435,9 @@ def train(args):
   elif optimizer_val.lower() == 'ada':
     optimizer = Adagrad(lr=lr, epsilon=epsilon, decay=decay)
     print ("Using Adagrad as the optimizer ...")
+  elif optimizer_val.lower() == 'adelta':
+    optimizer = Adadelta(lr=lr, rho=0.95, epsilon=None, decay=decay)
+    print ("Using Adadelta as the optimizer ...")  
   else:
       optimizer = DEFAULT_OPTIMIZER
                                                                                 # Transfer learning and fine-tuning for training
