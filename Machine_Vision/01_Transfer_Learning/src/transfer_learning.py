@@ -45,7 +45,10 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD,                           \
                              RMSprop,                       \
                              Adagrad,                       \
-                             Adadelta
+                             Adadelta,                      \
+                             Adam,                          \
+                             Adamax,                        \
+                             Nadam
 from keras.callbacks import EarlyStopping,   \
                             ModelCheckpoint, \
                             ReduceLROnPlateau
@@ -427,8 +430,11 @@ def train(args):
   epsilon = args.epsilon[0]
   
   if optimizer_val.lower() == 'sgd' :
-    optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
+    optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=False)
     print ("Using SGD as the optimizer ...")
+  elif optimizer_val.lower() == 'nsgd':
+    optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
+    print ("Using SGD as the optimizer with Nesterov momentum ...")
   elif optimizer_val.lower() == 'rms' or optimizer_val.lower() == 'rmsprop':
     optimizer = RMSprop(lr=lr, rho=0.9, epsilon=epsilon, decay=decay)
     print ("Using RMSProp as the optimizer ...")
@@ -436,11 +442,25 @@ def train(args):
     optimizer = Adagrad(lr=lr, epsilon=epsilon, decay=decay)
     print ("Using Adagrad as the optimizer ...")
   elif optimizer_val.lower() == 'adelta' or optimizer_val.lower() == 'adadelta':
-    optimizer = Adadelta(lr=lr, rho=0.95, epsilon=None, decay=0.0)
+    optimizer = Adadelta(lr=lr, rho=0.95, epsilon=epsilon, decay=0.0)
     print ("Using Adadelta as the optimizer ...")
+  elif optimizer_val.lower() == 'adam':
+    optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, decay=decay, amsgrad=False)
+    print ("Using Adam as the optimizer ...")
+  elif optimizer_val.lower() == 'amsgrad':
+    optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, decay=decay, amsgrad=True)
+    print ("Using AmsGrad variant of Adam as the optimizer ...")
+  elif optimizer_val.lower() == 'adamax':  
+    optimizer = Adamax(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, decay=decay)
+    print ("Using Adamax variant of Adam as the optimizer ...")
+  elif optimizer_val.lower() == 'nadam':  
+    optimizer = Nadam(lr=lr, beta_1=0.9, beta_2=0.999, epsilonepsilon, schedule_decay=decay)
+    print ("Using Nesterov Adam optimizer ...\
+           \n decay arguments is passed on to schedule_decay variable ...")
   else:
       optimizer = DEFAULT_OPTIMIZER
-                                                                                # Transfer learning and fine-tuning for training
+      print ("Options for optimizer are: 'sgd', 'nsgd', 'rmsprop', 'adagrad', 'adadelta, 'adam', 'nadam', 'amsgrad', 'adamax' ...")
+      
   nb_train_samples = get_nb_files(args.train_dir[0])
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
   
