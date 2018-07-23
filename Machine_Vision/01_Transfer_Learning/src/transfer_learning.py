@@ -459,7 +459,7 @@ def train(args):
            \n decay arguments is passed on to schedule_decay variable ...")
   else:
       optimizer = DEFAULT_OPTIMIZER
-      print ("Options for optimizer are: 'sgd', 'nsgd', 'rmsprop', 'adagrad', 'adadelta, 'adam', 'nadam', 'amsgrad', 'adamax' ...")
+      print ("Options for optimizer are: 'sgd', 'nsgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'nadam', 'amsgrad', 'adamax' ...")
       
   nb_train_samples = get_nb_files(args.train_dir[0])
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
