@@ -821,7 +821,8 @@ def get_user_options():
                    nargs=1)
     
     a.add_argument("--optimizer", 
-                   help = "Specify the type of optimizer to choose from. Options are: rms, ada and sgd ...", 
+                   help = "Specify the type of optimizer to choose from. \
+                           \n Options for optimizer are: 'sgd', 'nsgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'nadam', 'amsgrad', 'adamax' ...", 
                    dest = "optimizer_val", 
                    required=False, 
                    default=['rms'], 
