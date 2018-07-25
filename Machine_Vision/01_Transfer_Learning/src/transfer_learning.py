@@ -616,7 +616,7 @@ def train(args):
       base_model_name = 'Inception version 4'
   else:
       base_model = InceptionV3(weights='imagenet', 
-                               include_top=False)               # Model argument: include_top=False excludes the final FC layer
+                               include_top=False)
       base_model_name = 'Inception version 3'
   print ('Base model: ' + str(base_model_name))
   
