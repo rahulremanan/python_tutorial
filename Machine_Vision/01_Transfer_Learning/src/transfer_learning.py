@@ -475,12 +475,12 @@ def train(args):
                      decay=decay,     \
                      amsgrad=False)
     print ("Using Adam as the optimizer ...")
-    print ("\n Recommended default values are: ")
-    print ("\n lr=0.001,     \
-               beta_1=0.9,   \
-               beta_2=0.999, \
-               epsilon=1e-08, \
-               decay=0.0")
+    print ("\nWith follwoing parameters (recommended default): ")
+    print ("\n lr={} (0.001),     \
+            \n beta_1={} (0.9),   \
+            \n beta_2={} (0.999), \
+            \n epsilon={} (1e-08), \
+            \n decay={} (0.0)".format(lr, beta_1, beta_2, epsilon, decay))
   elif optimizer_val.lower() == 'amsgrad':
     optimizer = Adam(lr=lr,           \
                      beta_1=beta_1,   \
@@ -489,12 +489,12 @@ def train(args):
                      decay=decay,     \
                      amsgrad=True)
     print ("Using AmsGrad variant of Adam as the optimizer ...")
-    print ("\n Recommended default values are: ")
-    print ("\n lr=0.001,     \
-               beta_1=0.9,   \
-               beta_2=0.999, \
-               epsilon=1e-08, \
-               decay=0.0")
+    print ("\nWith follwoing parameters (recommended default): ")
+    print ("\n lr={} (0.001),     \
+            \n beta_1={} (0.9),   \
+            \n beta_2={} (0.999), \
+            \n epsilon={} (1e-08), \
+            \n decay={} (0.0)".format(lr, beta_1, beta_2, epsilon, decay))
   elif optimizer_val.lower() == 'adamax':  
     optimizer = Adamax(lr=lr,           \
                        beta_1=beta_1,   \
@@ -502,6 +502,12 @@ def train(args):
                        epsilon=epsilon, \
                        decay=decay)
     print ("Using Adamax variant of Adam as the optimizer ...")
+    print ("\nWith follwoing parameters (recommended default): ")
+    print ("\n lr={} (0.002),     \
+            \n beta_1={} (0.9),   \
+            \n beta_2={} (0.999), \
+            \n epsilon={} (1e-08), \
+            \n schedule_decay={} (0.0)".format(lr, beta_1, beta_2, epsilon, decay))
   elif optimizer_val.lower() == 'nadam':  
     optimizer = Nadam(lr=lr,            \
                       beta_1=beta_1,    \
@@ -510,6 +516,12 @@ def train(args):
                       schedule_decay=decay)
     print ("Using Nesterov Adam optimizer ...\
            \n decay arguments is passed on to schedule_decay variable ...")
+    print ("\nWith follwoing parameters (recommended default): ")
+    print ("\n lr={} (0.002),     \
+            \n beta_1={} (0.9),   \
+            \n beta_2={} (0.999), \
+            \n epsilon={} (1e-08), \
+            \n schedule_decay={} (0.004)".format(lr, beta_1, beta_2, epsilon, decay))
   else:
       optimizer = DEFAULT_OPTIMIZER
       print ("Options for optimizer are: 'sgd',        \
@@ -525,23 +537,23 @@ def train(args):
   nb_train_samples = get_nb_files(args.train_dir[0])
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
   
-  print ("Total number of training samples = " + str(nb_train_samples))
+  print ("\nTotal number of training samples = " + str(nb_train_samples))
   print ("Number of training classes = " + str(nb_classes))
   
   nb_val_samples = get_nb_files(args.val_dir[0])
   nb_val_classes = len(glob.glob(args.val_dir[0] + "/*"))
   
-  print ("Total number of validation samples = " + str(nb_val_samples))
+  print ("\nTotal number of validation samples = " + str(nb_val_samples))
   print ("Number of validation classes = " + str(nb_val_classes))
   
   if nb_val_classes == nb_classes:
-      print ("Initiating training session ...")
+      print ("\nInitiating training session ...")
   else:
-      print ("Mismatched number of training and validation data classes ...")
+      print ("\nMismatched number of training and validation data classes ...")
       print ("Unequal number of sub-folders found between train and validation directories ...")
       print ("Each sub-folder in train and validation directroies are treated as a separate class ...")
       print ("Correct this mismatch and re-run ...")
-      print ("Now exiting ...")
+      print ("\nNow exiting ...")
       sys.exit(1)
       
   nb_epoch = int(args.epoch[0])
@@ -582,14 +594,14 @@ def train(args):
   else:
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
       
-  print ("Generating training data: ... ")
+  print ("\nGenerating training data: ... ")
 
   train_generator = train_datagen.flow_from_directory(args.train_dir[0],
     target_size=(IM_WIDTH, IM_HEIGHT),
     batch_size=batch_size,
     class_mode='categorical')
   
-  print ("Generating validation data: ... ")
+  print ("\nGenerating validation data: ... ")
 
   validation_generator = test_datagen.flow_from_directory(args.val_dir[0],
     target_size=(IM_WIDTH, IM_HEIGHT),
@@ -631,26 +643,26 @@ def train(args):
           model = model
       try:
           model.load_weights(args.weights_file[0])
-          print ("Loaded model weights from: " + str(args.weights_file[0]))
+          print ("\nLoaded model weights from: " + str(args.weights_file[0]))
       except:
-          print ("Error loading model weights ...")
+          print ("\nError loading model weights ...")
           print ("Tabula rasa ...")
           print ("Loaded default model weights ...")
   elif load_checkpoint == True and os.path.exists(checkpointer_savepath):     
       try:
           model = load_model(checkpointer_savepath)
-          print ("Loaded model from checkpoint: " + str(checkpointer_savepath))
+          print ("\nLoaded model from checkpoint: " + str(checkpointer_savepath))
       except:
           if os.path.exists(args.saved_chkpnt[0]):
             model = load_model(args.saved_chkpnt[0])
-            print ('Loaded saved checkpoint file ...')
+            print ('\nLoaded saved checkpoint file ...')
           else:
-            print ("Error loading model checkpoint ...")
+            print ("\nError loading model checkpoint ...")
             print ("Tabula rasa ...")
             print ("Loaded default model weights ...")
   else:
       model = model
-      print ("Tabula rasa ...")
+      print ("\nTabula rasa ...")
       print ("Loaded default model weights ...")
  
   try:
@@ -659,14 +671,14 @@ def train(args):
       NB_FROZEN_LAYERS = DEFAULT_NB_LAYERS_TO_FREEZE
       
   if fine_tune_model == True:
-      print ("Fine tuning Inception architecture ...")
+      print ("\nFine tuning Inception architecture ...")
       print ("Frozen layers: " + str(NB_FROZEN_LAYERS))
       setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS)
   else:
-      print ("Transfer learning using Inception architecture ...")
+      print ("\nTransfer learning using Inception architecture ...")
       setup_to_transfer_learn(model, base_model, optimizer)
             
-  print ("Initializing training with  class labels: " + 
+  print ("\nInitializing training with  class labels: " + 
          str(labels))
   
   model_summary_ = args.model_summary[0]
@@ -674,7 +686,7 @@ def train(args):
   if model_summary_ == True:
       print (model.summary())
   else:
-      print ("Successfully loaded deep neural network classifier for training ...")
+      print ("\nSuccessfully loaded deep neural network classifier for training ...")
         
   if not os.path.exists(os.path.join(args.output_dir[0] + '/checkpoint/')):
     os.makedirs(os.path.join(args.output_dir[0] + '/checkpoint/'))
