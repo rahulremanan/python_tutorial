@@ -479,7 +479,7 @@ def train(args):
     print ("\n lr=0.001,     \
                beta_1=0.9,   \
                beta_2=0.999, \
-               epsilon=None, \
+               epsilon=1e-08, \
                decay=0.0")
   elif optimizer_val.lower() == 'amsgrad':
     optimizer = Adam(lr=lr,           \
@@ -493,7 +493,7 @@ def train(args):
     print ("\n lr=0.001,     \
                beta_1=0.9,   \
                beta_2=0.999, \
-               epsilon=None, \
+               epsilon=1e-08, \
                decay=0.0")
   elif optimizer_val.lower() == 'adamax':  
     optimizer = Adamax(lr=lr,           \
