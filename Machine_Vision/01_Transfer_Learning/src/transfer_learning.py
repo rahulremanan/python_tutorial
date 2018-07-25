@@ -475,7 +475,7 @@ def train(args):
                      decay=decay,     \
                      amsgrad=False)
     print ("Using Adam as the optimizer ...")
-    print ("\nWith following parameters (recommended default): ")
+    print ("With following parameters (recommended default): ")
     print ("\n lr={} (0.001),     \
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
@@ -489,7 +489,7 @@ def train(args):
                      decay=decay,     \
                      amsgrad=True)
     print ("Using AmsGrad variant of Adam as the optimizer ...")
-    print ("\nWith following parameters (recommended default): ")
+    print ("With following parameters (recommended default): ")
     print ("\n lr={} (0.001),     \
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
@@ -502,7 +502,7 @@ def train(args):
                        epsilon=epsilon, \
                        decay=decay)
     print ("Using Adamax variant of Adam as the optimizer ...")
-    print ("\nWith following parameters (recommended default): ")
+    print ("With following parameters (recommended default): ")
     print ("\n lr={} (0.002),     \
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
@@ -516,7 +516,7 @@ def train(args):
                       schedule_decay=decay)
     print ("Using Nesterov Adam optimizer ...\
            \n decay arguments is passed on to schedule_decay variable ...")
-    print ("\nWith follwoing parameters (recommended default): ")
+    print ("With follwoing parameters (recommended default): ")
     print ("\n lr={} (0.002),     \
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
@@ -688,6 +688,7 @@ def train(args):
   else:
       print ("\nSuccessfully loaded deep neural network classifier for training ...")
       print ("\nReady, Steady, Go ...")
+      print ("\n")
         
   if not os.path.exists(os.path.join(args.output_dir[0] + '/checkpoint/')):
     os.makedirs(os.path.join(args.output_dir[0] + '/checkpoint/'))
