@@ -196,7 +196,7 @@ def activation_val(val):
                        'softplus',
                        'sofsign',
                        'tanh'):
-        return True
+        return val
     else:
         raise argparse.ArgumentTypeError('Unexpected activation function. Expected values are:  hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...')
         
