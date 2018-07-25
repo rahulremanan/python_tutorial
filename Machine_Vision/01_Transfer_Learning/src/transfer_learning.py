@@ -618,7 +618,7 @@ def train(args):
       base_model = InceptionV3(weights='imagenet', 
                                include_top=False)
       base_model_name = 'Inception version 3'
-  print ('Base model: ' + str(base_model_name))
+  print ('\nBase model: ' + str(base_model_name))
   
   model = add_top_layer(args, base_model, nb_classes)
   print ("New top layer added to: " + str(base_model_name))
@@ -687,6 +687,7 @@ def train(args):
       print (model.summary())
   else:
       print ("\nSuccessfully loaded deep neural network classifier for training ...")
+      print ("\nReady, Steady, Go ...")
         
   if not os.path.exists(os.path.join(args.output_dir[0] + '/checkpoint/')):
     os.makedirs(os.path.join(args.output_dir[0] + '/checkpoint/'))
