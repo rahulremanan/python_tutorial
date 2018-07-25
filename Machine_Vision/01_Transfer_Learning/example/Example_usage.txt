@@ -30,7 +30,7 @@ python3 transfer_learning.py \
         --frozen_layers 170 \
         --checkpoints_file ./output/checkpoint/Transfer_learn_299_299_.h5
        
-# Example usage using GPU:
+# Example usage using CUDA enabled GPU:
 CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
                 		          --base_model Inception_V4 \
             		             --training_directory ./data/train \
