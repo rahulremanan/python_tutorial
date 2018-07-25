@@ -32,10 +32,10 @@ python3 transfer_learning.py \
        
 # Example usage using CUDA enabled GPU:
 CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
-                		          --base_model Inception_V4 \
-            		             --training_directory ./data/train \
-                    		       --validation_directory ./data/validation \
-                    	          --epochs 2 \
+                               --base_model Inception_V4 \
+                               --training_directory ./data/train \
+                               --validation_directory ./data/validation \
+                               --epochs 2 \
                                --batches 16 \
                                --output_directory ./output \
                                --train_model True \
