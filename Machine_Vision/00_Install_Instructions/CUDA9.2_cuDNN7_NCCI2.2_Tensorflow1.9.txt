@@ -120,6 +120,12 @@ add "--local_resources 2048,.5,1.0" (For devices with low ram causing Segmentati
 sudo bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 sudo pip3 install /tmp/tensorflow_pkg/tensorflow-*.whl
 
+-- Setup tensorflow for Julia --
+
+bazel build --config=opt //tensorflow:libtensorflow.so --config=cuda
+sudo su
+cp ./libtensorflow.so ~/.julia/v0.?/TensorFlow/deps/usr/bin/
+
 --Setup a virtual environment --
 sudo apt-get install virtualenv
 virtualenv tf_1.9.0_cuda9.2 -p /usr/bin/python3

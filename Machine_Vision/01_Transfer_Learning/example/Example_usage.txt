@@ -29,8 +29,7 @@ python3 transfer_learning.py \
         --optimizer amsgrad \
         --frozen_layers 170 \
         --checkpoints_file ./output/checkpoint/Transfer_learn_299_299_.h5
-        
-        
+       
 # Example usage using GPU:
 CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
         		       --base_model Inception_V4 \
@@ -59,6 +58,3 @@ CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
                                --optimizer amsgrad \
                                --frozen_layers 170 \
                                --checkpoints_file ./output/checkpoint/Transfer_learn_299_299_.h5
-        
-        
-        
