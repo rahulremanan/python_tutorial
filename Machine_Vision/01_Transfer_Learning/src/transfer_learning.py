@@ -480,7 +480,11 @@ def train(args):
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
             \n epsilon={} (1e-08), \
-            \n decay={} (0.0)".format(lr, beta_1, beta_2, epsilon, decay))
+            \n decay={} (0.0)".format(lr, 
+                                      beta_1, 
+                                      beta_2, 
+                                      epsilon, 
+                                      decay))
   elif optimizer_val.lower() == 'amsgrad':
     optimizer = Adam(lr=lr,           \
                      beta_1=beta_1,   \
@@ -494,7 +498,11 @@ def train(args):
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
             \n epsilon={} (1e-08), \
-            \n decay={} (0.0)".format(lr, beta_1, beta_2, epsilon, decay))
+            \n decay={} (0.0)".format(lr, 
+                                      beta_1, 
+                                      beta_2, 
+                                      epsilon, 
+                                      decay))
   elif optimizer_val.lower() == 'adamax':  
     optimizer = Adamax(lr=lr,           \
                        beta_1=beta_1,   \
@@ -507,7 +515,11 @@ def train(args):
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
             \n epsilon={} (1e-08), \
-            \n schedule_decay={} (0.0)".format(lr, beta_1, beta_2, epsilon, decay))
+            \n schedule_decay={} (0.0)".format(lr, 
+                                               beta_1, 
+                                               beta_2, 
+                                               epsilon, 
+                                               decay))
   elif optimizer_val.lower() == 'nadam':  
     optimizer = Nadam(lr=lr,            \
                       beta_1=beta_1,    \
@@ -521,7 +533,11 @@ def train(args):
             \n beta_1={} (0.9),   \
             \n beta_2={} (0.999), \
             \n epsilon={} (1e-08), \
-            \n schedule_decay={} (0.004)".format(lr, beta_1, beta_2, epsilon, decay))
+            \n schedule_decay={} (0.004)".format(lr, 
+                                                 beta_1, 
+                                                 beta_2, 
+                                                 epsilon, 
+                                                 decay))
   else:
       optimizer = DEFAULT_OPTIMIZER
       print ("Using stochastic gradient descent with Nesterov momentum ('nsgd') as the default optimizer ...")
