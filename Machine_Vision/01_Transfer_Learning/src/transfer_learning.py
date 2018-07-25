@@ -64,7 +64,7 @@ sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
 ada = Adagrad(lr=1e-3, epsilon=1e-08, decay=0.0)
     
-DEFAULT_OPTIMIZER = ada
+DEFAULT_OPTIMIZER = sgd
 
 def generate_timestamp():
     """ 
@@ -524,6 +524,7 @@ def train(args):
             \n schedule_decay={} (0.004)".format(lr, beta_1, beta_2, epsilon, decay))
   else:
       optimizer = DEFAULT_OPTIMIZER
+      print ("Using stochastic gradient descent with Nesterov momentum ('nsgd') as the default optimizer ...")
       print ("Options for optimizer are: 'sgd',        \
                                          \n'nsgd',     \
                                          \n'rmsprop',  \
@@ -944,7 +945,7 @@ def get_user_options():
                                                          'adamax' ...", 
                    dest = "optimizer_val", 
                    required=False, 
-                   default=['rms'], 
+                   default=['adam'], 
                    nargs=1)
     
     a.add_argument("--base_model", 
