@@ -2,55 +2,63 @@
 sudo python3 transfer_learning.py -h
 
 # Example usage: 
-sudo python3 transfer_learning.py \
-        --base_model Inception_V4
-	     --training_directory ./train \
-	     --validation_directory ./val \
-	     --epochs 10 \
-	     --batches 16 \
-	     --output_directory ./output \
-	     --train_model True \
-	     --load_weights True \
+python3 transfer_learning.py \
+        --base_model Inception_V4 \
+        --training_directory ./data/train \
+        --validation_directory ./data/validation \
+        --epochs 2 \
+        --batches 16 \
+        --output_directory ./output \
+        --train_model True \
+        --load_weights False \
         --load_checkpoint True \
-	     --fine_tune True \
-	     --test_augmentation True \
-	     --train_augmentation True \
-	     --plot False \
-	     --summary False \
-	     --dropout 0.6 \
+        --fine_tune False \
+        --test_augmentation False \
+        --train_augmentation False \
+        --plot False \
+        --summary False \
+        --dropout 0.6 \
         --learning_rate 1e-5 \
-	     --decay 0.0 \
-        --epsilon 1e-2 \
-        --optimizer ada \
+        --decay 0.0 \
+        --epsilon 1e-8 \
+        --activation relu \
+        --rho 0.9 \
+        --beta_1 0.9 \
+        --beta_2 0.999 \
+        --decay 0.0 \
+        --optimizer amsgrad \
         --frozen_layers 170 \
-        --weights_file ./output/trained_2018_03_27-10_42_23_weights_ft_.model \
-	     --config_file ./output/trained_2018_03_27-10_42_23_config_ft_.json
-        --checkpoints_file ./output/checkpoint/transfer_learn_299_299_.h5
-
-
+        --checkpoints_file ./output/checkpoint/Transfer_learn_299_299_.h5
+        
+        
 # Example usage using GPU:
 CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
-                                --base_model Inception_V4
-                        	     --training_directory ./train \
-                        	     --validation_directory ./val \
-                        	     --epochs 10 \
-                        	     --batches 16 \
-                        	     --output_directory ./output \
-                        	     --train_model True \
-                                --load_truncated False \ 
-                        	     --load_weights True \
-                                --load_checkpoint True \
-                        	     --fine_tune True \
-                        	     --test_augmentation True \
-                        	     --train_augmentation True \
-                        	     --plot False \
-                        	     --summary False \
-                        	     --dropout 0.6 \
-                                --learning_rate 1e-5 \
-                        	     --decay 0.0 \
-                                --epsilon 1e-2 \
-                                --optimizer ada \
-                                --frozen_layers 170 \
-                                --weights_file ./output/trained_2018_03_27-10_42_23_weights_ft_.model \
-                        	     --config_file ./output/trained_2018_03_27-10_42_23_config_ft_.json
-                                --checkpoints_file ./output/checkpoint/transfer_learn_299_299_.h5
+        		       --base_model Inception_V4 \
+        		       --training_directory ./data/train \
+        		       --validation_directory ./data/validation \
+        	               --epochs 2 \
+                               --batches 16 \
+                               --output_directory ./output \
+                               --train_model True \
+                               --load_weights False \
+                               --load_checkpoint True \
+                               --fine_tune False \
+                               --test_augmentation False \
+                               --train_augmentation False \
+                               --plot False \
+                               --summary False \
+                               --dropout 0.6 \
+                               --learning_rate 1e-5 \
+                               --decay 0.0 \
+                               --epsilon 1e-8 \
+                               --activation relu \
+                               --rho 0.9 \
+                               --beta_1 0.9 \
+                               --beta_2 0.999 \
+                               --decay 0.0 \
+                               --optimizer amsgrad \
+                               --frozen_layers 170 \
+                               --checkpoints_file ./output/checkpoint/Transfer_learn_299_299_.h5
+        
+        
+        
