@@ -428,38 +428,99 @@ def train(args):
   lr = args.learning_rate[0]
   decay = args.decay[0]
   epsilon = args.epsilon[0]
+  rho = args.rho[0]
+  beta_1 = args.beta_1[0]
+  beta_2 = args.beta_2[0]
   
   if optimizer_val.lower() == 'sgd' :
-    optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=False)
+    optimizer = SGD(lr=lr,       \
+                    decay=decay, \
+                    momentum=1,  \
+                    nesterov=False)
     print ("Using SGD as the optimizer ...")
   elif optimizer_val.lower() == 'nsgd':
-    optimizer = SGD(lr=lr, decay=decay, momentum=1, nesterov=True)
+    optimizer = SGD(lr=lr,      \
+                    decay=decay,\
+                    momentum=1, \
+                    nesterov=True)
     print ("Using SGD as the optimizer with Nesterov momentum ...")
-  elif optimizer_val.lower() == 'rms' or optimizer_val.lower() == 'rmsprop':
-    optimizer = RMSprop(lr=lr, rho=0.9, epsilon=epsilon, decay=decay)
+  elif optimizer_val.lower() == 'rms' \
+       or \
+       optimizer_val.lower() == 'rmsprop':
+    optimizer = RMSprop(lr=lr,          \
+                        rho=rho,        \
+                        epsilon=epsilon,\
+                        decay=decay)
     print ("Using RMSProp as the optimizer ...")
-  elif optimizer_val.lower() == 'ada' or optimizer_val.lower() == 'adagrad':
-    optimizer = Adagrad(lr=lr, epsilon=epsilon, decay=decay)
+  elif optimizer_val.lower() == 'ada' \
+       or \
+       optimizer_val.lower() == 'adagrad':
+    optimizer = Adagrad(lr=lr,           \
+                        epsilon=epsilon, \
+                        decay=decay)
     print ("Using Adagrad as the optimizer ...")
-  elif optimizer_val.lower() == 'adelta' or optimizer_val.lower() == 'adadelta':
-    optimizer = Adadelta(lr=lr, rho=0.95, epsilon=epsilon, decay=0.0)
+  elif optimizer_val.lower() == 'adelta' \
+       or \
+       optimizer_val.lower() == 'adadelta':
+    optimizer = Adadelta(lr=lr,           \
+                         rho=rho,         \
+                         epsilon=epsilon, \
+                         decay=decay)
     print ("Using Adadelta as the optimizer ...")
   elif optimizer_val.lower() == 'adam':
-    optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, decay=decay, amsgrad=False)
+    optimizer = Adam(lr=lr,           \
+                     beta_1=beta_1,   \
+                     beta_2=beta_2,    \
+                     epsilon=epsilon, \
+                     decay=decay,     \
+                     amsgrad=False)
     print ("Using Adam as the optimizer ...")
+    print ("\n Recommended default values are: ")
+    print ("\n lr=0.001,     \
+               beta_1=0.9,   \
+               beta_2=0.999, \
+               epsilon=None, \
+               decay=0.0")
   elif optimizer_val.lower() == 'amsgrad':
-    optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, decay=decay, amsgrad=True)
+    optimizer = Adam(lr=lr,           \
+                     beta_1=beta_1,   \
+                     beta_2=beta_2,    \
+                     epsilon=epsilon, \
+                     decay=decay,     \
+                     amsgrad=True)
     print ("Using AmsGrad variant of Adam as the optimizer ...")
+    print ("\n Recommended default values are: ")
+    print ("\n lr=0.001,     \
+               beta_1=0.9,   \
+               beta_2=0.999, \
+               epsilon=None, \
+               decay=0.0")
   elif optimizer_val.lower() == 'adamax':  
-    optimizer = Adamax(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, decay=decay)
+    optimizer = Adamax(lr=lr,           \
+                       beta_1=beta_1,   \
+                       beta_2=beta_2,    \
+                       epsilon=epsilon, \
+                       decay=decay)
     print ("Using Adamax variant of Adam as the optimizer ...")
   elif optimizer_val.lower() == 'nadam':  
-    optimizer = Nadam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=epsilon, schedule_decay=decay)
+    optimizer = Nadam(lr=lr,            \
+                      beta_1=beta_1,    \
+                      beta_2=beta_2,     \
+                      epsilon=epsilon,  \
+                      schedule_decay=decay)
     print ("Using Nesterov Adam optimizer ...\
            \n decay arguments is passed on to schedule_decay variable ...")
   else:
       optimizer = DEFAULT_OPTIMIZER
-      print ("Options for optimizer are: 'sgd', 'nsgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'nadam', 'amsgrad', 'adamax' ...")
+      print ("Options for optimizer are: 'sgd',        \
+                                         \n'nsgd',     \
+                                         \n'rmsprop',  \
+                                         \n'adagrad',  \
+                                         \n'adadelta', \
+                                         \n'adam',     \
+                                         \n'nadam',    \
+                                         \n'amsgrad',  \
+                                         \n'adamax' ...")
       
   nb_train_samples = get_nb_files(args.train_dir[0])
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
@@ -797,7 +858,16 @@ def get_user_options():
     
     a.add_argument("--activation", 
                    help = "Specify values for activation function.\
-                           Available activation functions are: hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...", 
+                           \nAvailable activation functions are: 'hard_sigmoid', \
+                                                                 'elu',          \
+                                                                 'linear',       \
+                                                                 'relu',         \
+                                                                 'selu',         \
+                                                                 'sigmoid',      \
+                                                                 'softmax',      \
+                                                                 'softplus',     \
+                                                                 'sofsign',      \
+                                                                 'tanh' ...", 
                    dest = "activation", 
                    required=False, 
                    default=['relu'], 
@@ -812,6 +882,33 @@ def get_user_options():
                    type = float,
                    nargs=1)
     
+    a.add_argument("--rho", 
+                   help = "Specify values for rho\
+                           \n Applied to RMSprop and Adadelta ...", 
+                   dest = "rho", 
+                   required=False, 
+                   default=[0.9], 
+                   type = float,
+                   nargs=1)
+ 
+    a.add_argument("--beta_1", 
+                   help = "Specify values for beta_1\
+                           \n Applied to Adam, AmsGrad, Adadelta and Nadam ...", 
+                   dest = "beta_1", 
+                   required=False, 
+                   default=[0.9], 
+                   type = float,
+                   nargs=1)    
+    
+    a.add_argument("--beta_2", 
+                   help = "Specify values for beta_2\
+                           \n Applied to Adam, AmsGrad, Adadelta and Nadam ...", 
+                   dest = "beta_2", 
+                   required=False, 
+                   default=[0.999], 
+                   type = float,
+                   nargs=1) 
+    
     a.add_argument("--decay", 
                    help = "Specify values for decay function ...", 
                    dest = "decay", 
@@ -822,14 +919,23 @@ def get_user_options():
     
     a.add_argument("--optimizer", 
                    help = "Specify the type of optimizer to choose from. \
-                           \n Options for optimizer are: 'sgd', 'nsgd', 'rmsprop', 'adagrad', 'adadelta', 'adam', 'nadam', 'amsgrad', 'adamax' ...", 
+                           \nOptions for optimizer are:  'sgd',     \
+                                                         'nsgd',    \
+                                                         'rmsprop', \
+                                                         'adagrad', \
+                                                         'adadelta',\
+                                                         'adam',    \
+                                                         'nadam',   \
+                                                         'amsgrad', \
+                                                         'adamax' ...", 
                    dest = "optimizer_val", 
                    required=False, 
                    default=['rms'], 
                    nargs=1)
     
     a.add_argument("--base_model", 
-                   help = "Specify the type of base model classifier to build the neural network. Options are: Inception_v4 or Inception_v3", 
+                   help = "Specify the type of base model classifier to build the neural network. \
+                           \nOptions are: Inception_v4 or Inception_v3 ...", 
                    dest = "base_model", 
                    required=False, 
                    default=['Inception_V4'], 
