@@ -592,6 +592,7 @@ def train(args):
       height_shift_range=0.2,
       shear_range=0.2,
       zoom_range=0.2,
+      vertical_flip=True,                                  
       horizontal_flip=True)
   else:
       train_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
@@ -607,6 +608,7 @@ def train(args):
           height_shift_range=0.2,
           shear_range=0.2,
           zoom_range=0.2,
+          vertical_flip=True,
           horizontal_flip=True)
   else:
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
