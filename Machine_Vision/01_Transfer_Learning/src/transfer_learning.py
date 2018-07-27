@@ -587,22 +587,49 @@ def train(args):
       preprocess_input = preprocess_input_inceptionv3
   
   if train_aug==True:
-    train_rotation_range = args.train_rot[0]
-    train_width_shift_range = args.train_w_shift[0]
-    train_height_shift_range = args.train_ht_shift[0]
-    train_shear_range = args.train_shear[0]
-    train_zoom_range = args.train_zoom[0]
-    train_vertical_flip = args.train_vflip[0]
-    train_horizontal_flip = args.train_hflip[0]
-    
+    try:
+        train_rotation_range = args.train_rot[0]
+        train_width_shift_range = args.train_w_shift[0]
+        train_height_shift_range = args.train_ht_shift[0]
+        train_shear_range = args.train_shear[0]
+        train_zoom_range = args.train_zoom[0]
+        train_vertical_flip = args.train_vflip[0]
+        train_horizontal_flip = args.train_hflip[0]
+    except:
+        train_rotation_range = 30
+        train_width_shift_range = 0.2
+        train_height_shift_range = 0.2
+        train_shear_range = 0.2
+        train_zoom_range = 0.2
+        train_vertical_flip = True
+        train_horizontal_flip = True
+        print ("Failed to load custom training image augmentation parameters ...")
+        print ("Loaded pre-set defaults ...")
+        print ("To switch off image augmentation during training set --train_augmentation to False")
+        
     train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
-                                        rotation_range=train_rotation_range,
-                                        width_shift_range=train_width_shift_range,
-                                        height_shift_range=train_height_shift_range,
-                                        shear_range=train_shear_range,
-                                        zoom_range=train_zoom_range,
-                                        vertical_flip=train_vertical_flip,                                  
-                                        horizontal_flip=train_horizontal_flip)
+                                            rotation_range=train_rotation_range,
+                                            width_shift_range=train_width_shift_range,
+                                            height_shift_range=train_height_shift_range,
+                                            shear_range=train_shear_range,
+                                            zoom_range=train_zoom_range,
+                                            vertical_flip=train_vertical_flip,                                  
+                                            horizontal_flip=train_horizontal_flip)
+    print ("Created image augmentation pipeline for training images ...")     
+    print ("Image augmentation parameters for training images: \
+          \n image rotation range = {},\
+             width shift range = {},\
+             height shift range = {}, \
+             shear range = {} ,\
+             zoom range = {}, \
+             enable vertical flip = True, \
+             enable horizontal_flip = True".format(train_rotation_range,
+                                                   train_width_shift_range,
+                                                   train_height_shift_range,
+                                                   train_shear_range,
+                                                   train_zoom_range,
+                                                   train_vertical_flip,
+                                                   train_horizontal_flip))
   else:
       train_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
     
@@ -876,6 +903,62 @@ def get_user_options():
     a.add_argument("--summary", 
                    help = "Specify if a summary should be generated ...", 
                    dest = "model_summary", 
+                   required=False, 
+                   default=[False], 
+                   type = string_to_bool,
+                   nargs=1)
+    
+    a.add_argument("--train_image_rotation", 
+                   help = "Specify values for rotation range to be applied to training images during pre-processing ...", 
+                   dest = "train_rot", 
+                   required=False, 
+                   default=[30], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--train_image_width_shift", 
+                   help = "Specify values for width shift range to be applied to training images during pre-processing ...", 
+                   dest = "train_w_shift", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--train_image_height_shift", 
+                   help = "Specify values for height shift range to be applied to training images during pre-processing ...", 
+                   dest = "train_ht_shift", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--train_image_shear", 
+                   help = "Specify values for shear transformation range to be applied to training images during pre-processing ...", 
+                   dest = "train_shear", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--train_image_zoom", 
+                   help = "Specify values for zooming transformation range to be applied to training images during pre-processing ...", 
+                   dest = "train_zoom", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--train_image_vertical_flip", 
+                   help = "Specify if training image should be randomly flipped vertical during pre-processing ...", 
+                   dest = "train_vflip", 
+                   required=False, 
+                   default=[False], 
+                   type = string_to_bool,
+                   nargs=1)
+    
+    a.add_argument("--train_image_horizontal_flip", 
+                   help = "Specify if training image should be randomly flipped horizontal during pre-processing ...", 
+                   dest = "train_hflip", 
                    required=False, 
                    default=[False], 
                    type = string_to_bool,
