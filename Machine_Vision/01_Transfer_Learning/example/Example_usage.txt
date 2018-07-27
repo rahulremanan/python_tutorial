@@ -6,30 +6,39 @@ python3 transfer_learning.py \
         --base_model Inception_V4 \
         --training_directory ./data/train \
         --validation_directory ./data/validation \
-        --epochs 2 \
-        --batches 16 \
+        --epochs 20 \
+        --batches 32 \
         --output_directory ./output \
         --train_model True \
         --load_weights False \
         --load_checkpoint True \
         --fine_tune False \
         --test_augmentation False \
-        --train_augmentation False \
+        --train_augmentation True \
+        --train_image_rotation 300 \
+        --train_image_width_shift 0.15 \
+        --train_image_height_shift 0.15 \
+        --train_image_shear 0.15 \
+        --train_image_zoom 0.15 \
+        --train_image_vertical_flip True \
+        --train_image_horizontal_flip True \
         --plot False \
         --summary False \
         --dropout 0.6 \
         --learning_rate 1e-5 \
         --decay 0.0 \
         --epsilon 1e-8 \
-        --activation relu \
+        --activation tanh \
         --rho 0.9 \
         --beta_1 0.9 \
         --beta_2 0.999 \
         --decay 0.0 \
-        --optimizer amsgrad \
-        --frozen_layers 170 \
+        --optimizer adam \
+        --frozen_layers 100 \
+        --weights_file ./output/trained_2018_07_25-18_12_31_weights_tl_.model\
+        --config_file ./output/trained_2018_07_25-18_12_31_weights_tl_.model \
         --checkpoints_file ./output/checkpoint/Transfer_learn_299_299_.h5
-       
+      
 # Example usage using CUDA enabled GPU:
 CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
                                --base_model Inception_V4 \

@@ -603,27 +603,27 @@ def train(args):
         train_zoom_range = 0.2
         train_vertical_flip = True
         train_horizontal_flip = True
-        print ("Failed to load custom training image augmentation parameters ...")
+        print ("\nFailed to load custom training image augmentation parameters ...")
         print ("Loaded pre-set defaults ...")
-        print ("To switch off image augmentation during training set --train_augmentation to False")
+        print ("To switch off image augmentation during training, set --train_augmentation flag to False")
         
     train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
-                                            rotation_range=train_rotation_range,
-                                            width_shift_range=train_width_shift_range,
-                                            height_shift_range=train_height_shift_range,
-                                            shear_range=train_shear_range,
-                                            zoom_range=train_zoom_range,
-                                            vertical_flip=train_vertical_flip,                                  
-                                            horizontal_flip=train_horizontal_flip)
-    print ("Created image augmentation pipeline for training images ...")     
+                                        rotation_range=train_rotation_range,
+                                        width_shift_range=train_width_shift_range,
+                                        height_shift_range=train_height_shift_range,
+                                        shear_range=train_shear_range,
+                                        zoom_range=train_zoom_range,
+                                        vertical_flip=train_vertical_flip,                                  
+                                        horizontal_flip=train_horizontal_flip)
+    print ("\nCreated image augmentation pipeline for training images ...")     
     print ("Image augmentation parameters for training images: \
           \n image rotation range = {},\
-             width shift range = {},\
-             height shift range = {}, \
-             shear range = {} ,\
-             zoom range = {}, \
-             enable vertical flip = True, \
-             enable horizontal_flip = True".format(train_rotation_range,
+          \n width shift range = {},\
+          \n height shift range = {}, \
+          \n shear range = {} ,\
+          \n zoom range = {}, \
+          \n enable vertical flip = {}, \
+          \n enable horizontal_flip = {}".format(train_rotation_range,
                                                    train_width_shift_range,
                                                    train_height_shift_range,
                                                    train_shear_range,
