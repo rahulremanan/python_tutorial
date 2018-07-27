@@ -198,7 +198,8 @@ def activation_val(val):
                        'tanh'):
         return val
     else:
-        raise argparse.ArgumentTypeError('Unexpected activation function. Expected values are:  hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...')
+        raise argparse.ArgumentTypeError('Unexpected activation function. \
+                                         \nExpected values are:  hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...')
         
 def get_nb_files(directory):
   if not os.path.exists(directory):
@@ -586,14 +587,22 @@ def train(args):
       preprocess_input = preprocess_input_inceptionv3
   
   if train_aug==True:
+    train_rotation_range = args.train_rot[0]
+    train_width_shift_range = args.train_w_shift[0]
+    train_height_shift_range = args.train_ht_shift[0]
+    train_shear_range = args.train_shear[0]
+    train_zoom_range = args.train_zoom[0]
+    train_vertical_flip = args.train_vflip[0]
+    train_horizontal_flip = args.train_hflip[0]
+    
     train_datagen =  ImageDataGenerator(preprocessing_function=preprocess_input,
-      rotation_range=30,
-      width_shift_range=0.2,
-      height_shift_range=0.2,
-      shear_range=0.2,
-      zoom_range=0.2,
-      vertical_flip=True,                                  
-      horizontal_flip=True)
+                                        rotation_range=train_rotation_range,
+                                        width_shift_range=train_width_shift_range,
+                                        height_shift_range=train_height_shift_range,
+                                        shear_range=train_shear_range,
+                                        zoom_range=train_zoom_range,
+                                        vertical_flip=train_vertical_flip,                                  
+                                        horizontal_flip=train_horizontal_flip)
   else:
       train_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
     
@@ -601,15 +610,14 @@ def train(args):
   test_aug = args.test_aug[0]  
   
   if test_aug==True:
-      test_datagen = ImageDataGenerator(
-        preprocessing_function=preprocess_input,
-          rotation_range=30,
-          width_shift_range=0.2,
-          height_shift_range=0.2,
-          shear_range=0.2,
-          zoom_range=0.2,
-          vertical_flip=True,
-          horizontal_flip=True)
+      test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
+                                        rotation_range=30,
+                                        width_shift_range=0.2,
+                                        height_shift_range=0.2,
+                                        shear_range=0.2,
+                                        zoom_range=0.2,
+                                        vertical_flip=True,
+                                        horizontal_flip=True)
   else:
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
       
