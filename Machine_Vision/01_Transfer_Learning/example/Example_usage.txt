@@ -14,12 +14,19 @@ python3 transfer_learning.py \
         --load_checkpoint True \
         --fine_tune False \
         --test_augmentation False \
+        --test_image_rotation 300 \
+        --test_image_width_shift 0.15 \
+        --test_image_height_shift 0.15 \
+        --test_image_shear 0.15 \
+        --test_image_zoom 0.2 \
+        --test_image_vertical_flip True \
+        --test_image_horizontal_flip True \
         --train_augmentation True \
         --train_image_rotation 300 \
         --train_image_width_shift 0.15 \
         --train_image_height_shift 0.15 \
         --train_image_shear 0.15 \
-        --train_image_zoom 0.15 \
+        --train_image_zoom 0.2 \
         --train_image_vertical_flip True \
         --train_image_horizontal_flip True \
         --plot False \

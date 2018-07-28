@@ -963,6 +963,62 @@ def get_user_options():
                    default=[False], 
                    type = string_to_bool,
                    nargs=1)
+
+    a.add_argument("--test_image_rotation", 
+                   help = "Specify values for rotation range to be applied to training images during pre-processing ...", 
+                   dest = "test_rot", 
+                   required=False, 
+                   default=[30], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--test_image_width_shift", 
+                   help = "Specify values for width shift range to be applied to training images during pre-processing ...", 
+                   dest = "test_w_shift", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--test_image_height_shift", 
+                   help = "Specify values for height shift range to be applied to training images during pre-processing ...", 
+                   dest = "test_ht_shift", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--test_image_shear", 
+                   help = "Specify values for shear transformation range to be applied to training images during pre-processing ...", 
+                   dest = "test_shear", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--test_image_zoom", 
+                   help = "Specify values for zooming transformation range to be applied to training images during pre-processing ...", 
+                   dest = "test_zoom", 
+                   required=False, 
+                   default=[0.2], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--test_image_vertical_flip", 
+                   help = "Specify if training image should be randomly flipped vertical during pre-processing ...", 
+                   dest = "test_vflip", 
+                   required=False, 
+                   default=[False], 
+                   type = string_to_bool,
+                   nargs=1)
+    
+    a.add_argument("--test_image_horizontal_flip", 
+                   help = "Specify if training image should be randomly flipped horizontal during pre-processing ...", 
+                   dest = "test_hflip", 
+                   required=False, 
+                   default=[False], 
+                   type = string_to_bool,
+                   nargs=1)
     
     a.add_argument("--dropout", 
                    help = "Specify values for dropout function ...", 
