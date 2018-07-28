@@ -623,7 +623,7 @@ def train(args):
           \n shear range = {} ,\
           \n zoom range = {}, \
           \n enable vertical flip = {}, \
-          \n enable horizontal_flip = {}".format(train_rotation_range,
+          \n enable horizontalflip = {}".format(train_rotation_range,
                                                    train_width_shift_range,
                                                    train_height_shift_range,
                                                    train_shear_range,
