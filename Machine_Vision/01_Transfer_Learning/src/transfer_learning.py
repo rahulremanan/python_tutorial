@@ -637,14 +637,48 @@ def train(args):
   test_aug = args.test_aug[0]  
   
   if test_aug==True:
+      try:
+        test_rotation_range = args.test_rot[0]
+        test_width_shift_range = args.test_w_shift[0]
+        test_height_shift_range = args.test_ht_shift[0]
+        test_shear_range = args.test_shear[0]
+        test_zoom_range = args.test_zoom[0]
+        test_vertical_flip = args.test_vflip[0]
+        test_horizontal_flip = args.test_hflip[0]
+      except:
+        test_rotation_range = 30
+        test_width_shift_range = 0.2
+        test_height_shift_range = 0.2
+        test_shear_range = 0.2
+        test_zoom_range = 0.2
+        test_vertical_flip = True
+        test_horizontal_flip = True
+        print ("\nFailed to load custom training image augmentation parameters ...")
+        print ("Loaded pre-set defaults ...")
+        print ("To switch off image augmentation during training, set --train_augmentation flag to False")
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
-                                        rotation_range=30,
-                                        width_shift_range=0.2,
-                                        height_shift_range=0.2,
-                                        shear_range=0.2,
-                                        zoom_range=0.2,
-                                        vertical_flip=True,
-                                        horizontal_flip=True)
+                                        rotation_range=test_rotation_range,
+                                        width_shift_range=test_width_shift_range,
+                                        height_shift_range=test_height_shift_range,
+                                        shear_range=test_shear_range,
+                                        zoom_range=test_zoom_range,
+                                        vertical_flip=test_vertical_flip,
+                                        horizontal_flip=test_horizontal_flip)
+      print ("\nCreated image augmentation pipeline for training images ...")     
+      print ("Image augmentation parameters for training images: \
+          \n image rotation range = {},\
+          \n width shift range = {},\
+          \n height shift range = {}, \
+          \n shear range = {} ,\
+          \n zoom range = {}, \
+          \n enable vertical flip = {}, \
+          \n enable horizontalflip = {}".format(test_rotation_range,
+                                                test_width_shift_range,
+                                                test_height_shift_range,
+                                                test_shear_range,
+                                                test_zoom_range,
+                                                test_vertical_flip,
+                                                test_horizontal_flip))
   else:
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
       
