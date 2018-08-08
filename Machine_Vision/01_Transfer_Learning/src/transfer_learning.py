@@ -186,20 +186,42 @@ def string_to_bool(val):
         raise argparse.ArgumentTypeError('Boolean value expected ...')
         
 def activation_val(val):
-    if val.lower() in ('hard_sigmoid',
-                       'elu',
-                       'linear',
-                       'relu', 
-                       'selu', 
-                       'sigmoid',
-                       'softmax',
-                       'softplus',
-                       'sofsign',
-                       'tanh'):
+    activation_function_options = ('hard_sigmoid',
+                                   'elu',
+                                   'linear',
+                                   'relu', 
+                                   'selu', 
+                                   'sigmoid',
+                                   'softmax',
+                                   'softplus',
+                                   'sofsign',
+                                   'tanh')
+    if val.lower() in activation_function_options:
         return val
     else:
         raise argparse.ArgumentTypeError('Unexpected activation function. \
-                                         \nExpected values are:  hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...')
+                                         \nExpected values are:  {} ...'.format(activation_function_options))
+
+def loss_val(val):
+    loss_function_options = ('mean_squared_error',
+                             'mean_absolute_error',
+                             'mean_absolute_percentage_error',
+                             'mean_squared_logarithmic_error', 
+                             'squared_hinge', 
+                             'hinge',
+                             'categorical_hinge',
+                             'logcosh',
+                             'categorical_crossentropy',
+                             'sparse_categorical_crossentropy',
+                             'binary_crossentropy',
+                             'kullback_leibler_divergence',
+                             'poisson',
+                             'cosine_proximity')
+    if val.lower() in loss_function_options:
+        return val
+    else:
+        raise argparse.ArgumentTypeError('Unexpected loss function. \
+                                         \nExpected values are:  {} ...'.format(loss_function_options))
         
 def get_nb_files(directory):
   if not os.path.exists(directory):
@@ -209,14 +231,6 @@ def get_nb_files(directory):
     for dr in dirs:
       cnt += len(glob.glob(os.path.join(r, dr + "/*")))
   return cnt
-
-def setup_to_transfer_learn(model, base_model, optimizer):
-  for layer in base_model.layers:
-    layer.trainable = False
-  model.compile(optimizer=optimizer, 
-                loss='categorical_crossentropy', 
-                metrics=['accuracy'])
-  return model
 
 def add_top_layer(args, base_model, nb_classes):
   """
@@ -286,17 +300,19 @@ def add_top_layer(args, base_model, nb_classes):
                       activation='softmax', \
                       name='prediction')(xout) # Softmax output layer
   
-  model = Model(inputs=base_model.input, outputs=predictions)
+  model = Model(inputs=base_model.input, 
+                outputs=predictions)
   
   return model
 
-def setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS):
+def finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS):
   """
       A function that freezes the bottom NB_LAYERS and retrain the remaining top layers.
       
       The required input arguments for this function are: model, optimizer and NB_FROZEN_LAYERS.
           model: inputs a model architecture with base layers to be frozen during training,
-          optimizer: inputs an choice of optimizer values for compiling the model,
+          optimizer: inputs a choice of optimizer value for compiling the model,
+          loss: inputs a choice for loss function used for compiling the model,
           NB_FROZEN_LAYERS: inputs a number that selects the total number of base layers to be frozen during training.
       
   """
@@ -305,7 +321,28 @@ def setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS):
      layer.trainable = False
   for layer in model.layers[NB_FROZEN_LAYERS:]:
      layer.trainable = True
-  model.compile(optimizer=optimizer, loss='categorical_crossentropy', 
+  model.compile(optimizer=optimizer, 
+                loss=loss, 
+                metrics=['accuracy'])
+  return model
+
+def transferlearn_model(model, base_model, optimizer, loss):
+  """
+     Function that freezes the base layers to train just the top layer.
+     
+     This function takes three positional arguments:
+         model: specifies the input model,
+         base_model: specifies the base model architecture,
+         optimizer: optimizer function for training the model,
+         loss: loss function for compiling the model
+     
+     Example usage:
+         transferlearn_model(model, base_model, optimizer)
+  """
+  for layer in base_model.layers:
+    layer.trainable = False
+  model.compile(optimizer=optimizer, 
+                loss=loss, 
                 metrics=['accuracy'])
   return model
 
@@ -432,6 +469,7 @@ def train(args):
   rho = args.rho[0]
   beta_1 = args.beta_1[0]
   beta_2 = args.beta_2[0]
+  loss = args.loss[0]
   
   if optimizer_val.lower() == 'sgd' :
     optimizer = SGD(lr=lr,       \
@@ -761,10 +799,10 @@ def train(args):
   if fine_tune_model == True:
       print ("\nFine tuning Inception architecture ...")
       print ("Frozen layers: " + str(NB_FROZEN_LAYERS))
-      setup_to_finetune(model, optimizer, NB_FROZEN_LAYERS)
+      finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS)
   else:
       print ("\nTransfer learning using Inception architecture ...")
-      setup_to_transfer_learn(model, base_model, optimizer)
+      transferlearn_model(model, base_model, optimizer, loss)
             
   print ("\nInitializing training with  class labels: " + 
          str(labels))
@@ -810,6 +848,19 @@ def train(args):
       generate_plot(args, "_tl_", model_train)
       
 def get_user_options():
+    """
+        A function that uses argument parser to pass user options from command line.
+        
+        Example usage:
+                args = get_user_options()
+                if ((not os.path.exists(args.train_dir[0])) 
+                or 
+                (not os.path.exists(args.val_dir[0])) 
+                or 
+                (not os.path.exists(args.output_dir[0]))):
+                    print("Specified directories do not exist ...")
+                    sys.exit(1)
+    """
     a = argparse.ArgumentParser()
     
     a.add_argument("--training_directory", 
@@ -1071,7 +1122,7 @@ def get_user_options():
                    nargs=1)
     
     a.add_argument("--activation", 
-                   help = "Specify values for activation function.\
+                   help = "Specify activation function.\
                            \nAvailable activation functions are: 'hard_sigmoid', \
                                                                  'elu',          \
                                                                  'linear',       \
@@ -1086,6 +1137,28 @@ def get_user_options():
                    required=False, 
                    default=['relu'], 
                    type = activation_val,
+                   nargs=1)
+    
+    a.add_argument("--loss", 
+                   help = "Specify loss function.\
+                           \nAvailable loss functions are:  'mean_squared_error', \
+                                                            'mean_absolute_error' \
+                                                            'mean_absolute_percentage_error' \
+                                                            'mean_squared_logarithmic_error' \
+                                                            'squared_hinge' \
+                                                            'hinge',          \
+                                                            'categorical_hinge',       \
+                                                            'logcosh',         \
+                                                            'categorical_crossentropy',         \
+                                                            'sparse_categorical_crossentropy',      \
+                                                            'binary_crossentropy',      \
+                                                            'kullback_leibler_divergence',     \
+                                                            'poisson',      \
+                                                            'cosine_proximity' ...", 
+                   dest = "loss", 
+                   required=False, 
+                   default=['categorical_crossentropy'], 
+                   type = loss_val,
                    nargs=1)
     
     a.add_argument("--learning_rate", 

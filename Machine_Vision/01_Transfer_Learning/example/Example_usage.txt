@@ -36,6 +36,7 @@ python3 transfer_learning.py \
         --decay 0.0 \
         --epsilon 1e-8 \
         --activation tanh \
+        --loss categorical_crossentropy \
         --rho 0.9 \
         --beta_1 0.9 \
         --beta_2 0.999 \
