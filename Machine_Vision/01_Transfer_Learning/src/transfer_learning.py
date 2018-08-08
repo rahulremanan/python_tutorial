@@ -52,6 +52,8 @@ from keras.optimizers import SGD,                           \
 from keras.callbacks import EarlyStopping,   \
                             ModelCheckpoint, \
                             ReduceLROnPlateau
+                            
+import execute_in_shell
 
 IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Default input image size for Inception v3 and v4 architecture
 DEFAULT_EPOCHS = 100
@@ -401,6 +403,10 @@ def generate_labels(args):
       print ("Mismatched training and validation data labels ...")
       print ("Sub-folder names do not match between training and validation directories ...")
       sys.exit(1)
+      
+    if args.normalize[0]:
+        for label in labels:
+            
 
     return labels
 
