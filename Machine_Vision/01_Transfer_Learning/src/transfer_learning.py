@@ -469,7 +469,7 @@ def normalize(args, labels):
             p = Process(target=execute_in_shell, args=([commands]))
             p.start()
             p.join()
-        print ("\nData normalization pipeline completed sccessfully ...")
+        print ("\nData normalization pipeline completed successfully ...")
     else:
         print ("\nFailed to initiate data normalization pipeline ...")
         return False    
