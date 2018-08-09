@@ -527,7 +527,6 @@ def train(args):
             print ("Training sesssion initiated ...")
             train(args)
   """    
-
   
   if not os.path.exists(args.output_dir[0]):
     os.makedirs(args.output_dir[0])
@@ -773,20 +772,20 @@ def train(args):
                                         vertical_flip=test_vertical_flip,
                                         horizontal_flip=test_horizontal_flip)
       print ("\nCreated image augmentation pipeline for training images ...")     
-      print ("Image augmentation parameters for training images: \
-          \n image rotation range = {},\
-          \n width shift range = {},\
-          \n height shift range = {}, \
-          \n shear range = {} ,\
-          \n zoom range = {}, \
-          \n enable vertical flip = {}, \
-          \n enable horizontal flip = {}".format(test_rotation_range,
-                                                test_width_shift_range,
-                                                test_height_shift_range,
-                                                test_shear_range,
-                                                test_zoom_range,
-                                                test_vertical_flip,
-                                                test_horizontal_flip))
+      print ("Image augmentation parameters for training images:")
+      print( "\n image rotation range = {},\
+              \n width shift range = {},\
+              \n height shift range = {}, \
+              \n shear range = {} ,\
+              \n zoom range = {}, \
+              \n enable vertical flip = {}, \
+              \n enable horizontal flip = {}".format(test_rotation_range,
+                                                     test_width_shift_range,
+                                                     test_height_shift_range,
+                                                     test_shear_range,
+                                                     test_zoom_range,
+                                                     test_vertical_flip,
+                                                     test_horizontal_flip))
   else:
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
       
