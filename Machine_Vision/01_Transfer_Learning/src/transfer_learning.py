@@ -8,6 +8,7 @@
 
 import argparse
 import os
+import random
 import time
 import sys
 import glob
@@ -53,7 +54,8 @@ from keras.callbacks import EarlyStopping,   \
                             ModelCheckpoint, \
                             ReduceLROnPlateau
                             
-import execute_in_shell
+from multiprocessing import Process
+from execute_in_shell import execute_in_shell
 
 IM_WIDTH, IM_HEIGHT = 299, 299                                                  # Default input image size for Inception v3 and v4 architecture
 DEFAULT_EPOCHS = 100
@@ -61,6 +63,8 @@ DEFAULT_BATCHES = 20
 FC_SIZE = 4096
 DEFAULT_DROPOUT = 0.1
 DEFAULT_NB_LAYERS_TO_FREEZE = 169
+
+verbose = True
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
@@ -403,19 +407,80 @@ def generate_labels(args):
       print ("Mismatched training and validation data labels ...")
       print ("Sub-folder names do not match between training and validation directories ...")
       sys.exit(1)
-      
-    if args.normalize[0]:
-        for label in labels:
-            
 
     return labels
+
+def normalize(args, labels):
+    if args.normalize[0] and os.path.exists(args.root_dir[0]):      
+        commands = ["rm -r {}/.tmp_train/".format(args.root_dir[0]),
+                    "rm -r {}/.tmp_validation/".format(args.root_dir[0]),
+                    "mkdir {}/.tmp_train/".format(args.root_dir[0]),
+                    "mkdir {}/.tmp_validation/".format(args.root_dir[0])]
+        execute_in_shell(command=commands,
+                         verbose=verbose)
+        del commands
+        
+        mk_train_folder = "mkdir -p {}/.tmp_train/".format(args.root_dir[0]) + "{}"
+        mk_val_folder = "mkdir -p {}/.tmp_validation/".format(args.root_dir[0]) + "{}"
+        
+        train_class_sizes = []
+        val_class_sizes = []
+        
+        for label in labels:
+            train_class_sizes.append(len(glob.glob(args.train_dir[0] + "/{}/*".format(label))))
+            val_class_sizes.append(len(glob.glob(args.val_dir[0] + "/{}/*".format(label))))
+        
+        train_size = min(train_class_sizes)
+        val_size = min(val_class_sizes)
+        
+        print ("Normalized training class size {}".format(train_size))
+        print ("Normalized validation class size {}".format(val_size))
+        
+        for label in labels:
+            commands = [mk_train_folder.format(label),
+                        mk_val_folder.format(label)]
+        
+            execute_in_shell(command=commands,
+                         verbose=verbose)
+            del commands
+        
+        commands = []
+        
+        for label in labels:
+            train_images = (glob.glob('{}/{}/*.*'.format(args.train_dir[0], label), recursive=True))
+            val_images = (glob.glob('{}/{}/*.*'.format(args.val_dir[0], label), recursive=True))
+            
+            sys_rnd = random.SystemRandom()
+            
+            for file in sys_rnd.sample(train_images, train_size):
+                if os.path.exists(file):
+                    commands.append('cp {} ./.tmp_train/{}/'.format(file, label))
+            
+            for file in sys_rnd.sample(val_images, val_size):
+                if os.path.exists(file):
+                    commands.append('cp {} ./.tmp_validation/{}/'.format(file, label))            
+            
+            if verbose:
+                commands.append(['\necho "Training folders: {}/.tmp_train/:"'.format(args.root_dir[0])])
+                commands.append(["ls {}/.tmp_train/".format(args.root_dir[0])])
+                commands.append(['\necho "Validation folders: {}/.tmp_validation/:"'.format(args.root_dir[0])])
+                commands.append(["ls {}/.tmp_validation/".format(args.root_dir[0])])
+                
+            p = Process(target=execute_in_shell, args=([commands]))
+            p.start()
+            p.join()
+        print ("\nData normalization pipeline completed sccessfully ...")
+    else:
+        print ("\nFailed to initiate data normalization pipeline ...")
+        return False    
+    return True
 
 def generate_plot(args, name, model_train):
     gen_plot = args.plot[0]
     if gen_plot==True:
         plot_training(args, name, model_train)
     else:
-        print ("No training summary plots generated ...")
+        print ("\nNo training summary plots generated ...")
         print ("Set: --plot True for creating training summary plots")
 
 def plot_training(args, name, history):
@@ -716,7 +781,7 @@ def train(args):
           \n shear range = {} ,\
           \n zoom range = {}, \
           \n enable vertical flip = {}, \
-          \n enable horizontalflip = {}".format(test_rotation_range,
+          \n enable horizontal flip = {}".format(test_rotation_range,
                                                 test_width_shift_range,
                                                 test_height_shift_range,
                                                 test_shear_range,
@@ -727,18 +792,30 @@ def train(args):
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
       
   print ("\nGenerating training data: ... ")
+  
+  labels = generate_labels(args)
+  
+  train_dir = args.train_dir[0]
+  val_dir = args.val_dir[0]
+  
+  if args.normalize[0] and os.path.exists(args.root_dir[0]):
+      normalize(args, labels)
+      train_dir = os.path.join(args.root_dir[0] + 
+                               str ('/.tmp_train/'))
+      val_dir = os.path.join(args.root_dir[0] + 
+                             str ('/.tmp_validation/'))
 
-  train_generator = train_datagen.flow_from_directory(args.train_dir[0],
-    target_size=(IM_WIDTH, IM_HEIGHT),
-    batch_size=batch_size,
-    class_mode='categorical')
+  train_generator = train_datagen.flow_from_directory(train_dir,
+                                                      target_size=(IM_WIDTH, IM_HEIGHT),
+                                                      batch_size=batch_size,
+                                                      class_mode='categorical')
   
   print ("\nGenerating validation data: ... ")
 
-  validation_generator = test_datagen.flow_from_directory(args.val_dir[0],
-    target_size=(IM_WIDTH, IM_HEIGHT),
-    batch_size=batch_size,
-    class_mode='categorical')
+  validation_generator = test_datagen.flow_from_directory(val_dir,
+                                                          target_size=(IM_WIDTH, IM_HEIGHT),
+                                                          batch_size=batch_size,
+                                                          class_mode='categorical')
   
   if str((args.base_model[0]).lower()) == 'inceptionv4' or  \
      str((args.base_model[0]).lower()) == 'inception_v4' or \
@@ -754,8 +831,6 @@ def train(args):
   
   model = add_top_layer(args, base_model, nb_classes)
   print ("New top layer added to: " + str(base_model_name))
-  
-  labels = generate_labels(args)
   
   load_weights_ = args.load_weights[0]
   fine_tune_model = args.fine_tune[0]
@@ -883,6 +958,14 @@ def get_user_options():
                    type=lambda x: is_valid_dir(a, x), 
                    nargs=1)
     
+    a.add_argument("--root_directory", 
+                   help = "Specify the root folder for sub-sampling and normalization ...", 
+                   dest = "root_dir", 
+                   required = False, 
+                   type=lambda x: is_valid_dir(a, x), 
+                   default = ['./'],
+                   nargs=1)
+    
     a.add_argument("--epochs", 
                    help = "Specify epochs for training ...", 
                    dest = "epoch", 
@@ -978,6 +1061,14 @@ def get_user_options():
     a.add_argument("--train_augmentation", 
                    help = "Specify image augmentation for train dataset ...", 
                    dest = "train_aug", 
+                   required=False, 
+                   default=[False], 
+                   nargs=1, 
+                   type = string_to_bool)
+    
+    a.add_argument("--normalize", 
+                   help = "Specify if a training and validation data should be normalized ...", 
+                   dest = "normalize", 
                    required=False, 
                    default=[False], 
                    nargs=1, 

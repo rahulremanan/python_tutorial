@@ -9,10 +9,12 @@ python3 transfer_learning.py \
         --epochs 20 \
         --batches 32 \
         --output_directory ./output \
+        --root_directory ./ \
         --train_model True \
         --load_weights False \
         --load_checkpoint True \
         --fine_tune False \
+        --normalize True \
         --test_augmentation False \
         --test_image_rotation 300 \
         --test_image_width_shift 0.15 \
