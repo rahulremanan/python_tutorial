@@ -64,7 +64,7 @@ FC_SIZE = 4096
 DEFAULT_DROPOUT = 0.1
 DEFAULT_NB_LAYERS_TO_FREEZE = 169
 
-verbose = True
+verbose = False
 
 sgd = SGD(lr=1e-7, decay=0.5, momentum=1, nesterov=True)
 rms = RMSprop(lr=1e-7, rho=0.9, epsilon=1e-08, decay=0.0)
@@ -410,7 +410,7 @@ def generate_labels(args):
 
     return labels
 
-def normalize(args, labels):
+def normalize(args, labels, move = False):
     if args.normalize[0] and os.path.exists(args.root_dir[0]):      
         commands = ["rm -r {}/.tmp_train/".format(args.root_dir[0]),
                     "rm -r {}/.tmp_validation/".format(args.root_dir[0]),
@@ -441,7 +441,7 @@ def normalize(args, labels):
                         mk_val_folder.format(label)]
         
             execute_in_shell(command=commands,
-                         verbose=verbose)
+                             verbose=verbose)
             del commands
         
         commands = []
@@ -452,19 +452,18 @@ def normalize(args, labels):
             
             sys_rnd = random.SystemRandom()
             
+            if move:
+              cmd = 'mv'
+            else:
+              cmd = 'cp'
+            
             for file in sys_rnd.sample(train_images, train_size):
                 if os.path.exists(file):
-                    commands.append('cp {} ./.tmp_train/{}/'.format(file, label))
+                    commands.append('{} {} ./.tmp_train/{}/'.format(cmd, file, label))
             
             for file in sys_rnd.sample(val_images, val_size):
                 if os.path.exists(file):
-                    commands.append('cp {} ./.tmp_validation/{}/'.format(file, label))            
-            
-            if verbose:
-                commands.append(['\necho "Training folders: {}/.tmp_train/:"'.format(args.root_dir[0])])
-                commands.append(["ls {}/.tmp_train/".format(args.root_dir[0])])
-                commands.append(['\necho "Validation folders: {}/.tmp_validation/:"'.format(args.root_dir[0])])
-                commands.append(["ls {}/.tmp_validation/".format(args.root_dir[0])])
+                    commands.append('{} {} ./.tmp_validation/{}/'.format(cmd, file, label))
                 
             p = Process(target=execute_in_shell, args=([commands]))
             p.start()
@@ -732,7 +731,7 @@ def train(args):
           \n shear range = {} ,\
           \n zoom range = {}, \
           \n enable vertical flip = {}, \
-          \n enable horizontalflip = {}".format(train_rotation_range,
+          \n enable horizontal flip = {}".format(train_rotation_range,
                                                    train_width_shift_range,
                                                    train_height_shift_range,
                                                    train_shear_range,
@@ -799,7 +798,7 @@ def train(args):
   val_dir = args.val_dir[0]
   
   if args.normalize[0] and os.path.exists(args.root_dir[0]):
-      normalize(args, labels)
+      normalize(args, labels, move = False)
       train_dir = os.path.join(args.root_dir[0] + 
                                str ('/.tmp_train/'))
       val_dir = os.path.join(args.root_dir[0] + 
