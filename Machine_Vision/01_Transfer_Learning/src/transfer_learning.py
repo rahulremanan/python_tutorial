@@ -397,13 +397,13 @@ def generate_labels(args):
     val_labels = sorted(dv.keys())
     
     if set(labels) == set (val_labels):
-        print("Training labels: " + str(labels))
-        print("Validation labels: " + str(val_labels))
+        print("\nTraining labels: " + str(labels))
+        print("\nValidation labels: " + str(val_labels))
         with open(os.path.join(file_pointer+".json"), "w") as json_file:
             json.dump(labels, json_file)
     else:
-      print("Training labels: " + str(labels))
-      print("Validation labels: " + str(val_labels))
+      print("\nTraining labels: " + str(labels))
+      print("\nValidation labels: " + str(val_labels))
       print ("Mismatched training and validation data labels ...")
       print ("Sub-folder names do not match between training and validation directories ...")
       sys.exit(1)
@@ -515,22 +515,7 @@ def plot_training(args, name, history):
          + str(output_file_loss))
   plt.close()
         
-def train(args): 
-  """
-    A function that takes the user arguments and initiates a training session of the neural network.
-    
-    This function takes only one input: args
-    
-    Example usage:
-            
-        if train_model == True:
-            print ("Training sesssion initiated ...")
-            train(args)
-  """    
-  
-  if not os.path.exists(args.output_dir[0]):
-    os.makedirs(args.output_dir[0])
-    
+def select_optimizer(args):
   optimizer_val = args.optimizer_val[0]
   lr = args.learning_rate[0]
   decay = args.decay[0]
@@ -538,7 +523,6 @@ def train(args):
   rho = args.rho[0]
   beta_1 = args.beta_1[0]
   beta_2 = args.beta_2[0]
-  loss = args.loss[0]
   
   if optimizer_val.lower() == 'sgd' :
     optimizer = SGD(lr=lr,       \
@@ -658,34 +642,68 @@ def train(args):
                                          \n'nadam',    \
                                          \n'amsgrad',  \
                                          \n'adamax' ...")
-      
-  nb_train_samples = get_nb_files(args.train_dir[0])
-  nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
-  
-  print ("\nTotal number of training samples = " + str(nb_train_samples))
-  print ("Number of training classes = " + str(nb_classes))
-  
-  nb_val_samples = get_nb_files(args.val_dir[0])
-  nb_val_classes = len(glob.glob(args.val_dir[0] + "/*"))
-  
-  print ("\nTotal number of validation samples = " + str(nb_val_samples))
-  print ("Number of validation classes = " + str(nb_val_classes))
-  
-  if nb_val_classes == nb_classes:
-      print ("\nInitiating training session ...")
+  return optimizer
+
+def process_model(args, 
+                  model, 
+                  base_model, 
+                  optimizer, 
+                  loss, 
+                  checkpointer_savepath):
+  load_weights_ = args.load_weights[0]
+  fine_tune_model = args.fine_tune[0]
+  load_checkpoint = args.load_checkpoint[0]
+   
+  if load_weights_ == True:     
+      try:
+          with open(args.config_file[0]) as json_file:
+              model_json = json_file.read()
+          model = model_from_json(model_json)
+      except:
+          model = model
+      try:
+          model.load_weights(args.weights_file[0])
+          print ("\nLoaded model weights from: " + str(args.weights_file[0]))
+      except:
+          print ("\nError loading model weights ...")
+          print ("Tabula rasa ...")
+          print ("Loaded default model weights ...")
+  elif load_checkpoint == True and os.path.exists(checkpointer_savepath):     
+      try:
+          model = load_model(checkpointer_savepath)
+          print ("\nLoaded model from checkpoint: " + str(checkpointer_savepath))
+      except:
+          if os.path.exists(args.saved_chkpnt[0]):
+            model = load_model(args.saved_chkpnt[0])
+            print ('\nLoaded saved checkpoint file ...')
+          else:
+            print ("\nError loading model checkpoint ...")
+            print ("Tabula rasa ...")
+            print ("Loaded default model weights ...")
   else:
-      print ("\nMismatched number of training and validation data classes ...")
-      print ("Unequal number of sub-folders found between train and validation directories ...")
-      print ("Each sub-folder in train and validation directroies are treated as a separate class ...")
-      print ("Correct this mismatch and re-run ...")
-      print ("\nNow exiting ...")
-      sys.exit(1)
+      model = model
+      print ("\nTabula rasa ...")
+      print ("Loaded default model weights ...")
+ 
+  try:
+      NB_FROZEN_LAYERS = args.frozen_layers[0]
+  except:
+      NB_FROZEN_LAYERS = DEFAULT_NB_LAYERS_TO_FREEZE
       
-  nb_epoch = int(args.epoch[0])
-  batch_size = int(args.batch[0])    
+  if fine_tune_model == True:
+      print ("\nFine tuning Inception architecture ...")
+      print ("Frozen layers: " + str(NB_FROZEN_LAYERS))
+      model = finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS)
+  else:
+      print ("\nTransfer learning using Inception architecture ...")
+      model = transferlearn_model(model, base_model, optimizer, loss)
+      
+  return model
+
+def process_images(args):  
   train_aug = args.train_aug[0] 
-  
-  
+  test_aug = args.test_aug[0] 
+   
   if str((args.base_model[0]).lower()) == 'inceptionv4' or  \
      str((args.base_model[0]).lower()) == 'inception_v4' or \
      str((args.base_model[0]).lower()) == 'inception_resnet':
@@ -739,9 +757,6 @@ def train(args):
                                                    train_horizontal_flip))
   else:
       train_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
-    
-  
-  test_aug = args.test_aug[0]  
   
   if test_aug==True:
       try:
@@ -772,7 +787,7 @@ def train(args):
                                         vertical_flip=test_vertical_flip,
                                         horizontal_flip=test_horizontal_flip)
       print ("\nCreated image augmentation pipeline for training images ...")     
-      print ("Image augmentation parameters for training images:")
+      print ("\nImage augmentation parameters for training images:")
       print( "\n image rotation range = {},\
               \n width shift range = {},\
               \n height shift range = {}, \
@@ -788,8 +803,58 @@ def train(args):
                                                      test_horizontal_flip))
   else:
       test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
+
+  return [train_datagen, test_datagen]
+
+def train(args): 
+  """
+    A function that takes the user arguments and initiates a training session of the neural network.
+    
+    This function takes only one input: args
+    
+    Example usage:
+            
+        if train_model == True:
+            print ("Training sesssion initiated ...")
+            train(args)
+  """    
+  
+  if not os.path.exists(args.output_dir[0]):
+    os.makedirs(args.output_dir[0])
+    
+  optimizer  = select_optimizer(args)
+  loss = args.loss[0]
+  checkpointer_savepath = os.path.join(args.output_dir[0]     +       
+                                       '/checkpoint/Transfer_learn_' +       
+                                       str(IM_WIDTH)  + '_'  + 
+                                       str(IM_HEIGHT) + '_'  + '.h5')
+  
+  nb_train_samples = get_nb_files(args.train_dir[0])
+  nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
+  
+  print ("\nTotal number of training samples = " + str(nb_train_samples))
+  print ("Number of training classes = " + str(nb_classes))
+  
+  nb_val_samples = get_nb_files(args.val_dir[0])
+  nb_val_classes = len(glob.glob(args.val_dir[0] + "/*"))
+  
+  print ("\nTotal number of validation samples = " + str(nb_val_samples))
+  print ("Number of validation classes = " + str(nb_val_classes))
+  
+  if nb_val_classes == nb_classes:
+      print ("\nInitiating training session ...")
+  else:
+      print ("\nMismatched number of training and validation data classes ...")
+      print ("Unequal number of sub-folders found between train and validation directories ...")
+      print ("Each sub-folder in train and validation directroies are treated as a separate class ...")
+      print ("Correct this mismatch and re-run ...")
+      print ("\nNow exiting ...")
+      sys.exit(1)
       
-  print ("\nGenerating training data: ... ")
+  nb_epoch = int(args.epoch[0])
+  batch_size = int(args.batch[0])    
+  
+  [train_datagen, validation_datagen] = process_images(args)
   
   labels = generate_labels(args)
   
@@ -797,20 +862,20 @@ def train(args):
   val_dir = args.val_dir[0]
   
   if args.normalize[0] and os.path.exists(args.root_dir[0]):
-      normalize(args, labels, move = False)
+      normalize(args, labels, move = True)
       train_dir = os.path.join(args.root_dir[0] + 
                                str ('/.tmp_train/'))
       val_dir = os.path.join(args.root_dir[0] + 
                              str ('/.tmp_validation/'))
-
+      
+  print ("\nGenerating training data: ... ")
   train_generator = train_datagen.flow_from_directory(train_dir,
                                                       target_size=(IM_WIDTH, IM_HEIGHT),
                                                       batch_size=batch_size,
                                                       class_mode='categorical')
   
   print ("\nGenerating validation data: ... ")
-
-  validation_generator = test_datagen.flow_from_directory(val_dir,
+  validation_generator = validation_datagen.flow_from_directory(val_dir,
                                                           target_size=(IM_WIDTH, IM_HEIGHT),
                                                           batch_size=batch_size,
                                                           class_mode='categorical')
@@ -830,58 +895,12 @@ def train(args):
   model = add_top_layer(args, base_model, nb_classes)
   print ("New top layer added to: " + str(base_model_name))
   
-  load_weights_ = args.load_weights[0]
-  fine_tune_model = args.fine_tune[0]
-  load_checkpoint = args.load_checkpoint[0]
-  
-  checkpointer_savepath = os.path.join(args.output_dir[0]     +       
-                                       '/checkpoint/Transfer_learn_' +       
-                                       str(IM_WIDTH)  + '_'  + 
-                                       str(IM_HEIGHT) + '_'  + '.h5')
-   
-  if load_weights_ == True:     
-      try:
-          with open(args.config_file[0]) as json_file:
-              model_json = json_file.read()
-          model = model_from_json(model_json)
-      except:
-          model = model
-      try:
-          model.load_weights(args.weights_file[0])
-          print ("\nLoaded model weights from: " + str(args.weights_file[0]))
-      except:
-          print ("\nError loading model weights ...")
-          print ("Tabula rasa ...")
-          print ("Loaded default model weights ...")
-  elif load_checkpoint == True and os.path.exists(checkpointer_savepath):     
-      try:
-          model = load_model(checkpointer_savepath)
-          print ("\nLoaded model from checkpoint: " + str(checkpointer_savepath))
-      except:
-          if os.path.exists(args.saved_chkpnt[0]):
-            model = load_model(args.saved_chkpnt[0])
-            print ('\nLoaded saved checkpoint file ...')
-          else:
-            print ("\nError loading model checkpoint ...")
-            print ("Tabula rasa ...")
-            print ("Loaded default model weights ...")
-  else:
-      model = model
-      print ("\nTabula rasa ...")
-      print ("Loaded default model weights ...")
- 
-  try:
-      NB_FROZEN_LAYERS = args.frozen_layers[0]
-  except:
-      NB_FROZEN_LAYERS = DEFAULT_NB_LAYERS_TO_FREEZE
-      
-  if fine_tune_model == True:
-      print ("\nFine tuning Inception architecture ...")
-      print ("Frozen layers: " + str(NB_FROZEN_LAYERS))
-      finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS)
-  else:
-      print ("\nTransfer learning using Inception architecture ...")
-      transferlearn_model(model, base_model, optimizer, loss)
+  model = process_model(args, 
+                        model, 
+                        base_model, 
+                        optimizer, 
+                        loss, 
+                        checkpointer_savepath)
             
   print ("\nInitializing training with  class labels: " + 
          str(labels))
@@ -897,6 +916,8 @@ def train(args):
         
   if not os.path.exists(os.path.join(args.output_dir[0] + '/checkpoint/')):
     os.makedirs(os.path.join(args.output_dir[0] + '/checkpoint/'))
+    
+  lr = args.learning_rate[0]
     
   earlystopper = EarlyStopping(patience=6, verbose=1)
   checkpointer = ModelCheckpoint(checkpointer_savepath, 
@@ -919,7 +940,7 @@ def train(args):
                                                learning_rate_reduction, 
                                                checkpointer])
   
-  if fine_tune_model == True:
+  if args.fine_tune[0] == True:
       save_model(args, "_ft_", model)
       generate_plot(args, "_ft_", model_train)
   else:
