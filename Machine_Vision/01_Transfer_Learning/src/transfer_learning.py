@@ -43,6 +43,7 @@ from keras.layers import Dense,                             \
                          BatchNormalization
 from keras.layers.merge import concatenate
 from keras.preprocessing.image import ImageDataGenerator
+from keras.regularizers import l2
 from keras.optimizers import SGD,                           \
                              RMSprop,                       \
                              Adagrad,                       \
@@ -249,6 +250,7 @@ def add_top_layer(args, base_model, nb_classes):
   """
   try:
       dropout = float(args.dropout[0])
+      weight_decay = float(args.decay[0])
   except:
       dropout = DEFAULT_DROPOUT
       print ('Invalid input for dropout ...')
@@ -268,42 +270,72 @@ def add_top_layer(args, base_model, nb_classes):
   x = GlobalAveragePooling2D()(x)
   x = Dropout(dropout)(x)
   x = BatchNormalization()(x)
-  x = Dense(FC_SIZE, activation=activation)(x)
+  x = Dense(FC_SIZE, 
+            activation=activation,
+            kernel_regularizer=l2(weight_decay))(x)
   x = Dropout(dropout)(x)
   
-  x1 = Dense(FC_SIZE, activation=activation, name="fc_dense1")(x)
+  x1 = Dense(FC_SIZE, 
+             activation=activation,
+             kernel_regularizer=l2(weight_decay),
+             name="fc_dense1")(x)
   x1 = Dropout(dropout, name = 'dropout1')(x1)
   x1 = BatchNormalization(name="fc_batch_norm1")(x1)
-  x1 = Dense(FC_SIZE, activation=activation, name="fc_dense2")(x1)
+  x1 = Dense(FC_SIZE, 
+             activation=activation, 
+             kernel_regularizer=l2(weight_decay),
+             name="fc_dense2")(x1)
   x1 = Dropout(dropout, name = 'dropout2')(x1)
 
-  x2 = Dense(FC_SIZE, activation=activation, name="fc_dense3")(x)
+  x2 = Dense(FC_SIZE, 
+             activation=activation, 
+             kernel_regularizer=l2(weight_decay),
+             name="fc_dense3")(x)
   x2 = Dropout(dropout, name = 'dropout3')(x2)
   x2 = BatchNormalization(name="fc_batch_norm2")(x2)
-  x2 = Dense(FC_SIZE, activation=activation, name="fc_dense4")(x2)
+  x2 = Dense(FC_SIZE, 
+             activation=activation, 
+             kernel_regularizer=l2(weight_decay),
+             name="fc_dense4")(x2)
   x2 = Dropout(dropout, name = 'dropout4')(x2)
 
   x12 = concatenate([x1, x2], name = 'mixed11')
   x12 = Dropout(dropout, name = 'dropout5')(x12)
-  x12 = Dense(FC_SIZE//16, activation=activation, name = 'fc_dense5')(x12)
+  x12 = Dense(FC_SIZE//16, 
+              activation=activation, 
+              kernel_regularizer=l2(weight_decay),
+              name = 'fc_dense5')(x12)
   x12 = Dropout(dropout, name = 'dropout6')(x12)
   x12 = BatchNormalization(name="fc_batch_norm3")(x12)
-  x12 = Dense(FC_SIZE//32, activation=activation, name = 'fc_dense6')(x12)
+  x12 = Dense(FC_SIZE//32, 
+              activation=activation, 
+              kernel_regularizer=l2(weight_decay),
+              name = 'fc_dense6')(x12)
   x12 = Dropout(dropout, name = 'dropout7')(x12)
   
   x3 = GlobalAveragePooling2D( name = 'global_avg_pooling2')(bm)
-  x3 = Dense(FC_SIZE//2, activation=activation, name = 'fc_dense7')(x3)
+  x3 = Dense(FC_SIZE//2, 
+             activation=activation, 
+             kernel_regularizer=l2(weight_decay),
+             name = 'fc_dense7')(x3)
   x3 = Dropout(dropout, name = 'dropout8')(x3)
   x3 = BatchNormalization(name="fc_batch_norm4")(x3)
-  x3 = Dense(FC_SIZE//2, activation=activation, name = 'fc_dense8')(x3)
+  x3 = Dense(FC_SIZE//2, 
+             activation=activation, 
+             kernel_regularizer=l2(weight_decay),
+             name = 'fc_dense8')(x3)
   x3 = Dropout(dropout, name = 'dropout9')(x3)
   
   xout = concatenate([x12, x3], name ='mixed12')
-  xout = Dense(FC_SIZE//32, activation= activation, name = 'fc_dense9')(xout)
+  xout = Dense(FC_SIZE//32, 
+               activation= activation, 
+               kernel_regularizer=l2(weight_decay),
+               name = 'fc_dense9')(xout)
   xout = Dropout(dropout, name = 'dropout10')(xout)
   
   predictions = Dense(nb_classes,           \
                       activation='softmax', \
+                      kernel_regularizer=l2(weight_decay),
                       name='prediction')(xout) # Softmax output layer
   
   model = Model(inputs=base_model.input, 
