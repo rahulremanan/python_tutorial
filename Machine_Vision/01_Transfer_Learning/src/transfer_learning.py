@@ -894,7 +894,9 @@ def train(args):
   val_dir = args.val_dir[0]
   
   if args.normalize[0] and os.path.exists(args.root_dir[0]):
-      normalize(args, labels, move = False)
+      normalize(args, 
+                labels, 
+                move = False)
       train_dir = os.path.join(args.root_dir[0] + 
                                str ('/.tmp_train/'))
       val_dir = os.path.join(args.root_dir[0] + 
@@ -924,7 +926,9 @@ def train(args):
       base_model_name = 'Inception version 3'
   print ('\nBase model: ' + str(base_model_name))
   
-  model = add_top_layer(args, base_model, nb_classes)
+  model = add_top_layer(args, 
+                        base_model, 
+                        nb_classes)
   print ("New top layer added to: " + str(base_model_name))
   
   model = process_model(args, 
@@ -951,7 +955,8 @@ def train(args):
     
   lr = args.learning_rate[0]
     
-  earlystopper = EarlyStopping(patience=6, verbose=1)
+  earlystopper = EarlyStopping(patience=6, 
+                               verbose=1)
   checkpointer = ModelCheckpoint(checkpointer_savepath, 
                                  verbose=1,  
                                  save_best_only=True)
