@@ -894,7 +894,7 @@ def train(args):
   val_dir = args.val_dir[0]
   
   if args.normalize[0] and os.path.exists(args.root_dir[0]):
-      normalize(args, labels, move = True)
+      normalize(args, labels, move = False)
       train_dir = os.path.join(args.root_dir[0] + 
                                str ('/.tmp_train/'))
       val_dir = os.path.join(args.root_dir[0] + 
