@@ -15,6 +15,9 @@ python3 transfer_learning.py \
         --load_checkpoint True \
         --fine_tune False \
         --normalize True \
+        --sub_sample True \
+        --train_sub_sample 0.8 \
+        --val_sub_sample 0.8 \
         --test_augmentation False \
         --test_image_rotation 300 \
         --test_image_width_shift 0.15 \

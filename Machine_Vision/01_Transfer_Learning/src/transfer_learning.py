@@ -442,7 +442,10 @@ def generate_labels(args):
 
     return labels
 
-def normalize(args, labels, move = False):
+def normalize(args, 
+              labels, 
+              move = False, 
+              sub_sample = False):
     if args.normalize[0] and os.path.exists(args.root_dir[0]):      
         commands = ["rm -r {}/.tmp_train/".format(args.root_dir[0]),
                     "rm -r {}/.tmp_validation/".format(args.root_dir[0]),
@@ -464,6 +467,10 @@ def normalize(args, labels, move = False):
         
         train_size = min(train_class_sizes)
         val_size = min(val_class_sizes)
+        
+        if sub_sample and 0 <= args.train_sub_sample[0] <=1 and 0 <= args.val_sub_sample[0] <=1 :
+            train_size = int(train_size * args.train_sub_sample[0])
+            val_size = int(val_size * args.val_sub_sample[0])
         
         print ("Normalized training class size {}".format(train_size))
         print ("Normalized validation class size {}".format(val_size))
@@ -896,7 +903,8 @@ def train(args):
   if args.normalize[0] and os.path.exists(args.root_dir[0]):
       normalize(args, 
                 labels, 
-                move = False)
+                move = False,
+                sub_sample = args.sub_sample[0])
       train_dir = os.path.join(args.root_dir[0] + 
                                str ('/.tmp_train/'))
       val_dir = os.path.join(args.root_dir[0] + 
@@ -1129,6 +1137,30 @@ def get_user_options():
                    default=[False], 
                    nargs=1, 
                    type = string_to_bool)
+    
+    a.add_argument("--sub_sample", 
+                   help = "Specify if a training and validation data should be should be sub sampled ...", 
+                   dest = "normalize", 
+                   required=False, 
+                   default=[False], 
+                   nargs=1, 
+                   type = string_to_bool)
+    
+    a.add_argument("--train_sub_sample", 
+                   help = "Specify the sub sampling fraction for training data ...", 
+                   dest = "train_sub_sample", 
+                   required=False, 
+                   default=[0.8], 
+                   type = float,
+                   nargs=1)
+    
+    a.add_argument("--validation_sub_sample", 
+                   help = "Specify the sub sampling fraction for validation data ...", 
+                   dest = "val_sub_sample", 
+                   required=False, 
+                   default=[0.8], 
+                   type = float,
+                   nargs=1)
     
     a.add_argument("--plot", 
                    help = "Specify if a plot should be generated ...", 
