@@ -147,8 +147,13 @@ sudo pip3 install /tmp/tensorflow_pkg/tensorflow-*.whl
 -- Setup tensorflow for Julia --
 
 bazel build --config=opt //tensorflow:libtensorflow.so --config=cuda
+
+-- Copy libtensorflow.so to julia packages folder --
+cd ./bazel-bin/tensorflow
 sudo su
-cp ./libtensorflow.so ~/.julia/v0.?/TensorFlow/deps/usr/bin/
+mkdir /etc/tensorflow/
+cp ./libtensorflow.so /etc/tensorflow/
+cp ./libtensorflow_framework.so /etc/tensorflow/
 
 --Setup a virtual environment --
 sudo apt-get install virtualenv
