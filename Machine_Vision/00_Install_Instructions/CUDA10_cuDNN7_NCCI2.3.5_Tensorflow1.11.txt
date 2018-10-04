@@ -1,18 +1,23 @@
 -- Update and upgrade --
+
 sudo apt-get update
 sudo apt-get upgrade
 
 -- Verify CUDA capability --
+
 sudo apt-get install pciutils 
 lspci | grep -i nvidia
 
 -- Verify linux version support --
+
 uname -m && cat /etc/*release
 
 -- Install dependencies --
-sudo apt-get install -y build-essential dkms freeglut3 freeglut3-dev libxi-dev libxmu-dev cmake git unzip zip python3-dev pylint
+
+sudo apt-get install -y build-essential dkms freeglut3 freeglut3-dev libxi-dev libxmu-dev cmake git unzip zip pylint pkg-config g++ zlib1g-dev python python3-numpy python3-dev python3-pip python3-wheel
 
 -- Install linux kernel header --
+
 uname -r
 sudo apt-get install linux-headers-$(uname -r)
 
@@ -21,9 +26,9 @@ sudo apt-get install linux-headers-$(uname -r)
 wget -O cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64
 
 -- Install CUDA 10 --
+
 sudo dpkg -i cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb
 sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-
 
 sudo apt-get update
 sudo apt-get -y install cuda
@@ -37,6 +42,7 @@ sudo ldconfig
 nvidia-smi
 
 -- Install cuDNN 7.3.1 --
+
 Download cuDNN from: https://developer.nvidia.com/cudnn
 
 tar -xf ./cudnn-10.0-linux-x64-v7.3.1.20.tgz
@@ -44,15 +50,15 @@ sudo cp -R cuda/include/* /usr/local/cuda-10.0/include
 sudo cp -R cuda/lib64/* /usr/local/cuda-10.0/lib64
 
 -- Install NCCL 2.3.5 --
+
 Download os agnostic nccl from: https://developer.nvidia.com/nccl 
 
 tar -xf nccl_2.3.5-2+cuda10.0_x86_64.txz 
 mkdir /usr/local/cuda-10.0/lib/
 mkdir /usr/local/cuda-10.0/include/
-cd /nccl_2.3.5-2+cuda10.0_x86_64/lib
-sudo cp -R * /usr/local/cuda-10.0/lib/
-cd ../nccl_2.3.5-2+cuda10.0_x86_64/include
-sudo cp -R * /usr/local/cuda-10.0/include/
+cd /nccl_2.3.5-2+cuda10.0_x86_64/
+sudo cp -R ./lib/* /usr/local/cuda-10.0/lib/
+sudo cp -R ./lib/* /usr/local/cuda-10.0/include/
 sudo ldconfig
 
 mv ./LICENSE.txt ./NCCL-SLA.txt
@@ -60,16 +66,15 @@ mv ./LICENSE.txt ./NCCL-SLA.txt
 sudo cp ./NCCL-SLA.txt /usr/local/cuda-10.0
 
 -- Install lincupti --
+
 sudo apt-get install -y libcupti-dev
 echo 'export LD_LIBRARY_PATH=/usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 
 -- Install tensorflow dependencies--
-sudo apt-get -y install python3-numpy python3-dev python3-pip python3-wheel
+
 sudo pip3 install keras_applications --no-deps keras_preprocessing --no-deps h5py scipy matplotlib
 
 -- Install bazel --
-
-sudo apt-get install pkg-config zip g++ zlib1g-dev unzip python python3
 
 cd ~/
 wget https://github.com/bazelbuild/bazel/releases/download/0.17.2/bazel-0.17.2-installer-darwin-x86_64.sh
@@ -122,7 +127,7 @@ Do you wish to build TensorFlow with CUDA support? [y/N]: Y
 Please specify the CUDA SDK version you want to use. [Leave empty to default to CUDA 9.0]: 10.0
 Please specify the location where CUDA 10.0 toolkit is installed. Refer to README.md for more details. [Default is /usr/local/cuda]: /usr/local/cuda-10.0
 Please specify the cuDNN version you want to use. [Leave empty to default to cuDNN 7.0]: 7.3.1
-Please specify the location where cuDNN 7 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda-10.0]: /usr/local/cuda-9.2
+Please specify the location where cuDNN 7 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda-10.0]: /usr/local/cuda-10.0
 Do you wish to build TensorFlow with TensorRT support? [y/N]: N
 Please specify the NCCL version you want to use. [Leave empty to default to NCCL 1.3]: 2.3.5
 Please specify the location where NCCL 2 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda-10.0]: /usr/local/cuda-10.0/targets/x86_64-linux
