@@ -75,7 +75,7 @@ $ mkdir /usr/local/cuda-10.0/lib/
 $ mkdir /usr/local/cuda-10.0/include/
 $ cd /nccl_2.3.5-2+cuda10.0_x86_64/
 $ sudo cp -R ./lib/* /usr/local/cuda-10.0/lib/
-$ sudo cp -R ./lib/* /usr/local/cuda-10.0/include/
+$ sudo cp -R ./include/* /usr/local/cuda-10.0/include/
 $ sudo ldconfig
 
 $ mv ./LICENSE.txt ./NCCL-SLA.txt
