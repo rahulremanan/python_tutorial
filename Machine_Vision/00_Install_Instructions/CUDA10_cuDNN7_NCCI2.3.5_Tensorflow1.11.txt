@@ -101,7 +101,6 @@ sudo apt-get upgrade bazel
 rm $HOME/.cache/bazel -fr
 sudo rm /usr/local/bin/bazel /etc/bazelrc /usr/local/lib/bazel -fr
 
-
 -- Fetch and configure tensorflow --
 
 cd ~/
@@ -140,6 +139,7 @@ Please specify optimization flags to use during compilation when bazel option "-
 Would you like to interactively configure ./WORKSPACE for Android builds? [y/N]:N
 
 -- Build tensorflow using bazel --
+
 bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
 
 add "--config=mkl" (For Intel MKL support for newer intel cpu for faster training on cpu)
@@ -147,6 +147,7 @@ add "--config=monolithic" (For static monolithic build. Try this option if a bui
 add "--local_resources 2048,.5,1.0" (For devices with low ram causing Segmentation fault or other related errors.)
 
 -- Build python wheel installer --
+
 sudo bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 sudo pip3 install /tmp/tensorflow_pkg/tensorflow-*.whl
 
@@ -155,6 +156,7 @@ sudo pip3 install /tmp/tensorflow_pkg/tensorflow-*.whl
 bazel build --config=opt //tensorflow:libtensorflow.so --config=cuda
 
 -- Copy libtensorflow.so to julia packages folder --
+
 cd ./bazel-bin/tensorflow
 sudo su
 mkdir /etc/tensorflow/
@@ -162,12 +164,14 @@ cp ./libtensorflow.so /etc/tensorflow/
 cp ./libtensorflow_framework.so /etc/tensorflow/
 
 --Setup a virtual environment --
+
 sudo apt-get install virtualenv
 virtualenv tf_1.9.0_cuda9.2 -p /usr/bin/python3
 source tf_1.9.0_cuda9.2/bin/activate
 pip install ./tmp/tensorflow_pkg/tensorflow*.whl
 
 -- Verify tensorflow installation --
+
 python
 (Run this inside python interpreter)
 >>>import tensorflow as tf
