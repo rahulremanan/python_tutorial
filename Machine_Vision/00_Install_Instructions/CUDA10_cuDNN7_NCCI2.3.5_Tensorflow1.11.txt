@@ -235,8 +235,8 @@ $ cp ./libtensorflow_framework.so /etc/tensorflow/
 --Setup a virtual environment --
 
 $ sudo apt-get install virtualenv
-$ virtualenv tf_1.9.0_cuda9.2 -p /usr/bin/python3
-$ source tf_1.9.0_cuda9.2/bin/activate
+$ virtualenv tf_1.11.0_cuda10.0 -p /usr/bin/python3
+$ source tf_1.11.0_cuda10.0/bin/activate
 $ pip install ./tmp/tensorflow_pkg/tensorflow*.whl
 
 -- Verify tensorflow installation --
