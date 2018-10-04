@@ -1,0 +1,179 @@
+-- Update and upgrade --
+sudo apt-get update
+sudo apt-get upgrade
+
+-- Verify CUDA capability --
+sudo apt-get install pciutils 
+lspci | grep -i nvidia
+
+-- Verify linux version support --
+uname -m && cat /etc/*release
+
+-- Install dependencies --
+sudo apt-get install -y build-essential dkms freeglut3 freeglut3-dev libxi-dev libxmu-dev cmake git unzip zip python3-dev pylint
+
+-- Install linux kernel header --
+uname -r
+sudo apt-get install linux-headers-$(uname -r)
+
+-- Fetch CUDA 10 .deb file --
+
+wget -O cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64
+
+-- Install CUDA 10 --
+sudo dpkg -i cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb
+sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+
+
+sudo apt-get update
+sudo apt-get -y install cuda
+
+-- Verify installation --
+
+echo 'export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
+source ~/.bashrc
+sudo ldconfig
+nvidia-smi
+
+-- Install cuDNN 7.3.1 --
+Download cuDNN from: https://developer.nvidia.com/cudnn
+
+tar -xf ./cudnn-10.0-linux-x64-v7.3.1.20.tgz
+sudo cp -R cuda/include/* /usr/local/cuda-10.0/include
+sudo cp -R cuda/lib64/* /usr/local/cuda-10.0/lib64
+
+-- Install NCCL 2.3.5 --
+Download os agnostic nccl from: https://developer.nvidia.com/nccl 
+
+tar -xf nccl_2.3.5-2+cuda10.0_x86_64.txz 
+mkdir /usr/local/cuda-10.0/lib/
+mkdir /usr/local/cuda-10.0/include/
+cd /nccl_2.3.5-2+cuda10.0_x86_64/lib
+sudo cp -R * /usr/local/cuda-10.0/lib/
+cd ../nccl_2.3.5-2+cuda10.0_x86_64/include
+sudo cp -R * /usr/local/cuda-10.0/include/
+sudo ldconfig
+
+mv ./LICENSE.txt ./NCCL-SLA.txt
+
+sudo cp ./NCCL-SLA.txt /usr/local/cuda-10.0
+
+-- Install lincupti --
+sudo apt-get install -y libcupti-dev
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+
+-- Install tensorflow dependencies--
+sudo apt-get -y install python3-numpy python3-dev python3-pip python3-wheel
+sudo pip3 install keras_applications --no-deps keras_preprocessing --no-deps h5py scipy matplotlib
+
+-- Install bazel --
+
+sudo apt-get install pkg-config zip g++ zlib1g-dev unzip python python3
+
+cd ~/
+wget https://github.com/bazelbuild/bazel/releases/download/0.17.2/bazel-0.17.2-installer-darwin-x86_64.sh
+chmod +x bazel-0.17.2-installer-darwin-x86_64.sh
+sudo ./bazel-0.17.2-installer-darwin-x86_64.sh
+echo 'export PATH="$PATH:$HOME/bin"' >> ~/.bashrc
+
+source ~/.bashrc
+sudo ldconfig
+
+-- Install bazel from apt repository --
+
+sudo apt-get install openjdk-8-jdk
+
+echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
+
+sudo apt-get update && sudo apt-get install -y bazel
+
+sudo apt-get upgrade bazel
+
+-- Removing bazel --
+
+rm $HOME/.cache/bazel -fr
+sudo rm /usr/local/bin/bazel /etc/bazelrc /usr/local/lib/bazel -fr
+
+
+-- Fetch and configure tensorflow --
+
+cd ~/
+git clone https://github.com/tensorflow/tensorflow.git
+cd tensorflow
+git pull
+git checkout
+
+./configure
+
+-- Sample configuration --
+Please specify the location of python. [Default is /usr/bin/python]: /usr/bin/python3
+Do you wish to build TensorFlow with jemalloc as malloc support? [Y/n]: Y
+Do you wish to build TensorFlow with Google Cloud Platform support? [Y/n]: Y
+Do you wish to build TensorFlow with Hadoop File System support? [Y/n]: Y
+Do you wish to build TensorFlow with Amazon S3 File System support? [Y/n]: Y
+Do you wish to build TensorFlow with Apache Kafka Platform support? [Y/n]: Y
+Do you wish to build TensorFlow with XLA JIT support? [y/N]: N
+Do you wish to build TensorFlow with GDR support? [y/N]: N
+Do you wish to build TensorFlow with VERBS support? [y/N]: N
+Do you wish to build TensorFlow with OpenCL SYCL support? [y/N]: N
+Do you wish to build TensorFlow with CUDA support? [y/N]: Y
+Please specify the CUDA SDK version you want to use. [Leave empty to default to CUDA 9.0]: 10.0
+Please specify the location where CUDA 10.0 toolkit is installed. Refer to README.md for more details. [Default is /usr/local/cuda]: /usr/local/cuda-10.0
+Please specify the cuDNN version you want to use. [Leave empty to default to cuDNN 7.0]: 7.3.1
+Please specify the location where cuDNN 7 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda-10.0]: /usr/local/cuda-9.2
+Do you wish to build TensorFlow with TensorRT support? [y/N]: N
+Please specify the NCCL version you want to use. [Leave empty to default to NCCL 1.3]: 2.3.5
+Please specify the location where NCCL 2 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda-10.0]: /usr/local/cuda-10.0/targets/x86_64-linux
+Please note that each additional compute capability significantly increases your build 
+time and binary size. [Default is: 3.7]
+Do you want to use clang as CUDA compiler? [y/N]: N
+Please specify which gcc should be used by nvcc as the host compiler. [Default is /usr/bin/gcc]: /usr/bin/gcc
+Do you wish to build TensorFlow with MPI support? [y/N]: N
+Please specify optimization flags to use during compilation when bazel option "--config=opt" is specified [Default is -march=native]: -march=native
+Would you like to interactively configure ./WORKSPACE for Android builds? [y/N]:N
+
+-- Build tensorflow using bazel --
+bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+
+add "--config=mkl" (For Intel MKL support for newer intel cpu for faster training on cpu)
+add "--config=monolithic" (For static monolithic build. Try this option if a build fails.)
+add "--local_resources 2048,.5,1.0" (For devices with low ram causing Segmentation fault or other related errors.)
+
+-- Build python wheel installer --
+sudo bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+sudo pip3 install /tmp/tensorflow_pkg/tensorflow-*.whl
+
+-- Setup tensorflow for Julia --
+
+bazel build --config=opt //tensorflow:libtensorflow.so --config=cuda
+
+-- Copy libtensorflow.so to julia packages folder --
+cd ./bazel-bin/tensorflow
+sudo su
+mkdir /etc/tensorflow/
+cp ./libtensorflow.so /etc/tensorflow/
+cp ./libtensorflow_framework.so /etc/tensorflow/
+
+--Setup a virtual environment --
+sudo apt-get install virtualenv
+virtualenv tf_1.9.0_cuda9.2 -p /usr/bin/python3
+source tf_1.9.0_cuda9.2/bin/activate
+pip install ./tmp/tensorflow_pkg/tensorflow*.whl
+
+-- Verify tensorflow installation --
+python
+(Run this inside python interpreter)
+>>>import tensorflow as tf
+>>>hello = tf.constant('Hello, TensorFlow!')
+>>>sess = tf.Session()
+>>>print(tf.__version__)
+>>>print(sess.run(hello))
+
+-- Keras installation --
+
+git clone https://github.com/keras-team/keras.git
+cd keras
+sudo python3 setup.py install
+python3 -c "import keras"
