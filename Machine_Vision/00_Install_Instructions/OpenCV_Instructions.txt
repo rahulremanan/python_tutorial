@@ -12,7 +12,7 @@ $ echo "deb http://us.archive.ubuntu.com/ubuntu/ yakkety universe" | sudo tee -a
 $ echo "deb http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/ xenial main" | sudo tee -a /etc/apt/sources.list
 $ sudo apt-get update
 # Install developer tools for compiling OpenCV 3.0
-$ sudo apt-get install -y build-essential cmake git python3.5-dev libatlas-base-dev gfortran python3-pip libgtk2.0-dev pkg-config libjpeg8-dev libtiff5-dev libjasper-dev libpng-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libgphoto2-dev gstreamer1.0-dev libdc1394-22 ffmpeg libavresample-dev
+$ sudo apt-get install -y build-essential cmake git python3.6-dev libatlas-base-dev gfortran python3-pip libgtk2.0-dev pkg-config libjpeg8-dev libtiff5-dev libpng-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libgphoto2-dev libgstreamer1.0-dev libdc1394-22 ffmpeg libavresample-dev
 
 -- Install libjasper --
 
@@ -120,7 +120,7 @@ $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D PYTHON_INCLUDE_DIR=/usr/include/python3.6m/ \
 	-D INSTALL_C_EXAMPLES=ON \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
-	-D OPENCV_EXTRA_MODULES_PATH= /home/ubuntu/opencv_contrib/modules \
+	-D OPENCV_EXTRA_MODULES_PATH= ./opencv_contrib/modules \
 	-D BUILD_PROTOBUF=ON \
 	-D UPDATE_PROTO_FILES=ON \
 	-D BUILD_EXAMPLES=ON ..

@@ -25,10 +25,21 @@ $ sudo apt-get install linux-headers-$(uname -r)
 
 $ wget -O cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64
 
--- Install CUDA --
+-- Fetch installer --
 
 $ sudo dpkg -i cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb
+
+-- Add keys -- 
+
+## Recommended method ##
+
+$ sudo apt-key add /var/cuda-repo-10-0-local-10.0.130-410.48/7fa2af80.pub
+
+-- Or --
+
 $ sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+
+-- Install CUDA --
 
 $ sudo apt-get update
 $ sudo apt-get -y install cuda
@@ -38,7 +49,7 @@ $ sudo apt-get -y install cuda
 echo 'export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}' >> ~/.bashrc
 echo 'export LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
 source ~/.bashrc
-sudo ldconfig
+ldconfig
 nvidia-smi
 
 -- Install TesnorRT 5.0 --
@@ -50,7 +61,7 @@ $ sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.0-trt5.0.0.10-rc-20180906_1-1_
 $ sudo apt-key add /var/nv-tensorrt-repo-cuda10.0-trt5.0.0.10-rc-20180906/7fa2af80.pub
 
 $ sudo apt-get update
-$ sudo apt-get install tensorrt
+$ sudo apt-get install -y tensorrt
 
 $ sudo apt-get install -y python3-libnvinfer-dev uff-converter-tf
 
@@ -78,7 +89,7 @@ $ sudo cp -R ./lib/* /usr/local/cuda-10.0/lib/
 $ sudo cp -R ./include/* /usr/local/cuda-10.0/include/
 $ sudo ldconfig
 
-$ mv ./LICENSE.txt ./NCCL-SLA.txt
+$ mv ./LICENCE.txt ./NCCL-SLA.txt
 
 $ sudo cp ./NCCL-SLA.txt /usr/local/cuda-10.0
 
@@ -101,6 +112,10 @@ $ echo 'export PATH="$PATH:$HOME/bin"' >> ~/.bashrc
 
 $ source ~/.bashrc
 $ sudo ldconfig
+
+-- Test bazel --
+
+whereis bazel
 
 -- Install bazel from apt repository --
 
@@ -125,6 +140,10 @@ $ git clone https://github.com/tensorflow/tensorflow.git
 $ cd tensorflow
 $ git pull
 $ git checkout
+
+-- For a specific tensorflow version --
+
+$ git checkout r1.11
 
 $ ./configure
 
