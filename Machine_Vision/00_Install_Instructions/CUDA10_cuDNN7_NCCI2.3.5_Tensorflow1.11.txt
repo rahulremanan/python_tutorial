@@ -73,6 +73,8 @@ $ dpkg -l | grep TensorRT
 
 Download cuDNN from: https://developer.nvidia.com/cudnn
 
+wget -O cudnn-10.0-linux-x64-v7.3.1.20.tgz ..link..
+
 $ tar -xf ./cudnn-10.0-linux-x64-v7.3.1.20.tgz
 $ sudo cp -R cuda/include/* /usr/local/cuda-10.0/include
 $ sudo cp -R cuda/lib64/* /usr/local/cuda-10.0/lib64
@@ -81,10 +83,12 @@ $ sudo cp -R cuda/lib64/* /usr/local/cuda-10.0/lib64
 
 Download os agnostic nccl from: https://developer.nvidia.com/nccl 
 
+wget -O nccl_2.3.5-2+cuda10.0_x86_64.txz ..link..
+
 $ tar -xf nccl_2.3.5-2+cuda10.0_x86_64.txz 
 $ mkdir /usr/local/cuda-10.0/lib/
 $ mkdir /usr/local/cuda-10.0/include/
-$ cd /nccl_2.3.5-2+cuda10.0_x86_64/
+$ cd ./nccl_2.3.5-2+cuda10.0_x86_64/
 $ sudo cp -R ./lib/* /usr/local/cuda-10.0/lib/
 $ sudo cp -R ./include/* /usr/local/cuda-10.0/include/
 $ sudo ldconfig
@@ -272,5 +276,6 @@ $ python
 
 $ git clone https://github.com/keras-team/keras.git
 $ cd keras
+$ git checkout 2.1.6
 $ sudo python3 setup.py install
 $ python3 -c "import keras"
