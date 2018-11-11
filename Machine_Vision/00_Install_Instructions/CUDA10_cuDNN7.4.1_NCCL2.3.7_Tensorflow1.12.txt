@@ -61,7 +61,9 @@ nvidia-smi
 
 Download tensorrt installer from https://developer.nvidia.com/nvidia-tensorrt-5x-download
 
-$ sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.0-trt5.0.0.10-rc-20180906_1-1_amd64.deb
+wget -O nv-tensorrt-repo-ubuntu1804-cuda10.0-trt5.0.2.6-ga-20181009_1-1_amd64.deb --download link--
+
+$ sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.0-trt5.0.2.6-ga-20181009_1-1_amd64.deb
 $ sudo apt-key add /var/nv-tensorrt-repo-cuda10.0-trt5.0.2.6-ga-20181009/7fa2af80.pub
 
 $ sudo apt-get update
@@ -75,13 +77,33 @@ $ dpkg -l | grep TensorRT
 
 -- Install cuDNN 7.4.1 --
 
-Download cuDNN from: https://developer.nvidia.com/cudnn
+Download cuDNN Library for Linux from: https://developer.nvidia.com/cudnn
 
-wget -O cudnn-10.0-linux-x64-v7.4.1.5.tgz ..link..
+wget -O cudnn-10.0-linux-x64-v7.4.1.5.tgz https://developer.download.nvidia.com/compute/machine-learning/cudnn/secure/v7.4.1.5/prod/10.0_20181108/cudnn-10.0-linux-x64-v7.4.1.5.tgz?C3RUgaxYYVQ71lTxRe1jQgcZiX64oY40eSZI0euCg4WeoxI9hMuAEIdBVQgKE6YB6NcS6sD4nRlo2QThOtKKaQvdSqY2rcd3GoGEGw4V5lH0kAPBcedVALqw121Xd359aPh6k-DZcNYoNyA0owdANttUCqzH26EWMuYK6AVnF9igQyO_X5lN3TQbTGUr1H0lblp1fPWiyJGOjbKdqwMiD4dA
 
 $ tar -xf ./cudnn-10.0-linux-x64-v7.4.1.5.tgz
-$ sudo cp -R cuda/include/* /usr/local/cuda-10.0/include
-$ sudo cp -R cuda/lib64/* /usr/local/cuda-10.0/lib64
+$ sudo cp -R ./cuda/include/cudnn.h /usr/local/cuda-10.0/include
+$ sudo cp -R ./cuda/lib64/libcudnn.so.7.4.1 /usr/local/cuda-10.0/lib64
+$ sudo ln -s /usr/local/cuda-10.0/lib64/libcudnn.so.7.4.1 /usr/local/cuda-10.0/lib64/libcudnn.so.7
+$ sudo ln -s /usr/local/cuda-10.0/lib64/libcudnn.so.7 /usr/local/cuda-10.0/lib64/libcudnn.so
+$ sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
+
+-- To fix cuDNN symlink errors --
+
+Go to /usr/local/cuda/lib64/ and run ls -lha libcudnn*.
+
+You should see two symlinks (bold teal) and one single file. Something like this:
+
+/usr/local/cuda/lib64$ ls -lha libcudnn*
+lrwxrwxrwx 1 root root  13 Dez 25 23:56 libcudnn.so -> libcudnn.so.7
+lrwxrwxrwx 1 root root  17 Dez 25 23:55 libcudnn.so.7 -> libcudnn.so.7.4.1
+-rwxr-xr-x 1 root root 76M Dez 25 23:27 libcudnn.so.7.4.1
+
+usr/local/cuda/lib64$ sudo rm libcudnn.so
+/usr/local/cuda/lib64$ sudo rm libcudnn.so.7
+/usr/local/cuda/lib64$ sudo ln libcudnn.so.7.4.1 libcudnn.so.7
+/usr/local/cuda/lib64$ sudo ln libcudnn.so.7 libcudnn.so
+$ sudo ldconfig
 
 -- Install NCCL 2.3.7 --
 
@@ -90,12 +112,16 @@ Download os agnostic nccl from: https://developer.nvidia.com/nccl
 wget -O nccl_2.3.7-1+cuda10.0_x86_64.txz ..link..
 
 $ tar -xf nccl_2.3.7-1+cuda10.0_x86_64.txz 
-$ mkdir /usr/local/cuda-10.0/nccl/
-$ mkdir /usr/local/cuda-10.0/nccl/lib/
-$ mkdir /usr/local/cuda-10.0/nccl/include/
+$ sudo mkdir /usr/local/cuda-10.0/nccl/
+$ sudo mkdir /usr/local/cuda-10.0/nccl/lib/
+$ sudo mkdir /usr/local/cuda-10.0/nccl/include/
 $ cd ./nccl_2.3.7-1+cuda10.0_x86_64/
 $ sudo cp -R ./lib/* /usr/local/cuda-10.0/nccl/lib/
 $ sudo cp -R ./include/* /usr/local/cuda-10.0/nccl/include/
+
+
+-- Optional step for NCCL installation --
+
 $ sudo cp -R ./lib/* /usr/local/cuda-10.0/lib64/ # To fix libnccl.so.2: cannot open shared object file error
 $ mkdir /usr/local/nccl-2.3.5/
 $ mkdir /usr/local/nccl-2.3.5/lib
@@ -112,6 +138,8 @@ $ sudo cp ./NCCL-SLA.txt /usr/local/cuda-10.0/nccl/
 
 $ sudo apt-get install -y libcupti-dev
 $ echo 'export LD_LIBRARY_PATH=/usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+$ source ~/.bashrc
+$ sudo ldconfig
 
 -- Install tensorflow dependencies--
 
@@ -158,13 +186,12 @@ $ git checkout
 
 -- For a specific tensorflow version --
 
-$ git checkout r1.11
+$ git checkout r1.12
 
 $ ./configure
 
 -- Sample configuration --
 Please specify the location of python. [Default is /usr/bin/python]: /usr/bin/python3
-
 
 Found possible Python library paths:
   /usr/lib/python3.6/dist-packages
@@ -202,7 +229,7 @@ Please specify the location where cuDNN 7 library is installed. Refer to README.
 Do you wish to build TensorFlow with TensorRT support? [y/N]: y
 TensorRT support will be enabled for TensorFlow.
 
-Please specify the location where TensorRT is installed. [Default is /usr/lib/x86_64-linux-gnu]:
+Please specify the location where TensorRT is installed. [Default is /usr/lib/x86_64-linux-gnu]: /usr/local/cuda-10.0/TensorRT-5.0.2.6/lib/
 
 
 Please specify the NCCL version you want to use. If NCCL 2.2 is not installed, then you can use version 1.3 that can be fetched automatically but it may have worse performance with multiple GPUs. [Default is 2.2]: 2.3.7
