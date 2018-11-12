@@ -79,7 +79,7 @@ $ dpkg -l | grep TensorRT
 
 Download cuDNN Library for Linux from: https://developer.nvidia.com/cudnn
 
-wget -O cudnn-10.0-linux-x64-v7.4.1.5.tgz https://developer.download.nvidia.com/compute/machine-learning/cudnn/secure/v7.4.1.5/prod/10.0_20181108/cudnn-10.0-linux-x64-v7.4.1.5.tgz?C3RUgaxYYVQ71lTxRe1jQgcZiX64oY40eSZI0euCg4WeoxI9hMuAEIdBVQgKE6YB6NcS6sD4nRlo2QThOtKKaQvdSqY2rcd3GoGEGw4V5lH0kAPBcedVALqw121Xd359aPh6k-DZcNYoNyA0owdANttUCqzH26EWMuYK6AVnF9igQyO_X5lN3TQbTGUr1H0lblp1fPWiyJGOjbKdqwMiD4dA
+wget -O cudnn-10.0-linux-x64-v7.4.1.5.tgz --download link--
 
 $ tar -xf ./cudnn-10.0-linux-x64-v7.4.1.5.tgz
 $ sudo cp -R ./cuda/include/cudnn.h /usr/local/cuda-10.0/include
