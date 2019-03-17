@@ -442,8 +442,6 @@ def generate_labels(args):
 
     return labels
 
-
-
 def normalize(args, 
               labels, 
               move = False, 
@@ -470,9 +468,12 @@ def normalize(args,
         train_size = min(train_class_sizes)
         val_size = min(val_class_sizes)
         
-        if sub_sample and 0 <= args.train_sub_sample[0] <=1 and 0 <= args.val_sub_sample[0] <=1 :
-            train_size = int(train_size * args.train_sub_sample[0])
-            val_size = int(val_size * args.val_sub_sample[0])
+        try:
+          if sub_sample and 0 <= args.train_sub_sample[0] <=1 and 0 <= args.val_sub_sample[0] <=1 :
+              train_size = int(train_size * args.train_sub_sample[0])
+              val_size = int(val_size * args.val_sub_sample[0])
+        except:
+          print ('Sub sample mode disabled ...')
         
         print ("Normalized training class size {}".format(train_size))
         print ("Normalized validation class size {}".format(val_size))
@@ -500,11 +501,11 @@ def normalize(args,
             
             for file in sys_rnd.sample(train_images, train_size):
                 if os.path.exists(file):
-                    commands.append('{} {} ./.tmp_train/{}/'.format(cmd, file, label))
+                    commands.append('{} {} {}/.tmp_train/{}/'.format(cmd, file, args.root_dir[0], label))
             
             for file in sys_rnd.sample(val_images, val_size):
                 if os.path.exists(file):
-                    commands.append('{} {} ./.tmp_validation/{}/'.format(cmd, file, label))
+                    commands.append('{} {} {}/.tmp_validation/{}/'.format(cmd, file, args.root_dir[0], label))
                 
             p = Process(target=execute_in_shell, args=([commands]))
             p.start()
