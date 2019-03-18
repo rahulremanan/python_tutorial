@@ -975,7 +975,7 @@ def train(args):
                                                           batch_size=batch_size,
                                                           class_mode='categorical')
   
-  
+  enable_dropout = args.enable_dropout[0]
   [model, base_model] = gen_model(args, enable_dropout)
     
   model = process_model(args, 
