@@ -239,7 +239,7 @@ def get_nb_files(directory):
       cnt += len(glob.glob(os.path.join(r, dr + "/*")))
   return cnt
 
-def add_top_layer(args, base_model, nb_classes):
+def add_top_layer(args, enable_dropout, base_model, nb_classes):
   """
     This functions adds a fully connected convolutional neural network layer to a base model.
     
@@ -266,72 +266,102 @@ def add_top_layer(args, base_model, nb_classes):
       
   bm = base_model.output
   
-  x = Dropout(dropout)(bm)
-  x = GlobalAveragePooling2D()(x)
-  x = Dropout(dropout)(x)
-  x = BatchNormalization()(x)
+  x = Dropout(dropout,
+              name='dropout_fc1')(bm,
+                       training=enable_dropout)
+  x = GlobalAveragePooling2D(name='gloablAveragePooling2D_fc1')(x)
+  x = Dropout(dropout,
+              name='dropout_fc2')(x,
+                       training=enable_dropout)
+  x = BatchNormalization(name='batchNormalization_fc1')(x)
   x = Dense(FC_SIZE, 
             activation=activation,
-            kernel_regularizer=l2(weight_decay))(x)
-  x = Dropout(dropout)(x)
+            kernel_regularizer=l2(weight_decay),
+            name='dense_fc1')(x)
+  x = Dropout(dropout,
+              name='dropout_fc3')(x,
+                       training=enable_dropout)
   
   x1 = Dense(FC_SIZE, 
              activation=activation,
              kernel_regularizer=l2(weight_decay),
-             name="fc_dense1")(x)
-  x1 = Dropout(dropout, name = 'dropout1')(x1)
-  x1 = BatchNormalization(name="fc_batch_norm1")(x1)
+             name="dense_fc2")(x)
+  x1 = Dropout(dropout,
+               name = 'dropout_fc4')(x1, 
+                                  training=enable_dropout)
+  x1 = BatchNormalization(name="batchNormalization_fc2")(x1)
   x1 = Dense(FC_SIZE, 
              activation=activation, 
              kernel_regularizer=l2(weight_decay),
-             name="fc_dense2")(x1)
-  x1 = Dropout(dropout, name = 'dropout2')(x1)
+             name="dense_fc3")(x1)
+  x1 = Dropout(dropout,
+               name = 'dropout_fc5')(x1, 
+                                  training=enable_dropout)
 
   x2 = Dense(FC_SIZE, 
              activation=activation, 
              kernel_regularizer=l2(weight_decay),
-             name="fc_dense3")(x)
-  x2 = Dropout(dropout, name = 'dropout3')(x2)
-  x2 = BatchNormalization(name="fc_batch_norm2")(x2)
+             name="dense_fc4")(x)
+  x2 = Dropout(dropout,
+               name = 'dropout_fc6')(x2, 
+                                  training=enable_dropout)
+  x2 = BatchNormalization(name="batchNormalization_fc3")(x2)
   x2 = Dense(FC_SIZE, 
              activation=activation, 
              kernel_regularizer=l2(weight_decay),
-             name="fc_dense4")(x2)
-  x2 = Dropout(dropout, name = 'dropout4')(x2)
+             name="dense_fc5")(x2)
+  x2 = Dropout(dropout,
+               name = 'dropout_fc7')(x2, 
+                                  training=enable_dropout)
 
   x12 = concatenate([x1, x2], name = 'mixed11')
-  x12 = Dropout(dropout, name = 'dropout5')(x12)
+  x12 = Dropout(dropout,
+                name = 'dropout_fc8')(x12, 
+                                   training=enable_dropout)
   x12 = Dense(FC_SIZE//16, 
               activation=activation, 
               kernel_regularizer=l2(weight_decay),
-              name = 'fc_dense5')(x12)
-  x12 = Dropout(dropout, name = 'dropout6')(x12)
-  x12 = BatchNormalization(name="fc_batch_norm3")(x12)
+              name = 'dense_fc6')(x12)
+  x12 = Dropout(dropout,
+                name = 'dropout_fc9')(x12, 
+                                   training=enable_dropout)
+  x12 = BatchNormalization(name="batchNormalization_fc4")(x12)
   x12 = Dense(FC_SIZE//32, 
               activation=activation, 
               kernel_regularizer=l2(weight_decay),
-              name = 'fc_dense6')(x12)
-  x12 = Dropout(dropout, name = 'dropout7')(x12)
+              name = 'dense_fc7')(x12)
+  x12 = Dropout(dropout,
+                name = 'dropout_fc10')(x12, 
+                                   training=enable_dropout)
   
-  x3 = GlobalAveragePooling2D( name = 'global_avg_pooling2')(bm)
+  x3 = Dropout(dropout,
+              name='dropout_fc11')(bm,
+                       training=enable_dropout)
+  x3 = GlobalAveragePooling2D( name = 'globalAveragePooling2D_fc2')(x3)
   x3 = Dense(FC_SIZE//2, 
              activation=activation, 
              kernel_regularizer=l2(weight_decay),
-             name = 'fc_dense7')(x3)
-  x3 = Dropout(dropout, name = 'dropout8')(x3)
-  x3 = BatchNormalization(name="fc_batch_norm4")(x3)
+             name = 'dense_fc8')(x3)
+  x3 = Dropout(dropout,
+               name = 'dropout_fc12')(x3, 
+                                  training=enable_dropout)
+  x3 = BatchNormalization(name="batchNormalization_fc5")(x3)
   x3 = Dense(FC_SIZE//2, 
              activation=activation, 
              kernel_regularizer=l2(weight_decay),
-             name = 'fc_dense8')(x3)
-  x3 = Dropout(dropout, name = 'dropout9')(x3)
+             name = 'dense_fc9')(x3)
+  x3 = Dropout(dropout,
+               name = 'dropout_fc13')(x3, 
+                                  training=enable_dropout)
   
   xout = concatenate([x12, x3], name ='mixed12')
   xout = Dense(FC_SIZE//32, 
                activation= activation, 
                kernel_regularizer=l2(weight_decay),
-               name = 'fc_dense9')(xout)
-  xout = Dropout(dropout, name = 'dropout10')(xout)
+               name = 'dense_fc10')(xout)
+  xout = Dropout(dropout,
+                 name = 'dropout_fc14')(xout, 
+                                     training=enable_dropout)
   
   predictions = Dense(nb_classes,           \
                       activation='softmax', \
@@ -513,8 +543,8 @@ def normalize(args,
         print ("\nData normalization pipeline completed successfully ...")
     else:
         print ("\nFailed to initiate data normalization pipeline ...")
-        return False    
-    return True
+        return False, None, None
+    return True, train_size, val_size
 
 def generate_plot(args, name, model_train):
     gen_plot = args.plot[0]
@@ -848,6 +878,26 @@ def process_images(args):
 
   return [train_datagen, test_datagen]
 
+def gen_model(args, enable_dropout):
+  if str((args.base_model[0]).lower()) == 'inceptionv4' or  \
+     str((args.base_model[0]).lower()) == 'inception_v4' or \
+     str((args.base_model[0]).lower()) == 'inception_resnet':
+      base_model = InceptionResNetV2(weights='imagenet', \
+                                     include_top=False)
+      base_model_name = 'Inception version 4'
+  else:
+      base_model = InceptionV3(weights='imagenet', 
+                               include_top=False)
+      base_model_name = 'Inception version 3'
+  print ('\nBase model: ' + str(base_model_name))
+  nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
+  model = add_top_layer(args, 
+                        enable_dropout,
+                        base_model, 
+                        nb_classes)
+  print ("New top layer added to: " + str(base_model_name))
+  return [model, base_model]
+
 def train(args): 
   """
     A function that takes the user arguments and initiates a training session of the neural network.
@@ -904,10 +954,10 @@ def train(args):
   val_dir = args.val_dir[0]
   
   if args.normalize[0] and os.path.exists(args.root_dir[0]):
-      normalize(args, 
-                labels, 
-                move = False,
-                sub_sample = args.sub_sample[0])
+      _, train_size, val_size = normalize(args, 
+                                          labels, 
+                                          move = False,
+                                          sub_sample = args.sub_sample[0])
       train_dir = os.path.join(args.root_dir[0] + 
                                str ('/.tmp_train/'))
       val_dir = os.path.join(args.root_dir[0] + 
@@ -925,23 +975,9 @@ def train(args):
                                                           batch_size=batch_size,
                                                           class_mode='categorical')
   
-  if str((args.base_model[0]).lower()) == 'inceptionv4' or  \
-     str((args.base_model[0]).lower()) == 'inception_v4' or \
-     str((args.base_model[0]).lower()) == 'inception_resnet':
-      base_model = InceptionResNetV2(weights='imagenet', \
-                                     include_top=False)
-      base_model_name = 'Inception version 4'
-  else:
-      base_model = InceptionV3(weights='imagenet', 
-                               include_top=False)
-      base_model_name = 'Inception version 3'
-  print ('\nBase model: ' + str(base_model_name))
   
-  model = add_top_layer(args, 
-                        base_model, 
-                        nb_classes)
-  print ("New top layer added to: " + str(base_model_name))
-  
+  [model, base_model] = gen_model(args, enable_dropout)
+    
   model = process_model(args, 
                         model, 
                         base_model, 
@@ -980,9 +1016,18 @@ def train(args):
                                               factor=0.5, 
                                               min_lr=lr*1e-2)
   
+  steps_pre_epoch = nb_train_samples//batch_size
+  validation_steps = nb_val_samples//batch_size
+  
+  if args.normalize[0]:
+      steps_pre_epoch = (train_size*len(labels))//batch_size
+      validation_steps = (train_size*len(labels))//batch_size
+      
   model_train = model.fit_generator(train_generator,
                                     epochs=nb_epoch,
+                                    steps_per_epoch=steps_pre_epoch,
                                     validation_data=validation_generator,
+                                    validation_steps=validation_steps,
                                     class_weight='auto', 
                                     callbacks=[earlystopper, 
                                                learning_rate_reduction, 
@@ -1083,6 +1128,14 @@ def get_user_options():
                    default=[True], 
                    nargs=1, 
                    type = string_to_bool)
+    
+    a.add_argument("--enable_dropout", 
+                   help = "Specify if the dropout layer should be enabled during inference ...", 
+                   dest = "enable_dropout", 
+                   required=False, 
+                   default=[True], 
+                   nargs=1, 
+                   type = string_to_bool)    
     
     a.add_argument("--load_truncated", 
                    help = "Specify if truncated image loading should be supported ...", 
