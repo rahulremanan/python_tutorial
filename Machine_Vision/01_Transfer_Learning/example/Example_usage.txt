@@ -11,6 +11,7 @@ python3 transfer_learning.py \
         --output_directory ./output \
         --root_directory ./ \
         --train_model True \
+        --enable_dropout True \
         --load_weights False \
         --load_checkpoint True \
         --fine_tune False \
@@ -61,6 +62,7 @@ CUDA_VISIBLE_DEVICES=0 python3 transfer_learning.py \
                                --batches 16 \
                                --output_directory ./output \
                                --train_model True \
+                               --enable_dropout True \
                                --load_weights False \
                                --load_checkpoint True \
                                --fine_tune False \
