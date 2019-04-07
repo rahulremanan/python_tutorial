@@ -27,17 +27,16 @@ $ sudo apt autoremove
 
 -- Fetch CUDA 10 installer file --
 
-$ wget -O cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64
-
+$ wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-ubuntu1810-10-1-local-10.1.105-418.39_1.0-1_amd64.deb -O cuda-repo-ubuntu1810-10-1-local-10.1.105-418.39_1.0-1_amd64.deb 
 -- Fetch installer --
 
-$ sudo dpkg -i cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb
+$ sudo dpkg -i cuda-repo-ubuntu1810-10-1-local-10.1.105-418.39_1.0-1_amd64.deb
 
 -- Add keys -- 
 
 ## Recommended method ##
 
-$ sudo apt-key add /var/cuda-repo-10-0-local-10.0.130-410.48/7fa2af80.pub
+$ sudo apt-key add /var/cuda-repo-10-1-local-10.1.105-418.39/7fa2af80.pub
 
 -- Or --
 
@@ -50,42 +49,46 @@ $ sudo apt-get -y install cuda
 
 -- Verify CUDA installation --
 
-echo 'export PATH=/usr/local/cuda-10.0/bin${PATH:+:${PATH}}' >> ~/.bashrc
-echo 'export LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
+echo 'export PATH=/usr/local/cuda-10.1/bin${PATH:+:${PATH}}' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
 source ~/.bashrc
 ldconfig
 nvidia-smi
 
--- Install TesnorRT 5.0 --
+-- Install TesnorRT 5.1 --
 (https://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html)
 
 Download tensorrt installer from https://developer.nvidia.com/nvidia-tensorrt-5x-download
 
-wget -O nv-tensorrt-repo-ubuntu1804-cuda10.0-trt5.0.2.6-ga-20181009_1-1_amd64.deb --download link--
+wget -O nv-tensorrt-repo-ubuntu1804-cuda10.1-trt5.1.2.2-rc-20190227_1-1_amd64.deb --download link--
 
-$ sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.0-trt5.0.2.6-ga-20181009_1-1_amd64.deb
-$ sudo apt-key add /var/nv-tensorrt-repo-cuda10.0-trt5.0.2.6-ga-20181009/7fa2af80.pub
+$ sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.1-trt5.1.2.2-rc-20190227_1-1_amd64.deb
+$ sudo apt-key add /var/nv-tensorrt-repo-cuda10.1-trt5.1.2.2-rc-20190227/7fa2af80.pub
 
 $ sudo apt-get update
 $ sudo apt-get install -y tensorrt
 
+libnvinfer.so
+
 $ sudo apt-get install -y python3-libnvinfer-dev uff-converter-tf
+
+find ~/ -type f -name "libnvinfer"
 
 -- Verify TensorRT installation --
 
 $ dpkg -l | grep TensorRT
 
--- Install cuDNN 7.4.1 --
+-- Install cuDNN 7.5.0 --
 
 Download cuDNN Library for Linux from: https://developer.nvidia.com/cudnn
 
-wget -O cudnn-10.0-linux-x64-v7.4.1.5.tgz --download link--
+wget <DOWNLOAD LINK> -O cudnn-10.1-linux-x64-v7.5.0.56.tgz
 
-$ tar -xf ./cudnn-10.0-linux-x64-v7.4.1.5.tgz
-$ sudo cp -R ./cuda/include/cudnn.h /usr/local/cuda-10.0/include
-$ sudo cp -R ./cuda/lib64/libcudnn.so.7.4.1 /usr/local/cuda-10.0/lib64
-$ sudo ln -s /usr/local/cuda-10.0/lib64/libcudnn.so.7.4.1 /usr/local/cuda-10.0/lib64/libcudnn.so.7
-$ sudo ln -s /usr/local/cuda-10.0/lib64/libcudnn.so.7 /usr/local/cuda-10.0/lib64/libcudnn.so
+$ tar -xf ./cudnn-10.1-linux-x64-v7.5.0.56.tgz
+$ sudo cp -R ./cuda/include/cudnn.h /usr/local/cuda-10.1/include
+$ sudo cp -R ./cuda/lib64/libcudnn.so.7.5.0 /usr/local/cuda-10.1/lib64
+$ sudo ln -s /usr/local/cuda-10.1/lib64/libcudnn.so.7.4.1 /usr/local/cuda-10.1/lib64/libcudnn.so.7
+$ sudo ln -s /usr/local/cuda-10.1/lib64/libcudnn.so.7 /usr/local/cuda-10.1/lib64/libcudnn.so
 $ sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
 
 -- To fix cuDNN symlink errors --
@@ -105,34 +108,34 @@ usr/local/cuda/lib64$ sudo rm libcudnn.so
 /usr/local/cuda/lib64$ sudo ln libcudnn.so.7 libcudnn.so
 $ sudo ldconfig
 
--- Install NCCL 2.3.7 --
+-- Install NCCL 2.4.2 --
 
 Download os agnostic nccl from: https://developer.nvidia.com/nccl 
 
-wget -O nccl_2.3.7-1+cuda10.0_x86_64.txz ..link..
+wget <DOWNLOAD LINK> -O nccl_2.4.2-1+cuda10.1_x86_64.txz
 
-$ tar -xf nccl_2.3.7-1+cuda10.0_x86_64.txz 
-$ sudo mkdir /usr/local/cuda-10.0/nccl/
-$ sudo mkdir /usr/local/cuda-10.0/nccl/lib/
-$ sudo mkdir /usr/local/cuda-10.0/nccl/include/
-$ cd ./nccl_2.3.7-1+cuda10.0_x86_64/
-$ sudo cp -R ./lib/* /usr/local/cuda-10.0/nccl/lib/
-$ sudo cp -R ./include/* /usr/local/cuda-10.0/nccl/include/
+$ tar -xf nccl_2.4.2-1+cuda10.1_x86_64.txz 
+$ sudo mkdir /usr/local/cuda-10.1/nccl/
+$ sudo mkdir /usr/local/cuda-10.1/nccl/lib/
+$ sudo mkdir /usr/local/cuda-10.1/nccl/include/
+$ cd ./nccl_2.4.2-1+cuda10.1_x86_64/
+$ sudo cp -R ./lib/* /usr/local/cuda-10.1/nccl/lib/
+$ sudo cp -R ./include/* /usr/local/cuda-10.1/nccl/include/
 
 
 -- Optional step for NCCL installation --
 
-$ sudo cp -R ./lib/* /usr/local/cuda-10.0/lib64/ # To fix libnccl.so.2: cannot open shared object file error
-$ mkdir /usr/local/nccl-2.3.5/
-$ mkdir /usr/local/nccl-2.3.5/lib
-$ mkdir /usr/local/nccl-2.3.5/include
-$ sudo cp -R ./lib/* /usr/local/nccl-2.3.5/lib/
-$ sudo cp -R ./include/* /usr/local/nccl-2.3.5/include
+$ sudo cp -R ./lib/* /usr/local/cuda-10.1/lib64/ # To fix libnccl.so.2: cannot open shared object file error
+$ mkdir /usr/local/nccl-2.4.2/
+$ mkdir /usr/local/nccl-2.4.2/lib
+$ mkdir /usr/local/nccl-2.4.2/include
+$ sudo cp -R ./lib/* /usr/local/nccl-2.4.2/lib/
+$ sudo cp -R ./include/* /usr/local/nccl-2.4.2/include
 $ sudo ldconfig
 
 $ mv ./LICENSE.txt ./NCCL-SLA.txt
 
-$ sudo cp ./NCCL-SLA.txt /usr/local/cuda-10.0/nccl/
+$ sudo cp ./NCCL-SLA.txt /usr/local/cuda-10.1/nccl/
 
 -- Install lincupti --
 
@@ -148,9 +151,9 @@ $ sudo pip3 install keras_applications --no-deps keras_preprocessing --no-deps h
 -- Install bazel --
 
 $ cd ~/
-$ wget https://github.com/bazelbuild/bazel/releases/download/0.17.2/bazel-0.17.2-installer-darwin-x86_64.sh
-$ chmod +x bazel-0.17.2-installer-darwin-x86_64.sh
-$ sudo ./bazel-0.17.2-installer-darwin-x86_64.sh
+$ wget https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-darwin-x86_64.sh
+$ chmod +x bazel-0.24.1-installer-darwin-x86_64.sh
+$ sudo ./bazel-0.24.1-installer-darwin-x86_64.sh
 $ echo 'export PATH="$PATH:$HOME/bin"' >> ~/.bashrc
 
 $ source ~/.bashrc
@@ -174,7 +177,7 @@ $ sudo apt-get upgrade -y bazel
 -- Removing bazel --
 
 $ rm $HOME/.cache/bazel -fr
-$ sudo rm /usr/local/bin/bazel /etc/bazelrc /usr/local/lib/bazel -fr
+$ sudo rm /usr/local/bin/bazel /etc/bazelrc /home/rahul/bin/bazel /etc/bazel.bazelrc /usr/local/lib/bazel -fr
 
 -- Fetch and configure tensorflow --
 
@@ -191,16 +194,15 @@ $ git checkout r1.12
 $ ./configure
 
 -- Sample configuration --
+
 Please specify the location of python. [Default is /usr/bin/python]: /usr/bin/python3
+
 
 Found possible Python library paths:
   /usr/lib/python3.6/dist-packages
   /usr/lib/python3/dist-packages
   /usr/local/lib/python3.6/dist-packages
 Please input the desired Python library path to use.  Default is [/usr/lib/python3.6/dist-packages]
-
-Do you wish to build TensorFlow with Apache Ignite support? [Y/n]: 
-Apache Ignite support will be enabled for TensorFlow.
 
 Do you wish to build TensorFlow with XLA JIT support? [Y/n]: 
 XLA JIT support will be enabled for TensorFlow.
@@ -211,37 +213,48 @@ No OpenCL SYCL support will be enabled for TensorFlow.
 Do you wish to build TensorFlow with ROCm support? [y/N]: 
 No ROCm support will be enabled for TensorFlow.
 
-Do you wish to build TensorFlow with CUDA support? [y/N]: y
+Do you wish to build TensorFlow with CUDA support? [y/N]: Y
 CUDA support will be enabled for TensorFlow.
 
-Please specify the CUDA SDK version you want to use. [Leave empty to default to CUDA 9.0]: 10.0
+Please specify the CUDA SDK version you want to use. [Leave empty to default to CUDA 10.0]: 10.1
 
 
-Please specify the location where CUDA 10.0 toolkit is installed. Refer to README.md for more details. [Default is /usr/local/cuda]: /usr/local/cuda-10.0
+Please specify the location where CUDA 10.1 toolkit is installed. Refer to README.md for more details. [Default is /usr/local/cuda]: 
 
 
-Please specify the cuDNN version you want to use. [Leave empty to default to cuDNN 7]: 7.4.1
+Please specify the cuDNN version you want to use. [Leave empty to default to cuDNN 7]: 7.5.0
+Please specify the location where cuDNN 7 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda]: 
 
 
-Please specify the location where cuDNN 7 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda-10.0]: 
-
-
-Do you wish to build TensorFlow with TensorRT support? [y/N]: y
+Do you wish to build TensorFlow with TensorRT support? [y/N]: Y
 TensorRT support will be enabled for TensorFlow.
 
-Please specify the location where TensorRT is installed. [Default is /usr/lib/x86_64-linux-gnu]: /usr/local/cuda-10.0/TensorRT-5.0.2.6/lib/
+Please specify the location where TensorRT is installed. [Default is /usr/lib/x86_64-linux-gnu]:
 
 
-Please specify the NCCL version you want to use. If NCCL 2.2 is not installed, then you can use version 1.3 that can be fetched automatically but it may have worse performance with multiple GPUs. [Default is 2.2]: 2.3.7
+Please specify the locally installed NCCL version you want to use. [Default is to use https://github.com/nvidia/nccl]: 2.4.2
 
-Please specify the location where NCCL 2 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda-10.0]:
-/usr/local/cuda-10.0/nccl/
 
-NCCL libraries found in /usr/local/cuda-10.0/targets/x86_64-linux/lib/libnccl.so
-Assuming NCCL header path is /usr/local/cuda-10.0/targets/x86_64-linux/lib/../include
-Please specify a list of comma-separated Cuda compute capabilities you want to build with.
+Please specify the location where NCCL 2 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda]:
+
+
+Assuming NCCL header path is /usr/local/cuda-10.1/../include/nccl.h
+Invalid path to NCCL 2 toolkit, /usr/local/cuda-10.1/ or /usr/local/cuda-10.1/../include/nccl.h not found. Please use the O/S agnostic package of NCCL 2
+Please specify the locally installed NCCL version you want to use. [Default is to use https://github.com/nvidia/nccl]: /usr/local/cuda-10.1/nccl/
+
+
+Please specify the location where NCCL /usr/local/cuda-10 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda]:/usr/local/cuda-10.1/nccl/
+
+
+Assuming NCCL header path is /usr/local/cuda-10.1/nccl/../include/nccl.h
+Invalid path to NCCL /usr/local/cuda-10 toolkit, /usr/local/cuda-10.1/nccl/ or /usr/local/cuda-10.1/nccl/../include/nccl.h not found. Please use the O/S agnostic package of NCCL 2
+Please specify the locally installed NCCL version you want to use. [Default is to use https://github.com/nvidia/nccl]: 
+
+
+Please specify a list of comma-separated CUDA compute capabilities you want to build with.
 You can find the compute capability of your device at: https://developer.nvidia.com/cuda-gpus.
-Please note that each additional compute capability significantly increases your build time and binary size. [Default is: 6.0]: 6.0
+Please note that each additional compute capability significantly increases your build time and binary size, and that TensorFlow only supports compute capabilities >= 3.5 [Default is: 6.0]: 6.0
+
 
 Do you want to use clang as CUDA compiler? [y/N]: 
 nvcc will be used as CUDA compiler.
@@ -252,7 +265,7 @@ Please specify which gcc should be used by nvcc as the host compiler. [Default i
 Do you wish to build TensorFlow with MPI support? [y/N]: 
 No MPI support will be enabled for TensorFlow.
 
-Please specify optimization flags to use during compilation when bazel option "--config=opt" is specified [Default is -march=native]: 
+Please specify optimization flags to use during compilation when bazel option "--config=opt" is specified [Default is -march=native -Wno-sign-compare]: 
 
 
 Would you like to interactively configure ./WORKSPACE for Android builds? [y/N]: 
@@ -264,6 +277,16 @@ Preconfigured Bazel build configs. You can use any of the below by adding "--con
         --config=gdr            # Build with GDR support.
         --config=verbs          # Build with libverbs support.
         --config=ngraph         # Build with Intel nGraph support.
+        --config=numa           # Build with NUMA support.
+        --config=dynamic_kernels        # (Experimental) Build kernels into separate shared objects.
+Preconfigured Bazel build configs to DISABLE default on features:
+        --config=noaws          # Disable AWS S3 filesystem support.
+        --config=nogcp          # Disable GCP support.
+        --config=nohdfs         # Disable HDFS support.
+        --config=noignite       # Disable Apache Ignite support.
+        --config=nokafka        # Disable Apache Kafka support.
+        --config=nonccl         # Disable NVIDIA NCCL support.
+Configuration finished         # Build with Intel nGraph support.
 Configuration finished
 
 -- Build tensorflow using bazel --
@@ -274,6 +297,21 @@ add "--config=mkl" (For Intel MKL support for newer intel cpu for faster trainin
 add "--config=monolithic" (For static monolithic build. Try this option if a build fails.)
 add "--local_resources 2048,.5,1.0" (For devices with low ram causing Segmentation fault or other related errors.)
 
+-- CUDA 10.1 sym links --
+
+sudo cp /usr/lib/x86_64-linux-gnu/libcublas.so.10.1.0.105 /usr/local/cuda-10.1/lib64/
+sudo ln -s /usr/local/cuda-10.1/lib64/libcublas.so.10.1.0.105 /usr/local/cuda-10.1/lib64/libcublas.so.10.1
+sudo ln -s /usr/local/cuda-10.1/lib64/libcublas.so.10.1 /usr/local/cuda-10.1/lib64/libcublas.so
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcusolver.so.10.1 /usr/local/cuda-10.1/lib64/libcusolver.so.10.1
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcurand.so.10.1 /usr/local/cuda-10.1/lib64/libcurand.so.10.1
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcufft.so.10.1 /usr/local/cuda-10.1/lib64/libcufft.so.10.1
+
+
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcublas.so.10.1.0.105 /usr/lib/libcublas.so.10.1
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcusolver.so.10.1.105 /usr/lib/libcusolver.so.10.1 
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcudart.so.10.1.105 /usr/lib/libcudart.so.10.1
+
+sudo cp /usr/lib/x86_64-linux-gnu/libcublas* /usr/local/cuda-10.1/
 
 -- To fix ERROR: Config value cuda is not defined in any .rc file --
 
