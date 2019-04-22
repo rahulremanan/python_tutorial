@@ -239,7 +239,7 @@ def get_nb_files(directory):
       cnt += len(glob.glob(os.path.join(r, dr + "/*")))
   return cnt
 
-def add_top_layer(args, enable_dropout, base_model, nb_classes):
+def add_top_layer(args, base_model, nb_classes):
   """
     This functions adds a fully connected convolutional neural network layer to a base model.
     
@@ -251,127 +251,194 @@ def add_top_layer(args, enable_dropout, base_model, nb_classes):
   try:
       dropout = float(args.dropout[0])
       weight_decay = float(args.decay[0])
+      enable_dropout = args.enable_dropout[0]
   except:
       dropout = DEFAULT_DROPOUT
-      print ('Invalid input for dropout ...')
+      weight_decay = 0.01
+      enable_dropout = True
+      print ('Invalid user input ...')
       
   try:
       activation = str(args.activation[0]).lower()
       print ('Building model using activation function: ' + str(activation))
   except:
       activation = 'relu'
-      print ('Invalid input for activation function ...')
+      print ('Invalid user input for activation function ...')
       print ('Choice of activation functions: hard_sigmoid, elu, linear, relu, selu, sigmoid, softmax, softplus, sofsign, tanh ...')
       print ('Building model using default activation function: relu')
       
+  base_model.trainable = False
   bm = base_model.output
   
   x = Dropout(dropout,
-              name='dropout_fc1')(bm,
-                       training=enable_dropout)
-  x = GlobalAveragePooling2D(name='gloablAveragePooling2D_fc1')(x)
-  x = Dropout(dropout,
-              name='dropout_fc2')(x,
-                       training=enable_dropout)
-  x = BatchNormalization(name='batchNormalization_fc1')(x)
-  x = Dense(FC_SIZE, 
-            activation=activation,
-            kernel_regularizer=l2(weight_decay),
-            name='dense_fc1')(x)
-  x = Dropout(dropout,
-              name='dropout_fc3')(x,
-                       training=enable_dropout)
+              name='gloablDropout')(bm,
+                                      training=enable_dropout)
+  gap = GlobalAveragePooling2D(name='gloablAveragePooling2D')(x)
+  bn = BatchNormalization(name='gloabl_batchNormalization')(x)
   
-  x1 = Dense(FC_SIZE, 
-             activation=activation,
-             kernel_regularizer=l2(weight_decay),
-             name="dense_fc2")(x)
-  x1 = Dropout(dropout,
-               name = 'dropout_fc4')(x1, 
-                                  training=enable_dropout)
-  x1 = BatchNormalization(name="batchNormalization_fc2")(x1)
-  x1 = Dense(FC_SIZE, 
-             activation=activation, 
-             kernel_regularizer=l2(weight_decay),
-             name="dense_fc3")(x1)
-  x1 = Dropout(dropout,
-               name = 'dropout_fc5')(x1, 
-                                  training=enable_dropout)
-
-  x2 = Dense(FC_SIZE, 
-             activation=activation, 
-             kernel_regularizer=l2(weight_decay),
-             name="dense_fc4")(x)
-  x2 = Dropout(dropout,
-               name = 'dropout_fc6')(x2, 
-                                  training=enable_dropout)
-  x2 = BatchNormalization(name="batchNormalization_fc3")(x2)
-  x2 = Dense(FC_SIZE, 
-             activation=activation, 
-             kernel_regularizer=l2(weight_decay),
-             name="dense_fc5")(x2)
-  x2 = Dropout(dropout,
-               name = 'dropout_fc7')(x2, 
-                                  training=enable_dropout)
-
-  x12 = concatenate([x1, x2], name = 'mixed11')
-  x12 = Dropout(dropout,
-                name = 'dropout_fc8')(x12, 
-                                   training=enable_dropout)
-  x12 = Dense(FC_SIZE//16, 
-              activation=activation, 
+  enable_attention = args.enable_attention[0]
+  enable_multilayerDense = args.enable_multilayerDense[0]
+  ATTN_UNIT_SIZE = 256
+  ATTN_CONV_LAYER_DEPTH = 2
+  
+  if enable_attention:
+    """
+    Covolutional attention layers 
+    """
+    preTrained_featureSize = base_model.get_output_shape_at(0)[-1]
+    x = bn
+    for i in range(ATTN_CONV_LAYER_DEPTH):
+        x = Conv2D(ATTN_UNIT_SIZE, 
+                   kernel_size=(1,1),
+                   padding='same',
+                   activation=activation,
+                   name='convAttentionLayer_{}'.format(i))(x)
+        x = Dropout(dropout,
+                    name='attentionDropout_{}'.format(i))(x,
+                                               training=enable_dropout)
+    
+    
+    x = Conv2D(1, 
+               kernel_size=(1,1),
+               padding='valid',
+               activation=activation,
+               name='convAttentionLayer_1D')(x)
+    x = Dropout(dropout,
+                name='attentionDropout_1D')(x,
+                                           training=enable_dropout)
+    
+    upConv2d_weights = np.ones((1, 1, 1, 1, preTrained_featureSize))
+    
+    upConv2d = Conv2D(preTrained_featureSize,
+                      kernel_size = (1,1), 
+                      padding = 'same', 
+                      activation = 'linear', 
+                      use_bias = False, 
+                      weights = upConv2d_weights,
+                      name='upConv2d')
+    upConv2d.trainable = False
+    
+    x = upConv2d(x)
+    maskFeatures = multiply([x,
+                             bn],
+                            name='multiply_maskFeature')
+    
+    gapFeatures = GlobalAveragePooling2D(name='attentionGlobalAveragePooling_features')(maskFeatures)
+    gapMask = GlobalAveragePooling2D(name='attentionGlobalAveragePooling_mask')(x)
+  
+    gap = Lambda(lambda x: x[0]/x[1], 
+                 name = 'rescaleGlobalAeragePooling')([gapFeatures,
+                                                       gapMask])
+  if enable_multilayerDense:
+    x = Dropout(dropout,
+                name='dropout_fc1')(gap,
+                                    training=enable_dropout)
+    x = BatchNormalization(name='batchNormalization_fc1')(x)
+    x = Dense(FC_SIZE, 
+              activation=activation,
               kernel_regularizer=l2(weight_decay),
-              name = 'dense_fc6')(x12)
-  x12 = Dropout(dropout,
-                name = 'dropout_fc9')(x12, 
-                                   training=enable_dropout)
-  x12 = BatchNormalization(name="batchNormalization_fc4")(x12)
-  x12 = Dense(FC_SIZE//32, 
-              activation=activation, 
-              kernel_regularizer=l2(weight_decay),
-              name = 'dense_fc7')(x12)
-  x12 = Dropout(dropout,
-                name = 'dropout_fc10')(x12, 
-                                   training=enable_dropout)
+              name='dense_fc1')(x)
+    x = Dropout(dropout,
+                name='dropout_fc2')(x,
+                                    training=enable_dropout)
   
-  x3 = Dropout(dropout,
-              name='dropout_fc11')(bm,
-                       training=enable_dropout)
-  x3 = GlobalAveragePooling2D( name = 'globalAveragePooling2D_fc2')(x3)
-  x3 = Dense(FC_SIZE//2, 
-             activation=activation, 
-             kernel_regularizer=l2(weight_decay),
-             name = 'dense_fc8')(x3)
-  x3 = Dropout(dropout,
-               name = 'dropout_fc12')(x3, 
-                                  training=enable_dropout)
-  x3 = BatchNormalization(name="batchNormalization_fc5")(x3)
-  x3 = Dense(FC_SIZE//2, 
-             activation=activation, 
-             kernel_regularizer=l2(weight_decay),
-             name = 'dense_fc9')(x3)
-  x3 = Dropout(dropout,
-               name = 'dropout_fc13')(x3, 
-                                  training=enable_dropout)
-  
-  xout = concatenate([x12, x3], name ='mixed12')
-  xout = Dense(FC_SIZE//32, 
-               activation= activation, 
+    x1 = Dense(FC_SIZE, 
+               activation=activation,
                kernel_regularizer=l2(weight_decay),
-               name = 'dense_fc10')(xout)
-  xout = Dropout(dropout,
-                 name = 'dropout_fc14')(xout, 
-                                     training=enable_dropout)
+               name="dense_fc2")(x)
+    x1 = Dropout(dropout,
+                 name = 'dropout_fc3')(x1, 
+                                       training=enable_dropout)
+    x1 = BatchNormalization(name="batchNormalization_fc2")(x1)
+    x1 = Dense(FC_SIZE, 
+               activation=activation, 
+               kernel_regularizer=l2(weight_decay),
+               name="dense_fc3")(x1)
+    x1 = Dropout(dropout,
+                 name = 'dropout_fc4')(x1, 
+                                  training=enable_dropout)
+
+    x2 = Dense(FC_SIZE, 
+               activation=activation, 
+               kernel_regularizer=l2(weight_decay),
+               name="dense_fc4")(x)
+    x2 = Dropout(dropout,
+                 name = 'dropout_fc5')(x2, 
+                                  training=enable_dropout)
+    x2 = BatchNormalization(name="batchNormalization_fc3")(x2)
+    x2 = Dense(FC_SIZE, 
+               activation=activation, 
+               kernel_regularizer=l2(weight_decay),
+               name="dense_fc5")(x2)
+    x2 = Dropout(dropout,
+                 name = 'dropout_fc6')(x2, 
+                                       training=enable_dropout)
+
+    x12 = concatenate([x1, x2], name = 'mixed11')
+    x12 = Dropout(dropout,
+                  name = 'dropout_fc7')(x12, 
+                                        training=enable_dropout)
+    x12 = Dense(FC_SIZE//16, 
+                activation=activation, 
+                kernel_regularizer=l2(weight_decay),
+                name = 'dense_fc6')(x12)
+    x12 = Dropout(dropout,
+                  name = 'dropout_fc8')(x12, 
+                                        training=enable_dropout)
+    x12 = BatchNormalization(name="batchNormalization_fc4")(x12)
+    x12 = Dense(FC_SIZE//32, 
+                activation=activation, 
+                kernel_regularizer=l2(weight_decay),
+                name = 'dense_fc7')(x12)
+    x12 = Dropout(dropout,
+                  name = 'dropout_fc9')(x12, 
+                                         training=enable_dropout)
   
+    x3 = Dense(FC_SIZE//2, 
+               activation=activation, 
+               kernel_regularizer=l2(weight_decay),
+               name = 'dense_fc8')(gap)
+    x3 = Dropout(dropout,
+                 name = 'dropout_fc11')(x3, 
+                                  training=enable_dropout)
+    x3 = BatchNormalization(name="batchNormalization_fc5")(x3)
+    x3 = Dense(FC_SIZE//2, 
+               activation=activation, 
+               kernel_regularizer=l2(weight_decay),
+               name = 'dense_fc9')(x3)
+    x3 = Dropout(dropout,
+                 name = 'dropout_fc12')(x3, 
+                                        training=enable_dropout)
+  
+    xout = concatenate([x12, x3], name ='mixed12')
+    xout = Dense(FC_SIZE//32, 
+                 activation= activation, 
+                 kernel_regularizer=l2(weight_decay),
+                 name = 'dense_fc10')(xout)
+    xout = Dropout(dropout,
+                   name = 'dropout_fc13')(xout, 
+                                     training=enable_dropout)
+    
+  else:
+    x = BatchNormalization(name='batchNormalization_fc1')(gap)
+    xout = Dense(FC_SIZE, 
+                 activation=activation,
+                 kernel_regularizer=l2(weight_decay),
+                 name='dense_fc1')(x)
+    xout = Dropout(dropout,
+                   name = 'dropout_fc13')(xout, 
+                                          training=enable_dropout)
+    
   predictions = Dense(nb_classes,           \
                       activation='softmax', \
                       kernel_regularizer=l2(weight_decay),
                       name='prediction')(xout) # Softmax output layer
-  
   model = Model(inputs=base_model.input, 
                 outputs=predictions)
   
   return model
+
+
 
 def finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS):
   """
@@ -891,8 +958,7 @@ def gen_model(args, enable_dropout):
       base_model_name = 'Inception version 3'
   print ('\nBase model: ' + str(base_model_name))
   nb_classes = len(glob.glob(args.train_dir[0] + "/*"))
-  model = add_top_layer(args, 
-                        enable_dropout,
+  model = add_top_layer(args,
                         base_model, 
                         nb_classes)
   print ("New top layer added to: " + str(base_model_name))
@@ -1135,7 +1201,23 @@ def get_user_options():
                    required=False, 
                    default=[True], 
                    nargs=1, 
-                   type = string_to_bool)    
+                   type = string_to_bool)
+    
+    a.add_argument("--enable_attention", 
+                   help = "Specify if the dropout layer should be enabled during inference ...", 
+                   dest = "enable_attention", 
+                   required=False, 
+                   default=[True], 
+                   nargs=1, 
+                   type = string_to_bool)
+    
+    a.add_argument("--enable_multilayerDense", 
+                   help = "Specify if the dropout layer should be enabled during inference ...", 
+                   dest = "enable_multilayerDense", 
+                   required=False, 
+                   default=[False], 
+                   nargs=1, 
+                   type = string_to_bool)
     
     a.add_argument("--load_truncated", 
                    help = "Specify if truncated image loading should be supported ...", 
