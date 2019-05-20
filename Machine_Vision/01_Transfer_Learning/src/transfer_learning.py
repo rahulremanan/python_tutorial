@@ -440,7 +440,7 @@ def add_top_layer(args, base_model, nb_classes):
 
 
 
-def finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS):
+def finetune_model(model, base_model, optimizer, loss, NB_FROZEN_LAYERS):
   """
       A function that freezes the bottom NB_LAYERS and retrain the remaining top layers.
       
@@ -452,9 +452,9 @@ def finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS):
       
   """
                      
-  for layer in model.layers[:NB_FROZEN_LAYERS]:
+  for layer in base_model.layers[:NB_FROZEN_LAYERS]:
      layer.trainable = False
-  for layer in model.layers[NB_FROZEN_LAYERS:]:
+  for layer in base_model.layers[NB_FROZEN_LAYERS:]:
      layer.trainable = True
   model.compile(optimizer=optimizer, 
                 loss=loss, 
@@ -832,7 +832,7 @@ def process_model(args,
   if fine_tune_model == True:
       print ("\nFine tuning Inception architecture ...")
       print ("Frozen layers: " + str(NB_FROZEN_LAYERS))
-      model = finetune_model(model, optimizer, loss, NB_FROZEN_LAYERS)
+      model = finetune_model(model, base_model, optimizer, loss, NB_FROZEN_LAYERS)
   else:
       print ("\nTransfer learning using Inception architecture ...")
       model = transferlearn_model(model, base_model, optimizer, loss)
