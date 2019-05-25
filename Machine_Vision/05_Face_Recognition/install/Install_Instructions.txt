@@ -52,6 +52,14 @@ $ scons
 $ scons --python=/usr/bin/python3
 $ ldconfig -p | grep libboost_python
 
+## Install OpenBLAS
+
+$ sudo apt-get install libopenblas-dev liblapack-dev                 
+
+-- Or using source tar file from http://www.openblas.net --
+ 
+ $ make; sudo make install  
+
 ## Install dlib
 
 $ git clone https://github.com/davisking/dlib.git
