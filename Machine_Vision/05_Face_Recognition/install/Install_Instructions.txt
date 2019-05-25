@@ -16,7 +16,7 @@ $ wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
 
 # Unpack using:
 
-$ tar -xvf boost_1_70_0 
+$ tar -xvf boost_1_70_0.tar.gz 
 $ cd boost_1_70_0
 $ ./b2 --clean-all -n
 
