@@ -15,6 +15,10 @@ cd bazel
 
 $sudo ./compile.sh
 
+-- OR --
+
+$ env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" BAZEL_JAVAC_OPTS="-J-Xms384m -J-Xmx512m" bash ./compile.sh
+
 # Copy the new binary from output/bazel to /usr/local/bin directory.
 
 $sudo cp output/bazel /usr/local/bin/bazel
