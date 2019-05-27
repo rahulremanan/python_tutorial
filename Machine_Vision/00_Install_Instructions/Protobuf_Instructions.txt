@@ -1,5 +1,5 @@
 # Install protobuf from source 
-$ sudo apt-get install autoconf automake libtool curl make g++ git unzip cmake
+$ sudo apt-get install autoconf automake libtool curl make g++ git-all unzip cmake
 $ git clone https://github.com/google/protobuf.git
 $ cd protobuf
 $ git submodule update --init --recursive
