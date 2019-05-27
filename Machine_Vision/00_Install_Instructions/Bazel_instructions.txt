@@ -1,4 +1,7 @@
-# Install Protocol-buffer before installing bazel:
+# Install Protocol-buffer and JDK before installing bazel:
+
+-- JDK installation --
+sudo apt-get install -y openjdk-8-jdk
 
 # Get bazel installation source files:
 # Note: A simple git clone won't work for newest versions of bazel since the developer build process now needs bazel.
