@@ -5,7 +5,7 @@
 
 $wget https://github.com/bazelbuild/bazel/releases/download/0.25.3/bazel-0.25.3-dist.zip
 
-$unzip -d bazel bazel-0.25.3-dist.zip
+$unzip -q -d bazel bazel-0.25.3-dist.zip
 
 cd bazel
 
