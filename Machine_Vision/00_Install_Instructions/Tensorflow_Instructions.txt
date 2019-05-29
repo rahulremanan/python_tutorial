@@ -1,4 +1,7 @@
-sudo apt-get install -y libcupti-dev pkg-config zip gcc-5 g++-5 zlib1g-dev unzip python3-numpy python3-dev python3-pip python3-wheel
+sudo apt-get install -y pkg-config zip gcc-5 g++-5 zlib1g-dev unzip python3-numpy python3-dev python3-pip python3-wheel
+
+#For CUDA
+sudo apt-get install libcupti-dev
 
 git clone https://github.com/tensorflow/tensorflow 
 cd tensorflow
