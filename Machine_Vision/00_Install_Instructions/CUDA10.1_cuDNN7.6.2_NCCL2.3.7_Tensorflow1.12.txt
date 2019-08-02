@@ -375,6 +375,7 @@ $ python
 >>>sess = tf.Session()
 >>>print(tf.__version__)
 >>>print(sess.run(hello))
+>>>print(tf.test.gpu_device_name())
 
 -- Keras installation --
 
