@@ -55,15 +55,15 @@ source ~/.bashrc
 ldconfig
 nvidia-smi
 
--- Install TesnorRT 5.1 --
+-- Install TesnorRT 5.1 GA --
 (https://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html)
 
 Download tensorrt installer from https://developer.nvidia.com/nvidia-tensorrt-5x-download
 
-wget -O nv-tensorrt-repo-ubuntu1804-cuda10.1-trt5.1.2.2-rc-20190227_1-1_amd64.deb --download link--
+wget <--download link--> -O nv-tensorrt-repo-ubuntu1804-cuda10.1-trt5.1.5.0-ga-20190427_1-1_amd64.deb 
 
-$ sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.1-trt5.1.2.2-rc-20190227_1-1_amd64.deb
-$ sudo apt-key add /var/nv-tensorrt-repo-cuda10.1-trt5.1.2.2-rc-20190227/7fa2af80.pub
+$ sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.1-trt5.1.5.0-ga-20190427_1-1_amd64.deb
+$ sudo apt-key add /var/nv-tensorrt-repo-cuda10.1-trt5.1.5.0-ga-20190427/7fa2af80.pub
 
 $ sudo apt-get update
 $ sudo apt-get install -y tensorrt
