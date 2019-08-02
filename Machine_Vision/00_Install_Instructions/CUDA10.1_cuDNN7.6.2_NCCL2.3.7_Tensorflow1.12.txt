@@ -119,7 +119,12 @@ usr/local/cuda/lib64$ sudo rm libcudnn.so
 /usr/local/cuda/lib64$ sudo ln libcudnn.so.7 libcudnn.so
 $ sudo ldconfig
 
--- Install NCCL 2.4.2 --
+-- Install NCCL 2.4.8 --
+
+$ wget <DOWNLOAD LINK> -O nccl-repo-ubuntu1804-2.4.8-ga-cuda10.1_1-1_amd64.deb
+$ sudo dpkg -i nccl-repo-ubuntu1804-2.4.8-ga-cuda10.1_1-1_amd64.deb
+$ sudo apt-get update
+$ sudo apt install -y libnccl2 libnccl-dev
 
 Download os agnostic nccl from: https://developer.nvidia.com/nccl 
 
@@ -161,10 +166,12 @@ $ sudo pip3 install keras_applications --no-deps keras_preprocessing --no-deps h
 
 -- Install bazel --
 
+## Recommended method
+
 $ cd ~/
-$ wget https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-darwin-x86_64.sh
-$ chmod +x bazel-0.24.1-installer-darwin-x86_64.sh
-$ sudo ./bazel-0.24.1-installer-darwin-x86_64.sh
+$ wget https://github.com/bazelbuild/bazel/releases/download/0.26.1/bazel-0.26.1-installer-linux-x86_64.sh
+$ chmod +x bazel-0.26.1-installer-linux-x86_64.sh
+$ sudo ./bazel-0.26.1-installer-linux-x86_64.sh
 $ echo 'export PATH="$PATH:$HOME/bin"' >> ~/.bashrc
 
 $ source ~/.bashrc
@@ -172,9 +179,12 @@ $ sudo ldconfig
 
 -- Test bazel --
 
-whereis bazel
+$ whereis bazel
+$ bazel version
 
 -- Install bazel from apt repository --
+
+## Untested -- Can result in Bazel downgrade request
 
 $ sudo apt-get install -y openjdk-8-jdk
 
@@ -187,7 +197,7 @@ $ sudo apt-get upgrade -y bazel
 
 -- Removing bazel --
 
-$ rm $HOME/.cache/bazel -fr
+$ sudo rm $HOME/.cache/bazel -fr
 $ sudo rm /usr/local/bin/bazel /etc/bazelrc /home/rahul/bin/bazel /etc/bazel.bazelrc /usr/local/lib/bazel -fr
 
 -- Fetch and configure tensorflow --
@@ -200,7 +210,7 @@ $ git checkout
 
 -- For a specific tensorflow version --
 
-$ git checkout r1.12
+$ git checkout r1.15
 
 $ ./configure
 
