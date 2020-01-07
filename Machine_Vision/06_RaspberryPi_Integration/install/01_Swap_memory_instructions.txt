@@ -15,6 +15,23 @@ Insert a USB drive, and find the drive path for the device:
     sudo /sbin/mkswap /dev/hda8
     sudo swapon -a
 
+Create an exFat partiton
+
+    sudo apt-get clean
+    sudo fdisk -l | grep '^Disk'
+    sudo fdisk /dev/sdb1
+       n -- New partition
+       w -- Write partition and exit
+    sudo apt install exfat-utils exfat-fuse
+    sudo mkfs.extfat /dev/sdb1 
+    -- OR --
+    sudo mkfs.ext3 /dev/sdb1
+    sudo mkdir /disk1
+    sudo mount /dev/sdb1 /disk1
+    df -H
+    
+    umount /dev/sdb1
+
 If your swap disk size is not enough you would like to create swap file and use it:
 
     Create swap file:
