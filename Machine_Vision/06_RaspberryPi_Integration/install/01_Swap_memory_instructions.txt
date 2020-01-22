@@ -25,7 +25,7 @@ Create an exFat partiton
     sudo apt install exfat-utils exfat-fuse
     sudo mkfs.extfat /dev/sdb1 
     -- OR --
-    sudo mkfs.ext3 /dev/sdb1
+    sudo mkfs.ext4 /dev/sdb1
     sudo mkdir /disk1
     sudo mount /dev/sdb1 /disk1
     df -H
