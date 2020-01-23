@@ -26,8 +26,8 @@ Create an exFat partiton
     sudo mkfs.extfat /dev/sdb1 
     -- OR --
     sudo mkfs.ext4 /dev/sdb1
-    sudo mkdir /disk1
-    sudo mount /dev/sdb1 /disk1
+    sudo mkdir /mnt/disk1
+    sudo mount /dev/sdb1 /mnt/disk1
     df -H
     
     umount /dev/sdb1
@@ -35,19 +35,19 @@ Create an exFat partiton
 If your swap disk size is not enough you would like to create swap file and use it:
 
     Create swap file:
-    sudo fallocate -l 10g /mnt/10GB.swap
-    sudo chmod 600 /mnt/10GB.swap
+    sudo fallocate -l 10g /mnt/disk1/10GB.swap
+    sudo chmod 600 /mnt/disk1/10GB.swap
 
     OR
 
-    sudo dd if=/dev/zero of=/mnt/10GB.swap bs=1024 count=10485760
-    sudo chmod 600 /mnt/10GB.swap
+    sudo dd if=/dev/zero of=/mnt/disk1/10GB.swap bs=1024 count=10485760
+    sudo chmod 600 /mnt/disk1/10GB.swap
 
     Mount swap file:
-    sudo mkswap /mnt/10GB.swap
+    sudo mkswap /mnt/disk1/10GB.swap
 
     Enable swap file:
-    sudo swapon /mnt/10GB.swap
+    sudo swapon /mnt/disk1/10GB.swap
 
 ## Verify swap size:
     swapon -s
