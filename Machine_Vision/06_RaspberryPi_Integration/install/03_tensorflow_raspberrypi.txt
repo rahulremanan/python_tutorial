@@ -1,6 +1,6 @@
 -- Install linux dependencies for Tensorflow --
 
-sudo apt install python-dev python-pip
+sudo apt install python3-dev python3-pip
 
 -- Install Tensorflow pip package dependencies --
 
@@ -16,6 +16,15 @@ cd tensorflow
 -- Configure tensorflow installer --
 
 ./configure
+
+# Get python 3 executable path by:
+python3
+>>>import sys
+>>>print(sys.executable)
+>>>exit()
+# Typical location: /usr/bin/python3
+
+# Disable every options including XLA JIT during Tensorflow configuration
 
 -- Build Tensorflow installer using Bazel --
 
