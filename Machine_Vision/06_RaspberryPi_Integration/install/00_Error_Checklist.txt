@@ -1,0 +1,10 @@
+-- General guidelines to help troubleshoot embedded systems --
+01 -- Check the internet or firewall or proxy for connectivity issues
+02 -- df -h for disk space, since we are working with limited (~6GB) disk space
+03 -- htop and monitor system resources
+04 -- Always be swapping: remember to use swap memory since RAM is limited (~1GB)
+05 -- Light on CPU: schedule tasks to only a single core to prevent CPU lockups
+06 -- Always RTFM (Read the f**king manual or the install instructions)
+07 -- Remember you are in the AArch64 world and not in the AMD64
+08 -- When all else fails, build/compile from source
+09 -- Use sudo apt upgrade with caution
