@@ -47,7 +47,7 @@ sudo env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" BAZEL_JAVAC_OPTS="-
 
 -- Copy the bazel binary --
 
-sudo cp output/bazel /usr/local/bin/bazel
+sudo cp output/bazel /usr/local/bin/
 
 -- Check Bazel version --
 
