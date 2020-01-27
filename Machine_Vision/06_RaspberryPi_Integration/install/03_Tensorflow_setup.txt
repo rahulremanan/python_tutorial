@@ -30,35 +30,36 @@ python3
 
 # Validated:
 
-bazel --host_jvm_args=-Xmx512m  \
-      --host_jvm_args=-Xms256m  \
-      build --jobs HOST_CPUS-2 \
-            --ram_utilization_factor=50 \
-            --local_cpu_resources=HOST_CPUS-2 \
-            --local_ram_resources=HOST_RAM*.5 \
-            --config=opt \
-            --verbose_failures \
+bazel --output_user_root=/mnt/disk1/.cache/bazel/bazel       \
+      --host_jvm_args=-Xmx512m                               \
+      --host_jvm_args=-Xms256m                               \
+      build --jobs HOST_CPUS-2                               \
+            --ram_utilization_factor=50                      \
+            --local_cpu_resources=HOST_CPUS-2                \
+            --local_ram_resources=HOST_RAM*.5                \
+            --config=opt                                     \
+            --verbose_failures                               \
             //tensorflow/tools/pip_package:build_pip_package
 
 # Experimental:
 
-bazel build -c opt --copt="-mfpu=neon-vfpv4" \
-                   --copt="-funsafe-math-optimizations" \
-                   --copt="-ftree-vectorize" \
-                   --copt="-fomit-frame-pointer" \
-                   --local_resources 1024,1.0,1.0 \
-                   --verbose_failures \
+bazel build -c opt --copt="-mfpu=neon-vfpv4"                           \
+                   --copt="-funsafe-math-optimizations"                \
+                   --copt="-ftree-vectorize"                           \
+                   --copt="-fomit-frame-pointer"                       \
+                   --local_resources 1024,1.0,1.0                      \
+                   --verbose_failures                                  \
                    tensorflow/tools/pip_package:build_pip_package
 
 -- Or --
 # With explicit environment path:
 # Not validated:
 
-bazel build -c opt --copt="-mfpu=neon-vfpv4" \
-                   --copt="-funsafe-math-optimizations" \
-                   --copt="-ftree-vectorize" \
-                   --copt="-fomit-frame-pointer" \
-                   --local_resources 1024,1.0,1.0 \
-                   --verbose_failures \
-                   tensorflow/tools/pip_package:build_pip_package \
+bazel build -c opt --copt="-mfpu=neon-vfpv4"                          \
+                   --copt="-funsafe-math-optimizations"               \
+                   --copt="-ftree-vectorize"                          \
+                   --copt="-fomit-frame-pointer"                      \
+                   --local_resources 1024,1.0,1.0                     \
+                   --verbose_failures                                 \
+                   tensorflow/tools/pip_package:build_pip_package     \
                    --action_env="LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
