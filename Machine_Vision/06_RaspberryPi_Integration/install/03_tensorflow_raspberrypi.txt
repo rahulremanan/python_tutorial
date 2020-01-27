@@ -30,9 +30,13 @@ python3
 
 # Validated:
 
-bazel build --jobs 1 \
+bazel --host_jvm_args=-Xmx512m  \
+      --host_jvm_args=-Xms256m  \
+      build --jobs HOST_CPUS-2 \
+            --ram_utilization_factor=50 \
+            --local_cpu_resources=HOST_CPUS-2 \
+            --local_ram_resources=HOST_RAM*.5 \
             --config=opt \
-            --local_resources 1024,1.0,1.0 \
             --verbose_failures \
             //tensorflow/tools/pip_package:build_pip_package
 
