@@ -52,6 +52,12 @@ If your swap disk size is not enough you would like to create swap file and use 
 ## Verify swap size:
     swapon -s
 
+## If there is an error: device already mounted or mount point busy:
+
+ lsof | grep /dev/sdb1
+ 
+(List of open files with /dev/sdb1)
+ 
 -- Unverified --
 
 # Assign swap memory:
