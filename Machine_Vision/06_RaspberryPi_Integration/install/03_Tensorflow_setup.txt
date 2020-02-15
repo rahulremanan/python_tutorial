@@ -1,7 +1,26 @@
 -- Install linux dependencies for Tensorflow --
 
-sudo apt install python3-dev python3-pip python3-scipy python3-h5py 
-sudo pip3 install grpcio  grpcio-tools
+sudo apt install python3-dev python3-pip cython gfortran
+sudo pip3 install grpcio  grpcio-tools \
+                  absl-py astunparse gast \
+                  google-pasta opt-einsum \
+                  tensorboard tensorflow-estimator \
+                  termcolor wrapt Cython\
+                  setuptools pybind11 Sphinx 
+
+-- Install scipy --
+
+git clone https://github.com/scipy/scipy.git
+
+cd scipy
+git clean -xdf
+python3 setup.py install --user
+
+-- Install h5py --
+
+git clone http://github.com/yourname/h5py
+cd ./h5py; git checkout
+
 
 -- Install Tensorflow pip package dependencies --
 
