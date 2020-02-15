@@ -1,31 +1,36 @@
-# Install Protocol-buffer and JDK before installing bazel:
+# Instructions to build the build tool that buildscp Tensorflow
+-- Install Tensorflow dependencies --
 
--- JDK installation --
-sudo apt-get install -y openjdk-8-jdk
+sudo apt-get update
+sudo apt install python3-dev python3-pip
+sudo pip3 install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
+sudo pip3 install -U --user keras_applications --no-deps keras_preprocessing --no-deps
 
-# Get bazel installation source files:
-# Note: A simple git clone won't work for newest versions of bazel since the developer build process now needs bazel.
+-- Install Bazel build dependencies --
 
-$wget https://github.com/bazelbuild/bazel/releases/download/0.25.3/bazel-0.25.3-dist.zip
+sudo apt install g++ unzip zip
+sudo apt-get install openjdk-11-jdk
 
-$unzip -q -d bazel bazel-0.25.3-dist.zip
+# Build Bazel using Bootstrap technique
 
-cd bazel
+-- Download and extract Bazel dist (architecture independent) zip file --
 
-## Resume bazel build process ##
+sudo wget https://github.com/bazelbuild/bazel/releases/download/2.0.0/bazel-2.0.0-dist.zip -O bazel.zip
+sudo mkdir ./bazel
+sudo unzip ./bazel.zip -d ./bazel
 
-# Compile bazel from source:
+-- Build Bazel --
 
-$sudo ./compile.sh
+sudo env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
 
--- OR --
+-- Copy the bazel binary --
 
-$ env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" BAZEL_JAVAC_OPTS="-J-Xms384m -J-Xmx512m" bash ./compile.sh
+sudo cp output/bazel /usr/local/bin/
 
-# Copy the new binary from output/bazel to /usr/local/bin directory.
+-- Check Bazel version --
 
-$sudo cp output/bazel /usr/local/bin/bazel
+bazel --version
 
 # Verify bazel installation:
 
-$bazel
+bazel

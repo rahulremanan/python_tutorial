@@ -30,7 +30,7 @@ python3
 
 # Validated:
 
-bazel --output_user_root=../.cache/bazel/bazel               \
+bazel --output_user_root=../.cache/bazel/                    \
       --host_jvm_args=-Xmx512m                               \
       --host_jvm_args=-Xms256m                               \
       build --jobs HOST_CPUS-3                               \
