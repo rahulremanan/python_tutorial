@@ -1,6 +1,7 @@
 -- Install linux dependencies for Tensorflow --
 
-sudo apt install python3-dev python3-pip python3-scipy python3-h5py
+sudo apt install python3-dev python3-pip python3-scipy python3-h5py 
+sudo pip3 install grpcio  grpcio-tools
 
 -- Install Tensorflow pip package dependencies --
 
@@ -70,4 +71,4 @@ bazel build -c opt --copt="-mfpu=neon-vfpv4"                          \
 
 # Install Tensorflow python package:
 
-sudo pip3 install /tmp/tensorflow_pkg/tensorflow*.whl
+sudo pip3 install /tmp/tensorflow_pkg/tensorflow*.whl --no-deps
