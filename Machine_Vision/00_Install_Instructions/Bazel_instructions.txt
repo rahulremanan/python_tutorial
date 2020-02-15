@@ -8,19 +8,18 @@ sudo pip3 install -U --user keras_applications --no-deps keras_preprocessing --n
 
 -- Install Bazel build dependencies --
 
-sudo apt install g++ unzip zip
-sudo apt-get install openjdk-11-jdk
+sudo apt install g++ unzip zip openjdk-11-jdk
 
 # Build Bazel using Bootstrap technique
 
 -- Download and extract Bazel dist (architecture independent) zip file --
 
-sudo wget https://github.com/bazelbuild/bazel/releases/download/2.0.0/bazel-2.0.0-dist.zip -O bazel.zip
+sudo wget https://github.com/bazelbuild/bazel/releases/download/2.1.0/bazel-2.1.0-dist.zip -O bazel.zip
 sudo mkdir ./bazel
 sudo unzip ./bazel.zip -d ./bazel
 
 -- Build Bazel --
-
+cd ./bazel
 sudo env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
 
 -- Copy the bazel binary --
