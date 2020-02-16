@@ -18,10 +18,13 @@ cd scipy
 git clean -xdf
 python3 setup.py install --user
 
--- Install h5py --
-cp /usr/lib/aarch64-linux-gnu/hdf5/serial/libhdf5.so /usr/lib/libhdf5.so
+-- Install h5py (verified) --
+
 git clone https://github.com/h5py/h5py
+
 cd ./h5py; git checkout; python3 setup.py install
+
+## (Not verified) ##
 pip3 install -v . --no-cache-dir
 sudo python3 setup.py build_ext --inplace --hdf5=/usr/lib/aarch64-linux-gnu/hdf5/serial
 sudo python3 setup.py install --hdf5=/usr/lib/aarch64-linux-gnu/hdf5/serial
@@ -96,3 +99,21 @@ bazel build -c opt --copt="-mfpu=neon-vfpv4"                          \
 # Install Tensorflow python package:
 
 sudo pip3 install /tmp/tensorflow_pkg/tensorflow*.whl --no-deps
+
+# Run a simple test for tensorflow:
+
+python3
+
+>>>import subprocess
+>>>print((subprocess.check_output("lscpu", shell=True).strip()).decode())
+>>>import tensorflow as tf
+
+>>>print('Using tensorflow version: {} ...'.format(tf.__version__))
+>>>print('Visible devices for tensorflow: {} ...'.format(tf.config.list_physical_devices()))
+
+>>>with tf.device('/cpu:0'):
+...    a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
+...    b = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[3, 2], name='b')
+...    c_cpu = tf.matmul(a, b)
+
+>>>print ('\nMatrix multiplication result using CPU: {}'.format(c_cpu))
