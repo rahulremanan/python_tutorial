@@ -101,6 +101,9 @@ bazel build -c opt --copt="-mfpu=neon-vfpv4"                          \
 sudo pip3 install /tmp/tensorflow_pkg/tensorflow*.whl --no-deps
 
 # Run a simple test for tensorflow:
+python3 -c "import tensorflow as tf;print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
+
+-- Another test using matrix multiplication --
 
 python3
 
