@@ -6,7 +6,7 @@ print('Visible devices for tensorflow: {} ...'.format(tf.config.list_physical_de
 print('Running tensorflow test: 1 ...')
 print(tf.reduce_sum(tf.random.normal([1000, 1000])))
 
-print('Running a tensorflow test: 2 ... ')
+print('Running tensorflow test: 2 ... ')
 
 with tf.device('/cpu:0'):
     a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
