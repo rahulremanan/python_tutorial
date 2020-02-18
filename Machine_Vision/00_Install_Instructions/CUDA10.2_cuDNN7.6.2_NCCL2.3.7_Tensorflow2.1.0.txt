@@ -176,11 +176,11 @@ $ sudo python3 -m pip install keras_applications --no-deps keras_preprocessing -
 $ sudo apt-get update
 $ sudo apt install python-dev python-pip python3-dev python3-pip
 $ sudo python3 -m pip install grpcio  grpcio-tools cycler kiwisolver \
-                            absl-py astunparse gast matplotlib     \
-                            google-pasta opt-einsum          \
-                            tensorboard tensorflow-estimator \
-                            termcolor wrapt Cython           \
-                            setuptools pybind11 Sphinx tables
+                              absl-py astunparse gast matplotlib     \
+                              google-pasta opt-einsum          \
+                              tensorboard tensorflow-estimator \
+                              termcolor wrapt Cython           \
+                              setuptools pybind11 Sphinx tables
 $ sudo python3 -m pip install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
 $ sudo python3 -m pip install -U --user keras_applications --no-deps keras_preprocessing --no-deps
 

@@ -10,19 +10,25 @@ sudo python3 -m pip install grpcio  grpcio-tools cycler kiwisolver \
                             termcolor wrapt Cython           \
                             setuptools pybind11 Sphinx tables
 
+-- Install numpy --
+sudo apt remove python3-numpy
+sudo python3 -m pip uninstall numpy
+git clone https://github.com/numpy/numpy
+git checkout
+python setup.py build -j 4 install --prefix $HOME/.local
+
 -- Install scipy --
 
 git clone https://github.com/scipy/scipy.git
 
-cd scipy
-git clean -xdf
+cd scipy; git clean -xdf
 python3 setup.py install --user
 
 -- Install h5py (verified) --
 
 git clone https://github.com/h5py/h5py
 
-cd ./h5py; git checkout; python3 setup.py install
+cd ./h5py; git checkout; python3 setup.py install --prefix $HOME/.local
 
 ## (Not verified) ##
 pip3 install -v . --no-cache-dir
@@ -32,9 +38,8 @@ sudo python3 setup.py install --hdf5=/usr/lib/aarch64-linux-gnu/hdf5/serial
 
 -- Install Tensorflow pip package dependencies --
 
-sudo pip3 install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
-sudo pip3 install -U --user keras_applications --no-deps
-sudo pip3 install -U --user keras_preprocessing --no-deps
+sudo python3 -m pip install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
+sudo python3 -m pip install -U --user keras_applications --no-deps keras_preprocessing --no-deps
 
 -- Get Tensorflow installation files --
 
