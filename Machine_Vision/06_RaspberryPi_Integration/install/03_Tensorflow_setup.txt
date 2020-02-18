@@ -3,8 +3,8 @@
 sudo apt install python3-dev python3-pip cython gfortran    \
                  libhdf5-103 libhdf5-dev hdf5-tools h5utils \
                  pkg-config libfreetype6-dev
-sudo python3 -m pip install grpcio  grpcio-tools             \
-                            absl-py astunparse gast          \
+sudo python3 -m pip install grpcio  grpcio-tools cycler kiwisolver \
+                            absl-py astunparse gast matplotlib     \
                             google-pasta opt-einsum          \
                             tensorboard tensorflow-estimator \
                             termcolor wrapt Cython           \

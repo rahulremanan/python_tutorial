@@ -175,6 +175,12 @@ $ sudo python3 -m pip install keras_applications --no-deps keras_preprocessing -
 
 $ sudo apt-get update
 $ sudo apt install python-dev python-pip python3-dev python3-pip
+$ sudo python3 -m pip install grpcio  grpcio-tools cycler kiwisolver \
+                            absl-py astunparse gast matplotlib     \
+                            google-pasta opt-einsum          \
+                            tensorboard tensorflow-estimator \
+                            termcolor wrapt Cython           \
+                            setuptools pybind11 Sphinx tables
 $ sudo python3 -m pip install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
 $ sudo python3 -m pip install -U --user keras_applications --no-deps keras_preprocessing --no-deps
 
@@ -290,10 +296,20 @@ add "--local_resources 2048,.5,1.0" (For devices with low ram causing Segmentati
 
 $ sudo bazel build -c opt --copt=-march="haswell" --config=cuda //tensorflow/tools/pip_package:build_pip_package
 
+-- Install tensorflow 2.1 dependencies --
+
+sudo python3 -m pip install opt-einsum google-pasta gast astor\
+                    tensorflow-estimator absl-py rsa cachetools\
+                    google-auth requests-oauthlib google-auth-oauthlib\
+                    grpcio markdown werkzeug protobuf tensorboard \
+                    termcolor wrapt
+
 -- Build python wheel installer and install python tf2.1 package --
 
 $ sudo bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
-$ sudo python3 -m pip install /tmp/tensorflow_pkg/tensorflow-*.whl
+$ sudo python3 -m pip install /tmp/tensorflow_pkg/tensorflow-*.whl 
+-- or --
+$ sudo python3 -m pip install /tmp/tensorflow_pkg/tensorflow-*.whl --no-deps
 
 -- Miscellaneous deployments --
 
