@@ -10,6 +10,9 @@ sudo python3 -m pip install grpcio  grpcio-tools cycler kiwisolver \
                             termcolor wrapt Cython           \
                             setuptools pybind11 Sphinx tables
 
+-- Display recently accessed or modified files in the last 30 min --
+find . -type f -amin -30
+
 -- Install numpy --
 sudo apt remove python3-numpy
 sudo python3 -m pip uninstall numpy
