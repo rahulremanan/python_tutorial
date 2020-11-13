@@ -1,48 +1,24 @@
-# Instructions to build the build tool that buildscp Tensorflow
+# Instructions to build the build tool that builds Tensorflow
 -- Install Tensorflow dependencies --
 
 sudo apt-get update
-sudo apt install python3-dev python3-pip
-sudo pip3 install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
-sudo pip3 install -U --user keras_applications --no-deps keras_preprocessing --no-deps
+sudo apt-gt install python3-dev python3-pip
+sudo python3 -m pip install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
+sudo python3 -m pip install -U --user keras_applications --no-deps keras_preprocessing --no-deps
 
 -- Install Bazel build dependencies --
 
-sudo apt install g++ unzip zip
-sudo apt-get install openjdk-11-jdk
+sudo apt-get install -y g++ unzip zip openjdk-11-jdk
 
 # Build Bazel using Bootstrap technique
 
 -- Download and extract Bazel dist (architecture independent) zip file --
 
-sudo wget https://github.com/bazelbuild/bazel/releases/download/2.0.0/bazel-2.0.0-dist.zip -O bazel.zip
+sudo wget https://github.com/bazelbuild/bazel/releases/download/3.7.0/bazel-3.7.0-dist.zip -O bazel.zip
 sudo mkdir ./bazel
-sudo unzip ./bazel.zip -d ./bazel
+sudo unzip -q ./bazel.zip -d ./bazel
 
--- Edit scripts/bootstrap/compile.sh (Optional) --
-
-sudo nano scripts/bootstrap/compile.sh
-
-## Move down to line 154, where you'll see the following block of code:
-
-Alt+G 154
-
-run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
-      -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VER$
-      -encoding UTF-8 ${BAZEL_JAVAC_OPTS} "@${paramfile}" 
-
-At the end of this block, add in the -J-Xmx500M flag, which sets the maximum size of the Java heap to 500 MB:
-
-run "${JAVAC}" -classpath "${classpath}" -sourcepath "${sourcepath}" \
-      -d "${output}/classes" -source "$JAVA_VERSION" -target "$JAVA_VER$
-      -encoding UTF-8 ${BAZEL_JAVAC_OPTS} "@${paramfile}"  -J-Xmx500M
-
--- Build Bazel --
-
-sudo env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
-
--- OR --
-##  (If the scripts/bootstrap/compile.sh file is not edited ...) 
+-- Build bazel --
 sudo env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" BAZEL_JAVAC_OPTS="-J-Xmx2g -J-Xms200m" bash ./compile.sh
 
 -- Copy the bazel binary --
