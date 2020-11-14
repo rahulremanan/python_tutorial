@@ -17,7 +17,7 @@ find . -type f -amin -30
 sudo apt remove python3-numpy
 sudo python3 -m pip uninstall numpy
 git clone https://github.com/numpy/numpy
-git checkout
+cd numpy; git checkout
 python setup.py build -j 4 install --prefix $HOME/.local
 
 -- Install scipy --
