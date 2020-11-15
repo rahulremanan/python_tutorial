@@ -11,14 +11,18 @@ sudo python3 -m pip install grpcio  grpcio-tools cycler kiwisolver \
                             setuptools pybind11 Sphinx tables
 
 -- Display recently accessed or modified files in the last 30 min --
+
 find . -type f -amin -30
 
 -- Install numpy --
+
 sudo apt remove python3-numpy
 sudo python3 -m pip uninstall numpy
 git clone https://github.com/numpy/numpy
 cd numpy; git checkout
 python3 setup.py build -j 4 install --prefix $HOME/.local
+## Test numpy install ##
+cd ../; python3 -c 'import numpy as np'
 
 -- Install scipy --
 
@@ -26,6 +30,8 @@ git clone https://github.com/scipy/scipy.git
 
 cd scipy; git clean -xdf
 python3 setup.py install --user
+## Test scipy install ##
+cd ../;python3 -c 'import scipy'
 
 -- Install h5py (verified) --
 
