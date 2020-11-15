@@ -76,7 +76,6 @@ bazel --output_user_root=../.cache/bazel/                    \
       --host_jvm_args=-Xmx512m                               \
       --host_jvm_args=-Xms256m                               \
       build --jobs HOST_CPUS-3                               \
-            --ram_utilization_factor=50                      \
             --local_cpu_resources=HOST_CPUS-3                \
             --local_ram_resources=HOST_RAM*.5                \
             --config=opt                                     \
