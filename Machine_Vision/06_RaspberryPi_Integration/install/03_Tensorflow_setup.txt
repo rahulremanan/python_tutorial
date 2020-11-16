@@ -39,12 +39,6 @@ git clone https://github.com/h5py/h5py
 
 cd ./h5py; git checkout; python3 setup.py install --prefix $HOME/.local
 
-## (Not verified) ##
-pip3 install -v . --no-cache-dir
-sudo python3 setup.py build_ext --inplace --hdf5=/usr/lib/aarch64-linux-gnu/hdf5/serial
-sudo python3 setup.py install --hdf5=/usr/lib/aarch64-linux-gnu/hdf5/serial
-
-
 -- Install Tensorflow pip package dependencies --
 
 sudo python3 -m pip install -U --user pip six numpy wheel setuptools mock 'future>=0.17.1'
@@ -60,10 +54,7 @@ cd tensorflow
 ./configure
 
 # Get python 3 executable path by:
-python3
->>>import sys
->>>print(sys.executable)
->>>exit()
+python3 -c 'import sys;print(sys.executable)'
 # Typical location: /usr/bin/python3
 
 # Disable every options including XLA JIT during Tensorflow configuration
@@ -75,9 +66,9 @@ python3
 bazel --output_user_root=../.cache/bazel/                    \
       --host_jvm_args=-Xmx512m                               \
       --host_jvm_args=-Xms256m                               \
-      build --jobs HOST_CPUS-3                               \
-            --local_cpu_resources=HOST_CPUS-3                \
-            --local_ram_resources=HOST_RAM*.5                \
+      build --jobs 1                                         \
+            --local_cpu_resources=1                          \
+            --local_ram_resources=512                        \
             --config=opt                                     \
             --verbose_failures                               \
             //tensorflow/tools/pip_package:build_pip_package
