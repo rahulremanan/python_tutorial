@@ -19,6 +19,7 @@ sudo mkdir ./bazel
 sudo unzip -q ./bazel.zip -d ./bazel
 
 -- Build bazel --
+cd ./bazel
 sudo env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" BAZEL_JAVAC_OPTS="-J-Xmx2g -J-Xms200m" bash ./compile.sh
 
 -- Copy the bazel binary --
