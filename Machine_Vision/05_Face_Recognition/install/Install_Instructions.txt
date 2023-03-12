@@ -12,12 +12,12 @@ $ sudo apt-get install -y build-essential g++ python-dev autotools-dev libicu-de
 
 # Download boost tar file: 
 
-$ wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
+$ wget https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.tar.gz
 
 # Unpack using:
 
-$ tar -xvf boost_1_70_0.tar.gz 
-$ cd boost_1_70_0
+$ tar -xvf boost_1_81_0.tar.gz
+$ cd boost_1_81_0
 $ ./b2 --clean-all -n
 
 If this is the first time installing boost, it should return an error: -bash: 
@@ -26,8 +26,8 @@ $ ./b2: No such file or directory
 # Install boost for Python3
 $ ./bootstrap.sh --prefix=/usr/ --with-python=/usr/bin/python3
 $ ./b2 -a --with-python --buildid=3
-$ n=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $NF}'`
-$ sudo ./b2 -a --with=all -j $n install
+sudo ./b2 -a --with=all -j 3 install
+
 
 # Test boost installation:
 $ whereis boost
@@ -39,6 +39,7 @@ $ ln -s /usr/boost_build/bin/bjam /usr/bin/bjam && \
 $ cd /usr/boost_1_64_0 && \
 $ echo "using python : 3.5 ;" >> /home/info/site-config.jam && \
 $ sudo sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/local.conf'
+$ n=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $NF}'`
 $ sudo ./b2 --with=all -j $n install
 $ sudo ./b2 --with-python toolset=gcc stage
 
@@ -58,7 +59,7 @@ $ sudo apt-get install libopenblas-dev liblapack-dev
 
 -- Or using source tar file from http://www.openblas.net --
  
- $ make; sudo make install  
+$ make; sudo make install  
 
 ## Install dlib
 

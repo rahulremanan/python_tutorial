@@ -29,7 +29,8 @@ cd ../; python3 -c 'import numpy as np'
 git clone https://github.com/scipy/scipy.git
 
 cd scipy; git clean -xdf
-python3 setup.py install --user
+python3 build 
+python setup.py install --prefix=$HOME/local
 ## Test scipy install ##
 cd ../;python3 -c 'import scipy'
 

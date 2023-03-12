@@ -14,9 +14,7 @@ sudo apt-get install -y g++ unzip zip openjdk-11-jdk
 
 -- Download and extract Bazel dist (architecture independent) zip file --
 
-sudo wget https://github.com/bazelbuild/bazel/releases/download/3.7.2/bazel-3.7.2-dist.zip -O bazel.zip
-sudo mkdir ./bazel
-sudo unzip -q ./bazel.zip -d ./bazel
+sudo wget https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel-4.0.0-dist.zip -O bazel.zip; mkdir ./bazel; unzip -q ./bazel.zip -d ./bazel
 
 -- Build bazel --
 cd ./bazel

@@ -1,10 +1,10 @@
 sudo apt-get update
 
-sudo apt-get install -y libasound2-dev build-essential cmake pkg-config libavcodec-dev libavformat-dev libswscale-dev python-dev python-numpy python3-dev python3-numpy libgtk2.0-dev checkinstall libjpeg-dev libdc1394-22-dev libxine2-dev libtbb-dev libqt4-dev libtheora-dev libvorbis-dev libxvidcore-dev libv4l-dev gstreamer1.0-dev gstreamer-plugins-base1.0-dev libopencore-amrnb-dev libopencore-amrwb-dev v4l-utils
+sudo apt-get install -y libasound2-dev build-essential cmake pkg-config libavcodec-dev libavformat-dev libswscale-dev python-dev python-numpy python3-dev python3-numpy libgtk2.0-dev checkinstall libjpeg-dev libdc1394-22-dev libxine2-dev libtbb-dev libqt4-dev libtheora-dev libvorbis-dev libxvidcore-dev libv4l-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libopencore-amrnb-dev libopencore-amrwb-dev v4l-utils
 
 -- Optional plugins --
 
-sudo apt-get install libgudev-1.0-dev libxt-dev libvorbis-dev libcdparanoia-dev libpango1.0-dev libtheora-dev libvisual-0.4-dev iso-codes libgtk-3-dev libraw1394-dev libiec61883-dev libavc1394-dev libv4l-dev libcairo2-dev libcaca-dev libspeex-dev libpng-dev libshout3-dev libjpeg-dev libaa1-dev libflac-dev libdv4-dev libtag1-dev libwavpack-dev libpulse-dev libsoup2.4-dev libbz2-dev libcdaudio-dev libdc1394-22-dev ladspa-sdk libass-dev libcurl4-gnutls-dev libdca-dev libdirac-dev libdvdnav-dev libexempi-dev libexif-dev libfaad-dev libgme-dev libgsm1-dev libiptcdata0-dev libkate-dev libmimic-dev libmms-dev libmodplug-dev libmpcdec-dev libofa0-dev libopus-dev librsvg2-dev librtmp-dev libschroedinger-dev libslv2-dev libsndfile1-dev libsoundtouch-dev libspandsp-dev libx11-dev libxvidcore-dev libzbar-dev libzvbi-dev liba52-0.7.4-dev libcdio-dev libdvdread-dev libmad0-dev libmp3lame-dev libmpeg2-4-dev libopencore-amrnb-dev libopencore-amrwb-dev libsidplay1-dev libtwolame-dev libx264-dev
+sudo apt-get install libgudev-1.0-dev libxt-dev libvorbis-dev libcdparanoia-dev libpango1.0-dev libtheora-dev libvisual-0.4-dev iso-codes libgtk-3-dev libraw1394-dev libiec61883-dev libv4l-dev libcairo2-dev libcaca-dev libspeex-dev libpng-dev libshout3-dev libjpeg-dev libaa1-dev libflac-dev libdv4-dev libtag1-dev libwavpack-dev libpulse-dev libsoup2.4-dev libbz2-dev libcdaudio-dev ladspa-sdk libass-dev libcurl4-gnutls-dev libdca-dev libdvdnav-dev libexempi-dev libexif-dev libfaad-dev libgme-dev libgsm1-dev libiptcdata0-dev libkate-dev libmms-dev libmodplug-dev libmpcdec-dev libofa0-dev libopus-dev librsvg2-dev librtmp-dev libsndfile1-dev libsoundtouch-dev libspandsp-dev libx11-dev libxvidcore-dev libzbar-dev libzvbi-dev liba52-0.7.4-dev libcdio-dev libdvdread-dev libmad0-dev libmp3lame-dev libmpeg2-4-dev libopencore-amrnb-dev libopencore-amrwb-dev libsidplay1-dev libtwolame-dev libx264-dev
 
 # Install YASM:
 
@@ -43,7 +43,7 @@ make install
 
 function build_h264 {
     # h.264 video encoder
-    cd /usr/src
+    # cd /usr/src
     git clone git://git.videolan.org/x264
     cd x264
 
@@ -77,9 +77,9 @@ function build_lame {
 
 # Install AAC encoder:
 
-wget http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
-tar xzvf faac-1.28.tar.gz
-cd faac-1.28
+wget https://onboardcloud.dl.sourceforge.net/project/faac/faac-src/faac-1.29/faac-1.29.9.2.tar.gz
+    tar xzvf faac-1.29.9.2.tar.gz
+    cd faac-1.29.9.2
 
 nano +126 common/mp4v2/mpeg4ip.h;
 
@@ -93,10 +93,10 @@ make install
 
 function build_faac {
     # aac encoder
-    cd /usr/src
-    wget http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
-    tar xzvf faac-1.28.tar.gz
-    cd faac-1.28
+    # cd /usr/src
+    wget https://onboardcloud.dl.sourceforge.net/project/faac/faac-src/faac-1.29/faac-1.29.9.2.tar.gz
+    tar xzvf faac-1.29.9.2.tar.gz
+    cd faac-1.29.9.2
     ./configure
     make
     make install
@@ -154,6 +154,9 @@ $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 # For installation without GTK and explicit python location pointers
 
 -- Python3 --
+python3 -m pip install find_libpython
+from find_libpython import find_libpython
+find_libpython()
 
 $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D WITH_GTK=OFF \
@@ -161,16 +164,16 @@ $ sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D WITH_TBB=ON \
 	-D BUILD_NEW_PYTHON_SUPPORT=ON \
 	-D CMAKE_INSTALL_PREFIX=/usr/local \
-	-D PYTHON_EXECUTABLE=/usr/bin/python3.5 \
+	-D PYTHON_EXECUTABLE=/usr/bin/python3.9 \
 	-D WITH_V4L=ON \
 	-D WITH_QT=ON \
 	-D WITH_OPENGL=ON \
-	-D PYTHON_PACKAGES=/usr/local/lib/python3.5/dist-packages/ \
- 	-D PYTHON_LIBRARY=/usr/lib/arm-linux-gnueabihf/libpython3.5m.so \
-        -D PYTHON_INCLUDE_DIR=/usr/include/python3.5m/ \
+	-D PYTHON_PACKAGES=/usr/local/lib/python3.9/dist-packages/ \
+ 	-D PYTHON_LIBRARY=/usr/lib/aarch64-linux-gnu/libpython3.9.so.1.0 \
+        -D PYTHON_INCLUDE_DIR=/usr/include/python3.9m/ \
 	-D INSTALL_C_EXAMPLES=ON \
 	-D INSTALL_PYTHON_EXAMPLES=ON \
-	-D OPENCV_EXTRA_MODULES_PATH= ../opencv_contrib/modules \
+	-D OPENCV_EXTRA_MODULES_PATH= ../../opencv_contrib/modules \
 	-D BUILD_PROTOBUF=ON \
 	-D UPDATE_PROTO_FILES=ON \
 	-D BUILD_EXAMPLES=ON ..
