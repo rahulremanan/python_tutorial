@@ -1,3 +1,6 @@
+#GitHub hidden dependencies
+.GitHub/
+
 #Archives
 .archives/
 
